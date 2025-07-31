@@ -630,7 +630,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_storage_base64 (~> 3.0.0)
-  activeadmin (~> 3.3)
+  activeadmin
   annotaterb (~> 4.17.0)
   aws-sdk-s3 (~> 1.192)
   better_errors (~> 2.10)
