@@ -18,7 +18,7 @@ Rails.application.configure do
   config.server_timing = true
 
   # Allow requests from the host defined in SERVER_HOST env variable
-  config.hosts << ENV.fetch('SERVER_HOST', 'localhost')
+  # config.hosts << ENV.fetch('SERVER_HOST', 'localhost')
 
   # Enable/disable Action Controller caching. By default Action Controller caching is disabled.
   # Run rails dev:cache to toggle Action Controller caching.

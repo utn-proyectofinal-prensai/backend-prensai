@@ -5,7 +5,7 @@ module API
     class RegistrationsController < DeviseTokenAuth::RegistrationsController
       include API::Concerns::ActAsAPIRequest
       protect_from_forgery with: :null_session
-      
+
       rescue_from ActionController::ParameterMissing, with: :render_parameter_missing
 
       private
@@ -22,7 +22,7 @@ module API
         render json: { errors: Array.wrap(message:) }, status:
       end
 
-      def render_parameter_missing(exception)
+      def render_parameter_missing(_exception)
         render json: { errors: [{ message: I18n.t('api.errors.missing_param') }] }, status: :unprocessable_entity
       end
     end

@@ -32,13 +32,14 @@ Layout/ClassStructure:
 Layout/LineLength:
   Exclude:
     - db/**/*
+    - config/routes.rb
 
 Layout/SpaceBeforeFirstArg:
   Exclude:
     - app/views/api/**/**/*
 
 Lint/AmbiguousBlockAssociation:
-  AllowedMethods: change
+  AllowedMethods: [change]
 
 Lint/BinaryOperatorWithIdenticalOperands:
   Enabled: false
@@ -163,3 +164,5 @@ Style/StringConcatenation:
 RSpec/Dialect:
   Enabled: false
 
+Layout/EndOfLine:
+  EnforcedStyle: lf
