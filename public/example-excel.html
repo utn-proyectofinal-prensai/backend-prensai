@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Excel de Ejemplo - PrensAI</title>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        .btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .fields-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .field-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Generar Excel de Ejemplo - PrensAI</h1>
+        
+        <div class="info">
+            <h3>📋 Campos que debe tener tu Excel:</h3>
+            <div class="fields-list">
+                <div class="field-item">titulo</div>
+                <div class="field-item">tipoPublicacion</div>
+                <div class="field-item">fecha</div>
+                <div class="field-item">soporte</div>
+                <div class="field-item">medio</div>
+                <div class="field-item">seccion</div>
+                <div class="field-item">autor</div>
+                <div class="field-item">conductor</div>
+                <div class="field-item">entrevistado</div>
+                <div class="field-item">tema</div>
+                <div class="field-item">etiqueta1</div>
+                <div class="field-item">etiqueta2</div>
+                <div class="field-item">link</div>
+                <div class="field-item">alcance</div>
+                <div class="field-item">cotizacion</div>
+                <div class="field-item">tapa</div>
+                <div class="field-item">valoracion</div>
+                <div class="field-item">ejeComunicacional</div>
+                <div class="field-item">factorPolitico</div>
+                <div class="field-item">crisis</div>
+                <div class="field-item">gestion</div>
+                <div class="field-item">area</div>
+                <div class="field-item">mencion1</div>
+                <div class="field-item">mencion2</div>
+                <div class="field-item">mencion3</div>
+                <div class="field-item">mencion4</div>
+                <div class="field-item">mencion5</div>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="generateExampleExcel()">
+            📥 Generar Excel de Ejemplo
+        </button>
+        
+        <button class="btn" onclick="window.location.href='/import.html'">
+            🚀 Ir a Importar Noticias
+        </button>
+    </div>
+
+    <script>
+        function generateExampleExcel() {
+            // Datos de ejemplo
+            const exampleData = [
+                {
+                    titulo: 'Nueva tecnología revoluciona el mercado financiero',
+                    tipoPublicacion: 'Nota',
+                    fecha: '2024-01-15',
+                    soporte: 'Digital',
+                    medio: 'El País',
+                    seccion: 'Tecnología',
+                    autor: 'Carlos Ruiz',
+                    conductor: '',
+                    entrevistado: '',
+                    tema: 'Tecnología',
+                    etiqueta1: 'Fintech',
+                    etiqueta2: 'Innovación',
+                    link: 'https://ejemplo.com/noticia1',
+                    alcance: 'Internacional',
+                    cotizacion: 'Alta',
+                    tapa: 'No',
+                    valoracion: 'Positiva',
+                    ejeComunicacional: 'Innovación',
+                    factorPolitico: 'Bajo',
+                    crisis: 'No',
+                    gestion: 'Privada',
+                    area: 'Tecnología',
+                    mencion1: 'CEO',
+                    mencion2: 'Analista',
+                    mencion3: '',
+                    mencion4: '',
+                    mencion5: ''
+                },
+                {
+                    titulo: 'Análisis del impacto económico en América Latina',
+                    tipoPublicacion: 'Reportaje',
+                    fecha: '2024-01-14',
+                    soporte: 'Digital',
+                    medio: 'BBC Mundo',
+                    seccion: 'Economía',
+                    autor: 'María González',
+                    conductor: '',
+                    entrevistado: '',
+                    tema: 'Economía',
+                    etiqueta1: 'América Latina',
+                    etiqueta2: 'Análisis',
+                    link: 'https://ejemplo.com/noticia2',
+                    alcance: 'Internacional',
+                    cotizacion: 'Media',
+                    tapa: 'No',
+                    valoracion: 'Neutral',
+                    ejeComunicacional: 'Transparencia',
+                    factorPolitico: 'Alto',
+                    crisis: 'No',
+                    gestion: 'Mixta',
+                    area: 'Economía',
+                    mencion1: 'Ministro',
+                    mencion2: 'Economista',
+                    mencion3: 'Analista',
+                    mencion4: '',
+                    mencion5: ''
+                },
+                {
+                    titulo: 'Entrevista exclusiva con el presidente sobre políticas públicas',
+                    tipoPublicacion: 'Entrevista',
+                    fecha: '2024-01-13',
+                    soporte: 'Digital',
+                    medio: 'CNN',
+                    seccion: 'Política',
+                    autor: 'Juan Pérez',
+                    conductor: 'Ana López',
+                    entrevistado: 'Presidente de la República',
+                    tema: 'Política',
+                    etiqueta1: 'Entrevista',
+                    etiqueta2: 'Políticas Públicas',
+                    link: 'https://ejemplo.com/noticia3',
+                    alcance: 'Nacional',
+                    cotizacion: 'Alta',
+                    tapa: 'Sí',
+                    valoracion: 'Positiva',
+                    ejeComunicacional: 'Transparencia',
+                    factorPolitico: 'Alto',
+                    crisis: 'No',
+                    gestion: 'Pública',
+                    area: 'Política',
+                    mencion1: 'Presidente',
+                    mencion2: 'Ministro',
+                    mencion3: 'Asesor',
+                    mencion4: '',
+                    mencion5: ''
+                }
+            ];
+
+            // Crear workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(exampleData);
+
+            // Agregar worksheet al workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Noticias');
+
+            // Generar archivo
+            XLSX.writeFile(wb, 'noticias-ejemplo-prensai.xlsx');
+        }
+    </script>
+</body>
+</html> 

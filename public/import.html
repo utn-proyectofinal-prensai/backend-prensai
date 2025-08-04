@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importar Noticias - PrensAI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .file-input {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .file-input:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        .file-input input[type="file"] {
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+        .file-label {
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            pointer-events: none;
+        }
+        .file-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .submit-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .success {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid rgba(46, 204, 113, 0.5);
+        }
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+        }
+        .loading {
+            text-align: center;
+            color: #f39c12;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #f39c12;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Importar Noticias - PrensAI</h1>
+        
+        <form class="upload-form" id="uploadForm">
+            <div class="file-container">
+                <div class="file-input">
+                    <input type="file" id="excelFile" name="excel" accept=".xlsx,.xls" required>
+                    <div class="file-label">
+                        📁 Selecciona tu archivo Excel con noticias procesadas
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn">
+                🚀 Importar Noticias
+            </button>
+        </form>
+        
+        <div id="result" class="result" style="display: none;"></div>
+        
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-number" id="totalNoticias">0</div>
+                <div>Total Noticias</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="noticiasProcesadas">0</div>
+                <div>Procesadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="noticiasPorTema">0</div>
+                <div>Temas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="noticiasPorMedio">0</div>
+                <div>Medios</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const resultDiv = document.getElementById('result');
+        const statsDiv = document.getElementById('stats');
+        const submitBtn = document.getElementById('submitBtn');
+        const fileInput = document.getElementById('excelFile');
+        const fileLabel = document.querySelector('.file-label');
+
+        // Mostrar nombre del archivo seleccionado
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                fileLabel.textContent = `📁 ${file.name}`;
+                console.log('Archivo seleccionado:', file.name);
+            }
+        });
+
+        // Manejar envío del formulario
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!fileInput.files[0]) {
+                showResult('Por favor selecciona un archivo Excel', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('excel', fileInput.files[0]);
+            
+            // Mostrar loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Procesando...';
+            showResult('Procesando archivo Excel...', 'loading');
+            
+            try {
+                console.log('Enviando archivo...');
+                const response = await fetch('/api/news/import', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Respuesta recibida:', response.status);
+                const result = await response.json();
+                console.log('Resultado:', result);
+                
+                if (response.ok) {
+                    showResult(`
+                        ✅ <strong>Importación completada exitosamente!</strong><br><br>
+                        📊 <strong>Resumen:</strong><br>
+                        • Total procesadas: ${result.totalProcesadas}<br>
+                        • Importadas correctamente: ${result.importadas}<br>
+                        • Errores: ${result.errores}<br><br>
+                        ${result.errores > 0 ? `<strong>⚠️ Errores encontrados:</strong><br>${result.detalles.errores.map(e => `• Fila ${e.fila}: ${e.error}`).join('<br>')}` : ''}
+                    `, 'success');
+                    
+                    // Cargar estadísticas actualizadas
+                    loadStats();
+                } else {
+                    showResult(`❌ Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showResult(`❌ Error de conexión: ${error.message}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Importar Noticias';
+            }
+        });
+
+        function showResult(message, type) {
+            resultDiv.innerHTML = message;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/news/stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalNoticias').textContent = stats.totalNoticias;
+                document.getElementById('noticiasProcesadas').textContent = Object.values(stats.noticiasPorEstado).reduce((a, b) => a + b, 0);
+                document.getElementById('noticiasPorTema').textContent = Object.keys(stats.noticiasPorTema).length;
+                document.getElementById('noticiasPorMedio').textContent = Object.keys(stats.noticiasPorMedio).length;
+                
+                statsDiv.style.display = 'grid';
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        // Cargar estadísticas al cargar la página
+        loadStats();
+    </script>
+</body>
+</html> 
