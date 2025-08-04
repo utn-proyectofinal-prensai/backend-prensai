@@ -1,0 +1,168 @@
+inherit_from:
+  - .rubocop_todo.yml
+
+inherit_mode:
+  merge:
+    - Exclude
+
+plugins:
+  - rubocop-capybara
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-rspec_rails
+
+require:
+  - rubocop-factory_bot
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - bin/bundle
+    - bin/yarn
+    - config/initializers/pagy.rb
+    - config/initializers/strong_migrations.rb
+    - db/schema.rb
+    - node_modules/**/*
+
+Layout/ClassStructure:
+  Enabled: true
+
+Layout/LineLength:
+  Exclude:
+    - db/**/*
+    - config/routes.rb
+
+Layout/SpaceBeforeFirstArg:
+  Exclude:
+    - app/views/api/**/**/*
+
+Lint/AmbiguousBlockAssociation:
+  AllowedMethods: [change]
+
+Lint/BinaryOperatorWithIdenticalOperands:
+  Enabled: false
+
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: false
+
+Lint/RaiseException:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 15
+  Exclude:
+    - db/**/*
+
+Metrics/BlockLength:
+  Exclude:
+    - app/admin/**/*
+    - config/**/*
+    - spec/**/*
+
+Metrics/BlockNesting:
+  Max: 4
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/CyclomaticComplexity:
+  Max: 6
+
+Metrics/MethodLength:
+  Max: 24
+  Exclude:
+    - db/migrate/20250401200354_create_good_jobs.rb
+
+Metrics/ModuleLength:
+  Max: 200
+
+Metrics/PerceivedComplexity:
+  Max: 12
+
+Naming/RescuedExceptionsVariableName:
+  Enabled: false
+
+Rails/FilePath:
+  Enabled: false
+
+Rails/SaveBang:
+  Enabled: true
+
+Rails/ThreeStateBooleanColumn:
+  Enabled: true
+  Exclude:
+    - db/migrate/20250401200354_create_good_jobs.rb
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
+  Exclude:
+    - spec/policies/admin/application_policy_spec.rb
+    - spec/policies/admin/page_policy_spec.rb
+    - spec/policies/application_policy_spec.rb
+
+Style/ArrayCoercion:
+  Enabled: true
+
+Style/BlockDelimiters:
+  EnforcedStyle: braces_for_chaining
+
+Style/Documentation:
+  Enabled: false
+
+Style/ExpandPathArguments:
+  Enabled: false
+
+Style/GlobalStdStream:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: false
+
+Style/HashLikeCase:
+  MinBranchesCount: 4
+
+Style/HashTransformKeys:
+  Enabled: false
+
+Style/HashTransformValues:
+  Enabled: false
+
+Style/ModuleFunction:
+  Enabled: false
+
+Style/RedundantFetchBlock:
+  Enabled: false
+
+Style/RedundantFileExtensionInRequire:
+  Enabled: false
+
+Style/RedundantRegexpCharacterClass:
+  Enabled: false
+
+Style/ReturnNil:
+  Enabled: true
+
+Style/SafeNavigationChainLength:
+  Enabled: false
+
+Style/SlicingWithRange:
+  Enabled: false
+
+Style/StringConcatenation:
+  Enabled: false
+
+RSpec/Dialect:
+  Enabled: false
+
+Layout/EndOfLine:
+  EnforcedStyle: lf
