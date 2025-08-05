@@ -285,4 +285,65 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// POST /api/news/metrics - Calcular métricas de noticias seleccionadas
+router.post('/metrics', async (req, res) => {
+  try {
+    const { newsIds } = req.body;
+    
+    if (!newsIds || !Array.isArray(newsIds) || newsIds.length === 0) {
+      return res.status(400).json({ error: 'Se requieren IDs de noticias válidos' });
+    }
+
+    // Obtener las noticias seleccionadas
+    const selectedNews = await News.findAll({
+      where: {
+        id: newsIds
+      }
+    });
+
+    if (selectedNews.length === 0) {
+      return res.status(404).json({ error: 'No se encontraron noticias con los IDs proporcionados' });
+    }
+
+    // Calcular métricas por soporte
+    const soporteCounts = {};
+    let totalNoticias = selectedNews.length;
+
+    selectedNews.forEach(noticia => {
+      const soporte = noticia.soporte || 'Sin especificar';
+      soporteCounts[soporte] = (soporteCounts[soporte] || 0) + 1;
+    });
+
+    // Calcular porcentajes
+    const soporteMetrics = Object.entries(soporteCounts).map(([soporte, count]) => ({
+      soporte,
+      cantidad: count,
+      porcentaje: Math.round((count / totalNoticias) * 100)
+    }));
+
+    // Ordenar por cantidad descendente
+    soporteMetrics.sort((a, b) => b.cantidad - a.cantidad);
+
+    // Calcular métricas adicionales básicas
+    const metricas = {
+      totalNoticias,
+      soporte: soporteMetrics,
+      resumen: {
+        soportesUnicos: Object.keys(soporteCounts).length,
+        soporteMasFrecuente: soporteMetrics[0]?.soporte || 'N/A',
+        porcentajeSoporteMasFrecuente: soporteMetrics[0]?.porcentaje || 0
+      }
+    };
+
+    res.json({
+      message: 'Métricas calculadas correctamente',
+      metricas
+    });
+
+  } catch (error) {
+    console.error('Error calculando métricas:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 module.exports = router; 
