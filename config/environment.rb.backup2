@@ -1,0 +1,5 @@
+ENV["TZINFO_DATA_PATH"] = nil
+
+require_relative "application"
+
+Rails.application.initialize!

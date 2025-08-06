@@ -1,0 +1,22 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  host: localhost
+  port: 5432
+  username: postgres
+  password: admincito
+
+development:
+  <<: *default
+  database: prensai_development
+
+test:
+  <<: *default
+  database: prensai_test
+
+production:
+  <<: *default
+  database: prensai_production
+  username: prensai
+  password: admincito
