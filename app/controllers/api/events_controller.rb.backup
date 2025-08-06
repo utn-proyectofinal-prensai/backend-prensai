@@ -1,7 +1,7 @@
 class Api::EventsController < ApplicationController
-  # include JwtAuthenticatable
+  include JwtAuthenticatable
   
-  # before_action :authenticate_user!
+  before_action :authenticate_user!
   before_action :set_event, only: [:update, :destroy]
   
   # GET /api/events
@@ -71,6 +71,6 @@ class Api::EventsController < ApplicationController
   end
   
   def event_params
-    params.require(:event).permit(:name, :description, :color, :tags, :is_active)
+    params.require(:event).permit(:name, :description, :start_date, :end_date, :active, :category, :priority)
   end
 end
