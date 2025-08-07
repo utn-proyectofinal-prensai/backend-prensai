@@ -290,53 +290,254 @@ router.post('/metrics', async (req, res) => {
   try {
     const { newsIds } = req.body;
     
-    if (!newsIds || !Array.isArray(newsIds) || newsIds.length === 0) {
+    if (!newsIds || !Array.isArray(newsIds)) {
       return res.status(400).json({ error: 'Se requieren IDs de noticias válidos' });
     }
 
-    // Obtener las noticias seleccionadas
     const selectedNews = await News.findAll({
-      where: {
-        id: newsIds
-      }
+      where: { id: newsIds }
     });
 
     if (selectedNews.length === 0) {
       return res.status(404).json({ error: 'No se encontraron noticias con los IDs proporcionados' });
     }
 
-    // Calcular métricas por soporte
-    const soporteCounts = {};
-    let totalNoticias = selectedNews.length;
+    const totalNoticias = selectedNews.length;
 
+    // Contar por soporte
+    const soporteCounts = {};
     selectedNews.forEach(noticia => {
-      const soporte = noticia.soporte || 'Sin especificar';
+      const soporte = noticia.soporte || 'No especificado';
       soporteCounts[soporte] = (soporteCounts[soporte] || 0) + 1;
     });
 
-    // Calcular porcentajes
-    const soporteMetrics = Object.entries(soporteCounts).map(([soporte, count]) => ({
-      soporte,
-      cantidad: count,
-      porcentaje: Math.round((count / totalNoticias) * 100)
-    }));
+    // Contar por medio
+    const medioCounts = {};
+    selectedNews.forEach(noticia => {
+      const medio = noticia.medio || 'No especificado';
+      medioCounts[medio] = (medioCounts[medio] || 0) + 1;
+    });
 
-    // Ordenar por cantidad descendente
-    soporteMetrics.sort((a, b) => b.cantidad - a.cantidad);
+    // Contar por tema
+    const temaCounts = {};
+    selectedNews.forEach(noticia => {
+      const tema = noticia.tema || 'No especificado';
+      temaCounts[tema] = (temaCounts[tema] || 0) + 1;
+    });
 
-    // Calcular métricas adicionales básicas
-    const metricas = {
-      totalNoticias,
-      soporte: soporteMetrics,
-      resumen: {
-        soportesUnicos: Object.keys(soporteCounts).length,
-        soporteMasFrecuente: soporteMetrics[0]?.soporte || 'N/A',
-        porcentajeSoporteMasFrecuente: soporteMetrics[0]?.porcentaje || 0
+    // Contar por valoración
+    const valoracionCounts = {};
+    selectedNews.forEach(noticia => {
+      const valoracion = noticia.valoracion || 'No especificado';
+      valoracionCounts[valoracion] = (valoracionCounts[valoracion] || 0) + 1;
+    });
+
+    // Contar por eje comunicacional
+    const ejeComunicacionalCounts = {};
+    selectedNews.forEach(noticia => {
+      const ejeComunicacional = noticia.ejeComunicacional || 'No especificado';
+      ejeComunicacionalCounts[ejeComunicacional] = (ejeComunicacionalCounts[ejeComunicacional] || 0) + 1;
+    });
+
+    // Contar por factor político
+    const factorPoliticoCounts = {};
+    selectedNews.forEach(noticia => {
+      const factorPolitico = noticia.factorPolitico || 'No especificado';
+      factorPoliticoCounts[factorPolitico] = (factorPoliticoCounts[factorPolitico] || 0) + 1;
+    });
+
+    // Contar por crisis
+    const crisisCounts = {};
+    selectedNews.forEach(noticia => {
+      const crisis = noticia.crisis || 'No especificado';
+      crisisCounts[crisis] = (crisisCounts[crisis] || 0) + 1;
+    });
+
+    // Contar por gestión
+    const gestionCounts = {};
+    selectedNews.forEach(noticia => {
+      const gestion = noticia.gestion || 'No especificado';
+      gestionCounts[gestion] = (gestionCounts[gestion] || 0) + 1;
+    });
+
+    // Contar por área
+    const areaCounts = {};
+    selectedNews.forEach(noticia => {
+      const area = noticia.area || 'No especificado';
+      areaCounts[area] = (areaCounts[area] || 0) + 1;
+    });
+
+    // Análisis de menciones - Contar cuántas noticias tienen "Sí" en cada mención
+    let menciones1ConSi = 0;
+    let menciones2ConSi = 0;
+    let menciones3ConSi = 0;
+    let menciones4ConSi = 0;
+    let menciones5ConSi = 0;
+
+    // Función helper para verificar si una mención tiene "Sí" o derivados
+    const tieneMencionSi = (mencion) => {
+      if (!mencion) return false;
+      const mencionLower = mencion.toString().toLowerCase().trim();
+      return mencionLower === 'sí' || mencionLower === 'si' || mencionLower === 'yes' || 
+             mencionLower === 'true' || mencionLower === 'verdadero' || mencionLower === '1';
+    };
+
+    selectedNews.forEach(noticia => {
+      if (tieneMencionSi(noticia.mencion1)) menciones1ConSi++;
+      if (tieneMencionSi(noticia.mencion2)) menciones2ConSi++;
+      if (tieneMencionSi(noticia.mencion3)) menciones3ConSi++;
+      if (tieneMencionSi(noticia.mencion4)) menciones4ConSi++;
+      if (tieneMencionSi(noticia.mencion5)) menciones5ConSi++;
+    });
+
+    const mencionesAnalysis = {
+      totalNoticias: totalNoticias,
+      mencion1: {
+        cantidad: menciones1ConSi,
+        porcentaje: Math.round((menciones1ConSi / totalNoticias) * 100)
+      },
+      mencion2: {
+        cantidad: menciones2ConSi,
+        porcentaje: Math.round((menciones2ConSi / totalNoticias) * 100)
+      },
+      mencion3: {
+        cantidad: menciones3ConSi,
+        porcentaje: Math.round((menciones3ConSi / totalNoticias) * 100)
+      },
+      mencion4: {
+        cantidad: menciones4ConSi,
+        porcentaje: Math.round((menciones4ConSi / totalNoticias) * 100)
+      },
+      mencion5: {
+        cantidad: menciones5ConSi,
+        porcentaje: Math.round((menciones5ConSi / totalNoticias) * 100)
       }
     };
 
+    // Contar por menciones (mantener para compatibilidad con las pestañas)
+    const mencionesCounts = {};
+    selectedNews.forEach(noticia => {
+      const menciones = noticia.menciones || 'No especificado';
+      mencionesCounts[menciones] = (mencionesCounts[menciones] || 0) + 1;
+    });
+
+    // Función helper para convertir counts a métricas
+    const countsToMetrics = (counts) => {
+      return Object.entries(counts).map(([nombre, cantidad]) => ({
+        nombre,
+        cantidad,
+        porcentaje: Math.round((cantidad / totalNoticias) * 100)
+      }));
+    };
+
+    // Análisis de valoración para determinar si el tema es crítico
+    let valoracionesNegativas = 0;
+    let valoracionesPositivas = 0;
+    let valoracionesNeutras = 0;
+    let valoracionesNoEspecificadas = 0;
+
+    selectedNews.forEach(noticia => {
+      const valoracion = noticia.valoracion ? noticia.valoracion.toString().toLowerCase().trim() : '';
+      
+      if (valoracion === '') {
+        valoracionesNoEspecificadas++;
+      } else if (valoracion === 'negativa' || valoracion === 'negativo' || valoracion === 'negative') {
+        valoracionesNegativas++;
+      } else if (valoracion === 'positiva' || valoracion === 'positivo' || valoracion === 'positive') {
+        valoracionesPositivas++;
+      } else if (valoracion === 'neutra' || valoracion === 'neutral' || valoracion === 'neutro') {
+        valoracionesNeutras++;
+      } else if (valoracion === 'no_negativo' || valoracion === 'no negativo' || valoracion === 'no_negativa' || valoracion === 'no negativa') {
+        // NO_NEGATIVO se considera como no negativa (positiva o neutra)
+        valoracionesPositivas++;
+      } else {
+        valoracionesNoEspecificadas++;
+      }
+    });
+
+    // Determinar si el tema es crítico (5 o más valoraciones negativas)
+    const esTemaCritico = valoracionesNegativas >= 5;
+
+    const valoracionAnalysis = {
+      totalNoticias: totalNoticias,
+      negativas: {
+        cantidad: valoracionesNegativas,
+        porcentaje: Math.round((valoracionesNegativas / totalNoticias) * 100)
+      },
+      positivas: {
+        cantidad: valoracionesPositivas,
+        porcentaje: Math.round((valoracionesPositivas / totalNoticias) * 100)
+      },
+      neutras: {
+        cantidad: valoracionesNeutras,
+        porcentaje: Math.round((valoracionesNeutras / totalNoticias) * 100)
+      },
+      noEspecificadas: {
+        cantidad: valoracionesNoEspecificadas,
+        porcentaje: Math.round((valoracionesNoEspecificadas / totalNoticias) * 100)
+      },
+      esTemaCritico: esTemaCritico
+    };
+
+    // Convertir counts a métricas
+    const soporteMetrics = countsToMetrics(soporteCounts);
+    const medioMetrics = countsToMetrics(medioCounts);
+    const temaMetrics = countsToMetrics(temaCounts);
+    const valoracionMetrics = countsToMetrics(valoracionCounts);
+    const ejeComunicacionalMetrics = countsToMetrics(ejeComunicacionalCounts);
+    const factorPoliticoMetrics = countsToMetrics(factorPoliticoCounts);
+    const crisisMetrics = countsToMetrics(crisisCounts);
+    const gestionMetrics = countsToMetrics(gestionCounts);
+    const areaMetrics = countsToMetrics(areaCounts);
+    const mencionesMetrics = countsToMetrics(mencionesCounts);
+
+    // Calcular resumen
+    const soportesUnicos = Object.keys(soporteCounts).length;
+    const mediosUnicos = Object.keys(medioCounts).length;
+    const temasUnicos = Object.keys(temaCounts).length;
+    
+    const soporteMasFrecuente = Object.entries(soporteCounts).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+    const porcentajeSoporteMasFrecuente = Math.round((soporteCounts[soporteMasFrecuente] / totalNoticias) * 100);
+    
+    const medioMasFrecuente = Object.entries(medioCounts).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+    const temaMasFrecuente = Object.entries(temaCounts).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+
+    // Calcular fechas
+    const fechas = selectedNews.map(n => new Date(n.fecha)).filter(f => !isNaN(f));
+    const fechaMasAntigua = fechas.length > 0 ? new Date(Math.min(...fechas)).toISOString().split('T')[0] : 'No disponible';
+    const fechaMasReciente = fechas.length > 0 ? new Date(Math.max(...fechas)).toISOString().split('T')[0] : 'No disponible';
+    const rangoDias = fechas.length > 0 ? Math.ceil((Math.max(...fechas) - Math.min(...fechas)) / (1000 * 60 * 60 * 24)) + 1 : 0;
+
+    const metricas = {
+      totalNoticias,
+      soporte: soporteMetrics,
+      medio: medioMetrics,
+      tema: temaMetrics,
+      valoracion: valoracionMetrics,
+      ejeComunicacional: ejeComunicacionalMetrics,
+      factorPolitico: factorPoliticoMetrics,
+      crisis: crisisMetrics,
+      gestion: gestionMetrics,
+      area: areaMetrics,
+      menciones: mencionesMetrics,
+      resumen: {
+        soportesUnicos,
+        mediosUnicos,
+        temasUnicos,
+        soporteMasFrecuente,
+        porcentajeSoporteMasFrecuente,
+        medioMasFrecuente,
+        temaMasFrecuente,
+        fechaMasAntigua,
+        fechaMasReciente,
+        rangoDias
+      },
+      valoracionAnalysis: valoracionAnalysis,
+      mencionesAnalysis: mencionesAnalysis
+    };
+
     res.json({
-      message: 'Métricas calculadas correctamente',
+      message: 'Métricas calculadas exitosamente',
       metricas
     });
 
