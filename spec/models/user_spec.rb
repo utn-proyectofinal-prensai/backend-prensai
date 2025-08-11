@@ -15,12 +15,15 @@ describe User do
   end
 
   describe 'enums' do
-    it { is_expected.to define_enum_for(:role).with_values(user: 'user', admin: 'admin').backed_by_column_of_type(:string) }
+    it {
+      expect(subject).to define_enum_for(:role).with_values(user: 'user',
+                                                            admin: 'admin').backed_by_column_of_type(:string)
+    }
   end
 
   describe 'defaults' do
     it 'sets default role to user' do
-      user = User.new
+      user = described_class.new
       expect(user.role).to eq('user')
     end
   end

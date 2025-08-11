@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 describe 'POST api/v1/users' do
-  let(:admin) { create(:user, :admin) }
   subject { post api_v1_users_path, params:, headers: admin_headers, as: :json }
 
+  let(:admin) { create(:user, :admin) }
   let(:user) { User.last }
   let(:email) { 'test@example.com' }
-
   let(:params) do
     {
       user: {
@@ -19,8 +18,10 @@ describe 'POST api/v1/users' do
       }
     }
   end
-
   let(:admin_headers) { admin.create_new_auth_token }
+
+
+
 
   it 'returns a successful response' do
     subject

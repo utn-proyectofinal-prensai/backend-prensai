@@ -2,7 +2,7 @@
 
 module API
   module V1
-class SessionsController < Devise::SessionsController
+    class SessionsController < Devise::SessionsController
       include API::Concerns::ActAsAPIRequest
       protect_from_forgery with: :null_session
       respond_to :json

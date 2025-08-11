@@ -28,4 +28,3 @@ class JsonFailureApp < Devise::FailureApp
     request.path.start_with?('/api/')
   end
 end
-

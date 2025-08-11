@@ -3,7 +3,7 @@
 module API
   module V1
     class UsersController < API::V1::APIController
-      before_action :set_user, only: [:show, :update, :destroy]
+      before_action :set_user, only: %i[show update destroy]
 
       def index
         @users = policy_scope(User)
@@ -40,7 +40,7 @@ module API
       end
 
       def user_params
-        params.require(:user).permit(permitted_attributes(User))
+        params.expect(user: [permitted_attributes(User)])
       end
 
       def update_user_params
