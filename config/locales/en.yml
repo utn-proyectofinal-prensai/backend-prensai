@@ -10,3 +10,4 @@ en:
       invalid_content_type: Invalid content type header
       missing_param: A required param is missing
       not_found: Couldn't find the record
+      forbidden: You are not allowed to perform this action

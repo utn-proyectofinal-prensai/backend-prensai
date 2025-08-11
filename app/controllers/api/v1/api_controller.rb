@@ -15,6 +15,7 @@ module API
       rescue_from ActiveRecord::RecordNotFound,        with: :render_not_found
       rescue_from ActiveRecord::RecordInvalid,         with: :render_record_invalid
       rescue_from ActionController::ParameterMissing,  with: :render_parameter_missing
+      rescue_from Pundit::NotAuthorizedError,          with: :render_forbidden
 
       private
 
@@ -28,6 +29,10 @@ module API
 
       def render_parameter_missing(exception)
         render_error(exception, { message: I18n.t('api.errors.missing_param') }, :unprocessable_entity)
+      end
+
+      def render_forbidden(exception)
+        render_error(exception, { message: I18n.t('api.errors.forbidden') }, :forbidden)
       end
 
       def render_error(exception, errors, status)
