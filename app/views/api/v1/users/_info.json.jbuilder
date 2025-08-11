@@ -6,6 +6,7 @@ json.name       user.full_name
 json.username   user.username
 json.first_name user.first_name
 json.last_name  user.last_name
+json.role       user.role
 json.uid        user.uid
 json.provider   user.provider
 json.created_at user.created_at

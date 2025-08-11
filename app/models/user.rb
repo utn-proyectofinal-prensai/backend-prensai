@@ -5,24 +5,25 @@
 # Table name: users
 #
 #  id                     :integer          not null, primary key
+#  allow_password_change  :boolean          default(FALSE), not null
+#  current_sign_in_at     :datetime
+#  current_sign_in_ip     :inet
 #  email                  :string
 #  encrypted_password     :string           default(""), not null
-#  reset_password_token   :string
-#  reset_password_sent_at :datetime
-#  allow_password_change  :boolean          default(FALSE), not null
-#  sign_in_count          :integer          default(0), not null
-#  current_sign_in_at     :datetime
-#  last_sign_in_at        :datetime
-#  current_sign_in_ip     :inet
-#  last_sign_in_ip        :inet
 #  first_name             :string           default("")
 #  last_name              :string           default("")
+#  last_sign_in_at        :datetime
+#  last_sign_in_ip        :inet
+#  provider               :string           default("email"), not null
+#  reset_password_sent_at :datetime
+#  reset_password_token   :string
+#  role                   :string           default("user"), not null
+#  sign_in_count          :integer          default(0), not null
+#  tokens                 :json
+#  uid                    :string           default(""), not null
 #  username               :string           default("")
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  provider               :string           default("email"), not null
-#  uid                    :string           default(""), not null
-#  tokens                 :json
 #
 # Indexes
 #
@@ -39,6 +40,12 @@ class User < ApplicationRecord
   include DeviseTokenAuth::Concerns::User
 
   validates :uid, uniqueness: { scope: :provider }
+  
+  # Validaciones para el campo role
+  validates :role, presence: true, inclusion: { in: %w[admin user] }
+  
+  # Enumeración para roles
+  enum :role, { user: 'user', admin: 'admin' }, default: 'user'
 
   attribute :impersonated_by, :integer
 
@@ -46,10 +53,10 @@ class User < ApplicationRecord
 
   RANSACK_ATTRIBUTES = %w[id email first_name last_name username sign_in_count current_sign_in_at
                           last_sign_in_at current_sign_in_ip last_sign_in_ip provider uid
-                          created_at updated_at].freeze
+                          role created_at updated_at].freeze
 
   def self.from_social_provider(provider, user_params)
-    where(provider:, uid: user_params['id']).first_or_create! do |user|
+    where(provider: provider, uid: user_params['id']).first_or_create! do |user|
       user.password = Devise.friendly_token[0, 20]
       user.assign_attributes user_params.except('id')
     end
@@ -59,6 +66,11 @@ class User < ApplicationRecord
     return username if first_name.blank?
 
     "#{first_name} #{last_name}"
+  end
+
+  # Método helper para verificar si es admin
+  def admin?
+    role == 'admin'
   end
 
   private
