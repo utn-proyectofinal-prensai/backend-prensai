@@ -685,6 +685,7 @@ DEPENDENCIES
   pundit (~> 2.5)
   rack-cors (~> 3.0)
   rails (~> 8.0.2)
+  rails-i18n
   rails_best_practices (~> 1.20)
   reek (~> 6.5)
   rspec-openapi (~> 0.19)
