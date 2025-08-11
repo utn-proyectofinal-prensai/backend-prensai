@@ -129,11 +129,14 @@
 
 Rails.application.routes.draw do
   # Rutas de autenticación con devise-jwt
-  devise_for :users, path: '/api/v1/users', defaults: { format: :json }, controllers: {
-    registrations: 'api/v1/registrations',
-    sessions: 'api/v1/sessions',
-    passwords: 'api/v1/passwords'
-  }
+  devise_for :users,
+             path: '/api/v1/users',
+             defaults: { format: :json },
+             skip: [:registrations],
+             controllers: {
+               sessions: 'api/v1/sessions',
+               passwords: 'api/v1/passwords'
+             }
 
   namespace :api do
     namespace :v1, defaults: { format: :json } do
