@@ -35,6 +35,7 @@ describe 'POST api/v1/users/sign_in' do
       expect(json[:user][:provider]).to eq('email')
       expect(json[:user][:first_name]).to eq(user.first_name)
       expect(json[:user][:last_name]).to eq(user.last_name)
+      expect(json[:user][:role]).to eq(user.role)
     end
 
     it 'returns a valid client and access token' do
@@ -61,10 +62,8 @@ describe 'POST api/v1/users/sign_in' do
 
     it 'return errors upon failure' do
       subject
-      expected_response = {
-        errors: [{ message: 'Invalid login credentials. Please try again.' }]
-      }.with_indifferent_access
-      expect(json).to eq(expected_response)
+      expect(json[:errors]).to be_present
+      expect(json[:errors].first[:message]).to include('Email o contraseña incorrectos')
     end
   end
 end

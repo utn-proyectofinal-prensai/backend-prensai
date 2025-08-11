@@ -16,23 +16,49 @@ describe User do
   end
 
   describe 'enums' do
-    it 'defines role enum' do
-      expect(User.roles).to eq({ 'user' => 0, 'admin' => 1 })
-    end
+    it { is_expected.to define_enum_for(:role).with_values(user: 'user', admin: 'admin').backed_by_column_of_type(:string) }
+  end
 
-    it 'has user as default role' do
+  describe 'defaults' do
+    it 'sets default role to user' do
       user = User.new
       expect(user.role).to eq('user')
     end
   end
 
-  describe 'role methods' do
-    let(:user) { create(:user) }
-    let(:admin) { create(:user, :admin) }
+  describe '#admin?' do
+    context 'when user is admin' do
+      let(:user) { build(:user, role: 'admin') }
 
-    it 'admin? returns correct boolean' do
-      expect(user.admin?).to be false
-      expect(admin.admin?).to be true
+      it 'returns true' do
+        expect(user.admin?).to be true
+      end
+    end
+
+    context 'when user is not admin' do
+      let(:user) { build(:user, role: 'user') }
+
+      it 'returns false' do
+        expect(user.admin?).to be false
+      end
+    end
+  end
+
+  describe '#user?' do
+    context 'when user has user role' do
+      let(:user) { build(:user, role: 'user') }
+
+      it 'returns true' do
+        expect(user.user?).to be true
+      end
+    end
+
+    context 'when user is admin' do
+      let(:user) { build(:user, role: 'admin') }
+
+      it 'returns false' do
+        expect(user.user?).to be false
+      end
     end
   end
 

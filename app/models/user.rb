@@ -16,7 +16,7 @@
 #  provider               :string           default("email"), not null
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
-#  role                   :integer          default("user"), not null
+#  role                   :string           default("user"), not null
 #  sign_in_count          :integer          default(0), not null
 #  tokens                 :json
 #  uid                    :string           default(""), not null
@@ -41,7 +41,9 @@ class User < ApplicationRecord
   enum :role, { user: 0, admin: 1 }, default: :user
 
   validates :uid, uniqueness: { scope: :provider }
-  validates :role, presence: true
+  validates :role, presence: true, inclusion: { in: %w[admin user] }
+  
+  enum :role, { user: 'user', admin: 'admin' }, default: 'user'
 
   attribute :impersonated_by, :integer
 
@@ -49,10 +51,10 @@ class User < ApplicationRecord
 
   RANSACK_ATTRIBUTES = %w[id email first_name last_name username sign_in_count current_sign_in_at
                           last_sign_in_at current_sign_in_ip last_sign_in_ip provider uid
-                          created_at updated_at role].freeze
+                          role created_at updated_at].freeze
 
   def self.from_social_provider(provider, user_params)
-    where(provider:, uid: user_params['id']).first_or_create! do |user|
+    where(provider: provider, uid: user_params['id']).first_or_create! do |user|
       user.password = Devise.friendly_token[0, 20]
       user.assign_attributes user_params.except('id')
     end

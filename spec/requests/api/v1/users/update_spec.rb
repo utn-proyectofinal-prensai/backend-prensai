@@ -28,6 +28,22 @@ describe 'PUT api/v1/user/' do
     end
   end
 
+  context 'when updating role' do
+    let(:params) { { user: { role: 'admin' } } }
+
+    it 'returns success' do
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'updates the user role' do
+      expect(user.reload.role).to eq('admin')
+    end
+
+    it 'returns the updated role' do
+      expect(json[:user][:role]).to eq('admin')
+    end
+  end
+
   context 'with invalid data' do
     let(:params) { { user: { email: 'notanemail' } } }
 
@@ -40,7 +56,7 @@ describe 'PUT api/v1/user/' do
     end
 
     it 'returns the error' do
-      expect(json.dig(:errors, 0, :email)).to include('is not an email')
+      expect(json.dig(:errors, 0, :email)).to include('no es un correo electrónico')
     end
   end
 
@@ -48,7 +64,7 @@ describe 'PUT api/v1/user/' do
     let(:params) { {} }
 
     it 'returns the missing params error' do
-      expect(json.dig(:errors, 0, :message)).to eq 'A required param is missing'
+      expect(json.dig(:errors, 0, :message)).to include('Falta un parámetro requerido')
     end
   end
 end

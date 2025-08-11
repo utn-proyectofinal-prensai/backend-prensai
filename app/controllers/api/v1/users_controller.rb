@@ -44,7 +44,7 @@ module API
       end
 
       def update_user_params
-        params.require(:user).permit(permitted_attributes(@user))
+        params.expect(user: %i[username first_name last_name email role])
       end
     end
   end
