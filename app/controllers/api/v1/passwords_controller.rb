@@ -2,7 +2,7 @@
 
 module API
   module V1
-    class PasswordsController < DeviseTokenAuth::PasswordsController
+    class PasswordsController < Devise::PasswordsController
       include API::Concerns::ActAsAPIRequest
       protect_from_forgery with: :null_session
 
@@ -14,8 +14,12 @@ module API
         { allow_other_host: true }
       end
 
-      def render_error(status, message, _data = nil)
-        render json: { errors: Array.wrap(message:) }, status:
+      def respond_with(resource, _opts = {})
+        if resource.errors.empty?
+          head :no_content
+        else
+          render json: { errors: resource.errors.full_messages }, status: :unprocessable_entity
+        end
       end
 
       def render_parameter_missing(_exception)

@@ -2,28 +2,19 @@
 
 module API
   module V1
-    class SessionsController < DeviseTokenAuth::SessionsController
+class SessionsController < Devise::SessionsController
       include API::Concerns::ActAsAPIRequest
       protect_from_forgery with: :null_session
-
-      rescue_from ActionController::ParameterMissing, with: :render_parameter_missing
+      respond_to :json
 
       private
 
-      def resource_params
-        params.expect(user: %i[email password])
+      def respond_with(current_user, _opts = {})
+        render :create, formats: [:json], locals: { user: current_user }
       end
 
-      def render_create_success
-        render :create, formats: [:json]
-      end
-
-      def render_error(status, message, _data = nil)
-        render json: { errors: Array.wrap(message:) }, status:
-      end
-
-      def render_parameter_missing(_exception)
-        render json: { errors: [{ message: I18n.t('api.errors.missing_param') }] }, status: :unprocessable_entity
+      def respond_to_on_destroy
+        head :no_content
       end
     end
   end

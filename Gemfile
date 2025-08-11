@@ -13,7 +13,7 @@ gem 'aws-sdk-s3', '~> 1.192', require: false
 gem 'bootsnap', '~> 1.18'
 gem 'cssbundling-rails', '~> 1.4'
 gem 'devise', '~> 4.9'
-gem 'devise_token_auth', github: 'lynndylanhurley/devise_token_auth'
+gem 'devise-jwt', '~> 0.12.1'
 gem 'draper', '~> 4.0'
 gem 'faraday'
 gem 'flipper', '~> 1.3.5'

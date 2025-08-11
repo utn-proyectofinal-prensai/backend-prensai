@@ -2,7 +2,7 @@
 
 module API
   module V1
-    class RegistrationsController < DeviseTokenAuth::RegistrationsController
+    class RegistrationsController < Devise::RegistrationsController
       include API::Concerns::ActAsAPIRequest
       protect_from_forgery with: :null_session
 
@@ -14,12 +14,12 @@ module API
         params.expect(user: %i[email password password_confirmation username first_name last_name])
       end
 
-      def render_create_success
-        render :create, formats: [:json]
-      end
-
-      def render_error(status, message, _data = nil)
-        render json: { errors: Array.wrap(message:) }, status:
+      def respond_with(resource, _opts = {})
+        if resource.persisted?
+          render :create, formats: [:json], locals: { user: resource }
+        else
+          render json: { errors: resource.errors.full_messages }, status: :unprocessable_entity
+        end
       end
 
       def render_parameter_missing(_exception)

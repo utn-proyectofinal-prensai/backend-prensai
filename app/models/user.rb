@@ -13,13 +13,11 @@
 #  last_name              :string           default("")
 #  last_sign_in_at        :datetime
 #  last_sign_in_ip        :inet
-#  provider               :string           default("email"), not null
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
 #  role                   :integer          default("user"), not null
 #  sign_in_count          :integer          default(0), not null
 #  tokens                 :json
-#  uid                    :string           default(""), not null
 #  username               :string           default("")
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
@@ -29,44 +27,27 @@
 #  index_users_on_email                 (email) UNIQUE
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
 #  index_users_on_role                  (role)
-#  index_users_on_uid_and_provider      (uid,provider) UNIQUE
 #
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :trackable, :validatable
-  include DeviseTokenAuth::Concerns::User
+         :recoverable, :trackable, :validatable,
+         :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
 
   enum :role, { user: 0, admin: 1 }, default: :user
 
-  validates :uid, uniqueness: { scope: :provider }
   validates :role, presence: true
 
   attribute :impersonated_by, :integer
 
-  before_validation :init_uid
-
   RANSACK_ATTRIBUTES = %w[id email first_name last_name username sign_in_count current_sign_in_at
-                          last_sign_in_at current_sign_in_ip last_sign_in_ip provider uid
+                          last_sign_in_at current_sign_in_ip last_sign_in_ip
                           created_at updated_at role].freeze
-
-  def self.from_social_provider(provider, user_params)
-    where(provider:, uid: user_params['id']).first_or_create! do |user|
-      user.password = Devise.friendly_token[0, 20]
-      user.assign_attributes user_params.except('id')
-    end
-  end
 
   def full_name
     return username if first_name.blank?
 
     "#{first_name} #{last_name}"
-  end
-
-  private
-
-  def init_uid
-    self.uid = email if uid.blank? && provider == 'email'
   end
 end

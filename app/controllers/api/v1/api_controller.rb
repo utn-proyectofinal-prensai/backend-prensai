@@ -5,7 +5,6 @@ module API
     class APIController < ActionController::API
       include API::Concerns::ActAsAPIRequest
       include Pundit::Authorization
-      include DeviseTokenAuth::Concerns::SetUserByToken
 
       before_action :authenticate_user!
 
@@ -16,6 +15,10 @@ module API
       rescue_from ActiveRecord::RecordInvalid,         with: :render_record_invalid
       rescue_from ActionController::ParameterMissing,  with: :render_parameter_missing
       rescue_from Pundit::NotAuthorizedError,          with: :render_forbidden
+      rescue_from Warden::NotAuthenticated,            with: :render_unauthorized
+      rescue_from Warden::JWTAuth::Errors::RevokedToken, with: :render_unauthorized
+      rescue_from JWT::ExpiredSignature,               with: :render_unauthorized
+      rescue_from JWT::DecodeError,                    with: :render_unauthorized
 
       private
 
@@ -37,7 +40,11 @@ module API
 
       def render_error(exception, errors, status)
         logger.info { exception }
-        render json: { errors: Array.wrap(errors) }, status:
+        render json: { errors: Array.wrap(errors) }, status: status
+      end
+
+      def render_unauthorized(exception)
+        render_error(exception, { message: I18n.t('api.errors.unauthorized') }, :unauthorized)
       end
     end
   end
