@@ -5,30 +5,31 @@
 # Table name: users
 #
 #  id                     :integer          not null, primary key
+#  allow_password_change  :boolean          default(FALSE), not null
+#  current_sign_in_at     :datetime
+#  current_sign_in_ip     :inet
 #  email                  :string
 #  encrypted_password     :string           default(""), not null
-#  reset_password_token   :string
-#  reset_password_sent_at :datetime
-#  allow_password_change  :boolean          default(FALSE), not null
-#  sign_in_count          :integer          default(0), not null
-#  current_sign_in_at     :datetime
-#  last_sign_in_at        :datetime
-#  current_sign_in_ip     :inet
-#  last_sign_in_ip        :inet
 #  first_name             :string           default("")
 #  last_name              :string           default("")
+#  last_sign_in_at        :datetime
+#  last_sign_in_ip        :inet
+#  provider               :string           default("email"), not null
+#  reset_password_sent_at :datetime
+#  reset_password_token   :string
+#  role                   :string           default("user"), not null
+#  sign_in_count          :integer          default(0), not null
+#  tokens                 :json
+#  uid                    :string           default(""), not null
 #  username               :string           default("")
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  provider               :string           default("email"), not null
-#  uid                    :string           default(""), not null
-#  tokens                 :json
 #
 # Indexes
 #
-#  index_users_on_email                 (email) UNIQUE
-#  index_users_on_reset_password_token  (reset_password_token) UNIQUE
-#  index_users_on_uid_and_provider      (uid,provider) UNIQUE
+#  index_users_on_email                 :email UNIQUE
+#  index_users_on_reset_password_token  :reset_password_token UNIQUE
+#  index_users_on_uid_and_provider      :uid,provider UNIQUE
 #
 
 FactoryBot.define do
@@ -37,5 +38,15 @@ FactoryBot.define do
     password { Faker::Internet.password(min_length: 8) }
     username { Faker::Internet.unique.user_name }
     uid      { Faker::Internet.uuid }
+    role     { 'user' }
+
+    trait :admin do
+      role { 'admin' }
+    end
+
+    trait :with_name do
+      first_name { Faker::Name.first_name }
+      last_name  { Faker::Name.last_name }
+    end
   end
 end
