@@ -148,6 +148,7 @@ GEM
     brakeman (7.0.2)
       racc
     builder (3.3.0)
+    byebug (12.0.0)
     capybara (3.40.0)
       addressable
       matrix
@@ -270,6 +271,9 @@ GEM
       fugit (>= 1.11.0)
       railties (>= 6.1.0)
       thor (>= 1.0.0)
+    google-protobuf (4.30.2-arm64-darwin)
+      bigdecimal
+      rake (>= 13)
     google-protobuf (4.30.2-x64-mingw-ucrt)
       bigdecimal
       rake (>= 13)
@@ -370,6 +374,8 @@ GEM
       net-protocol
     newrelic_rpm (9.19.0)
     nio4r (2.7.4)
+    nokogiri (1.18.8-arm64-darwin)
+      racc (~> 1.4)
     nokogiri (1.18.8-x64-mingw-ucrt)
       racc (~> 1.4)
     octokit (10.0.0)
@@ -394,6 +400,9 @@ GEM
     pry (0.15.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    pry-byebug (3.11.0)
+      byebug (~> 12.0)
+      pry (>= 0.13, < 0.16)
     pry-rails (0.3.11)
       pry (>= 0.13.0)
     psych (5.2.6)
@@ -626,6 +635,7 @@ GEM
     zeitwerk (2.7.3)
 
 PLATFORMS
+  arm64-darwin-24
   x64-mingw-ucrt
 
 DEPENDENCIES
