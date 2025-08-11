@@ -40,11 +40,8 @@ class User < ApplicationRecord
   include DeviseTokenAuth::Concerns::User
 
   validates :uid, uniqueness: { scope: :provider }
-  
-  # Validaciones para el campo role
   validates :role, presence: true, inclusion: { in: %w[admin user] }
   
-  # Enumeración para roles
   enum :role, { user: 'user', admin: 'admin' }, default: 'user'
 
   attribute :impersonated_by, :integer
@@ -66,11 +63,6 @@ class User < ApplicationRecord
     return username if first_name.blank?
 
     "#{first_name} #{last_name}"
-  end
-
-  # Método helper para verificar si es admin
-  def admin?
-    role == 'admin'
   end
 
   private

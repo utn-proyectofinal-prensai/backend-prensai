@@ -27,9 +27,9 @@
 #
 # Indexes
 #
-#  index_users_on_email                 (email) UNIQUE
-#  index_users_on_reset_password_token  (reset_password_token) UNIQUE
-#  index_users_on_uid_and_provider      (uid,provider) UNIQUE
+#  index_users_on_email                 :email UNIQUE
+#  index_users_on_reset_password_token  :reset_password_token UNIQUE
+#  index_users_on_uid_and_provider      :uid,provider UNIQUE
 #
 
 FactoryBot.define do
@@ -38,5 +38,15 @@ FactoryBot.define do
     password { Faker::Internet.password(min_length: 8) }
     username { Faker::Internet.unique.user_name }
     uid      { Faker::Internet.uuid }
+    role     { 'user' }
+
+    trait :admin do
+      role { 'admin' }
+    end
+
+    trait :with_name do
+      first_name { Faker::Name.first_name }
+      last_name  { Faker::Name.last_name }
+    end
   end
 end

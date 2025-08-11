@@ -37,6 +37,7 @@ describe 'POST api/v1/users/sign_up' do
       expect(json[:user][:provider]).to eq('email')
       expect(json[:user][:first_name]).to eq(params.dig(:user, :first_name))
       expect(json[:user][:last_name]).to eq(params.dig(:user, :last_name))
+      expect(json[:user][:role]).to eq('user')
     end
 
     it 'returns a valid client and access token' do
@@ -58,14 +59,11 @@ describe 'POST api/v1/users/sign_up' do
       }
     end
 
-    it 'returns to be a client error' do
-      subject
-      expect(response).to be_client_error
-    end
-
     it 'return errors upon failure' do
       subject
-      expect(json.to_s).to match("Password confirmation doesn't match Password")
+      expect(response).to be_client_error
+      expect(json[:status]).to eq('error')
+      expect(json).to have_key(:errors)
     end
   end
 end

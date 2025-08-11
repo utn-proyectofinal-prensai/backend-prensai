@@ -27,9 +27,9 @@
 #
 # Indexes
 #
-#  index_users_on_email                 (email) UNIQUE
-#  index_users_on_reset_password_token  (reset_password_token) UNIQUE
-#  index_users_on_uid_and_provider      (uid,provider) UNIQUE
+#  index_users_on_email                 :email UNIQUE
+#  index_users_on_reset_password_token  :reset_password_token UNIQUE
+#  index_users_on_uid_and_provider      :uid,provider UNIQUE
 #
 
 describe User do
@@ -37,12 +37,60 @@ describe User do
     subject { build(:user) }
 
     it { is_expected.to validate_uniqueness_of(:uid).scoped_to(:provider) }
+    it { is_expected.to validate_presence_of(:role) }
 
     context 'when was created with regular login' do
       subject { build(:user) }
 
       it { is_expected.to validate_uniqueness_of(:email).case_insensitive.scoped_to(:provider) }
       it { is_expected.to validate_presence_of(:email) }
+    end
+  end
+
+  describe 'enums' do
+    it { is_expected.to define_enum_for(:role).with_values(user: 'user', admin: 'admin').backed_by_column_of_type(:string) }
+  end
+
+  describe 'defaults' do
+    it 'sets default role to user' do
+      user = User.new
+      expect(user.role).to eq('user')
+    end
+  end
+
+  describe '#admin?' do
+    context 'when user is admin' do
+      let(:user) { build(:user, role: 'admin') }
+
+      it 'returns true' do
+        expect(user.admin?).to be true
+      end
+    end
+
+    context 'when user is not admin' do
+      let(:user) { build(:user, role: 'user') }
+
+      it 'returns false' do
+        expect(user.admin?).to be false
+      end
+    end
+  end
+
+  describe '#user?' do
+    context 'when user has user role' do
+      let(:user) { build(:user, role: 'user') }
+
+      it 'returns true' do
+        expect(user.user?).to be true
+      end
+    end
+
+    context 'when user is admin' do
+      let(:user) { build(:user, role: 'admin') }
+
+      it 'returns false' do
+        expect(user.user?).to be false
+      end
     end
   end
 
