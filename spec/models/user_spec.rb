@@ -1,47 +1,38 @@
 # frozen_string_literal: true
 
-# == Schema Information
-#
-# Table name: users
-#
-#  id                     :integer          not null, primary key
-#  email                  :string
-#  encrypted_password     :string           default(""), not null
-#  reset_password_token   :string
-#  reset_password_sent_at :datetime
-#  allow_password_change  :boolean          default(FALSE), not null
-#  sign_in_count          :integer          default(0), not null
-#  current_sign_in_at     :datetime
-#  last_sign_in_at        :datetime
-#  current_sign_in_ip     :inet
-#  last_sign_in_ip        :inet
-#  first_name             :string           default("")
-#  last_name              :string           default("")
-#  username               :string           default("")
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  provider               :string           default("email"), not null
-#  uid                    :string           default(""), not null
-#  tokens                 :json
-#
-# Indexes
-#
-#  index_users_on_email                 (email) UNIQUE
-#  index_users_on_reset_password_token  (reset_password_token) UNIQUE
-#  index_users_on_uid_and_provider      (uid,provider) UNIQUE
-#
-
 describe User do
   describe 'validations' do
     subject { build(:user) }
 
     it { is_expected.to validate_uniqueness_of(:uid).scoped_to(:provider) }
+    it { is_expected.to validate_presence_of(:role) }
 
     context 'when was created with regular login' do
       subject { build(:user) }
 
       it { is_expected.to validate_uniqueness_of(:email).case_insensitive.scoped_to(:provider) }
       it { is_expected.to validate_presence_of(:email) }
+    end
+  end
+
+  describe 'enums' do
+    it 'defines role enum' do
+      expect(User.roles).to eq({ 'user' => 0, 'admin' => 1 })
+    end
+
+    it 'has user as default role' do
+      user = User.new
+      expect(user.role).to eq('user')
+    end
+  end
+
+  describe 'role methods' do
+    let(:user) { create(:user) }
+    let(:admin) { create(:user, :admin) }
+
+    it 'admin? returns correct boolean' do
+      expect(user.admin?).to be false
+      expect(admin.admin?).to be true
     end
   end
 
@@ -70,6 +61,11 @@ describe User do
         expect {
           described_class.from_social_provider('provider', params)
         }.to change(described_class, :count).by(1)
+      end
+
+      it 'creates user with default role' do
+        user = described_class.from_social_provider('provider', params)
+        expect(user.role).to eq('user')
       end
     end
 
