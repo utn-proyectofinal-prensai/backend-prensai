@@ -4,13 +4,12 @@ describe User do
   describe 'validations' do
     subject { build(:user) }
 
-    it { is_expected.to validate_uniqueness_of(:uid).scoped_to(:provider) }
     it { is_expected.to validate_presence_of(:role) }
 
     context 'when was created with regular login' do
       subject { build(:user) }
 
-      it { is_expected.to validate_uniqueness_of(:email).case_insensitive.scoped_to(:provider) }
+      it { is_expected.to validate_uniqueness_of(:email).case_insensitive }
       it { is_expected.to validate_presence_of(:email) }
     end
   end
@@ -50,33 +49,6 @@ describe User do
 
     it 'returns the correct name' do
       expect(user.full_name).to eq('John Doe')
-    end
-  end
-
-  describe '.from_social_provider' do
-    context 'when user does not exists' do
-      let(:params) { attributes_for(:user) }
-
-      it 'creates the user' do
-        expect {
-          described_class.from_social_provider('provider', params)
-        }.to change(described_class, :count).by(1)
-      end
-
-      it 'creates user with default role' do
-        user = described_class.from_social_provider('provider', params)
-        expect(user.role).to eq('user')
-      end
-    end
-
-    context 'when the user exists' do
-      let!(:user)  { create(:user, provider: 'provider', uid: 'user@example.com') }
-      let(:params) { attributes_for(:user).merge('id' => 'user@example.com') }
-
-      it 'returns the given user' do
-        expect(described_class.from_social_provider('provider', params))
-          .to eq(user)
-      end
     end
   end
 end

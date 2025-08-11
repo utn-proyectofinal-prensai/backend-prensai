@@ -7,13 +7,12 @@ class UserPolicy < ApplicationPolicy
 
   def create? = user.admin?
 
-  def update? = user.admin? || user.id == record.id
+  def update? = user.admin?
 
   def destroy? = user.admin? && user.id != record.id
 
   def permitted_attributes
-    base = %i[username first_name last_name email]
-    user.admin? ? base + %i[role password password_confirmation] : base
+    %i[username first_name last_name email role password password_confirmation]
   end
 
   class Scope < Scope

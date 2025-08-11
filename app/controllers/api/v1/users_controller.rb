@@ -16,14 +16,14 @@ module API
 
       def create
         authorize User, :create?
-        @user = User.new(create_user_params)
+        @user = User.new(user_params)
         @user.save!
         render :show, status: :created
       end
 
       def update
         authorize @user
-        @user.update!(update_user_params)
+        @user.update!(user_params)
         render :show
       end
 
@@ -39,12 +39,8 @@ module API
         @user = params[:id].present? ? User.find(params[:id]) : current_user
       end
 
-      def create_user_params
+      def user_params
         params.require(:user).permit(permitted_attributes(User))
-      end
-
-      def update_user_params
-        params.require(:user).permit(permitted_attributes(@user))
       end
     end
   end
