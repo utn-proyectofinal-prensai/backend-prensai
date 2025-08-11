@@ -10,5 +10,10 @@ FactoryBot.define do
     trait :admin do
       role { 'admin' }
     end
+
+    trait :with_name do
+      first_name { Faker::Name.first_name }
+      last_name  { Faker::Name.last_name }
+    end
   end
 end

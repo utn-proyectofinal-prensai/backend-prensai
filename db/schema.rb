@@ -200,7 +200,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_050500) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.json "tokens"
-    t.integer "role", default: 0, null: false
+    t.string "role", default: "user", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"

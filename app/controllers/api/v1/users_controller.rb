@@ -23,7 +23,7 @@ module API
 
       def update
         authorize @user
-        @user.update!(user_params)
+        @user.update!(update_user_params)
         render :show
       end
 
@@ -41,6 +41,10 @@ module API
 
       def user_params
         params.require(:user).permit(permitted_attributes(User))
+      end
+
+      def update_user_params
+        params.expect(user: %i[username first_name last_name email role])
       end
     end
   end

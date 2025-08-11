@@ -15,7 +15,7 @@
 #  last_sign_in_ip        :inet
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
-#  role                   :integer          default("user"), not null
+#  role                   :string           default("user"), not null
 #  sign_in_count          :integer          default(0), not null
 #  tokens                 :json
 #  username               :string           default("")
@@ -35,15 +35,15 @@ class User < ApplicationRecord
          :recoverable, :trackable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
 
-  enum :role, { user: 0, admin: 1 }, default: :user
-
-  validates :role, presence: true
+  validates :role, presence: true, inclusion: { in: %w[admin user] }
+  
+  enum :role, { user: 'user', admin: 'admin' }, default: 'user'
 
   attribute :impersonated_by, :integer
 
   RANSACK_ATTRIBUTES = %w[id email first_name last_name username sign_in_count current_sign_in_at
                           last_sign_in_at current_sign_in_ip last_sign_in_ip
-                          created_at updated_at role].freeze
+                          role created_at updated_at].freeze
 
   def full_name
     return username if first_name.blank?
