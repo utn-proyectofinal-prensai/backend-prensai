@@ -7,8 +7,8 @@ module App
         origins '*'
         resource '*',
                  headers: :any,
-                 methods: %i[get post options put delete],
-                 expose: %w[access-token uid client impersonated]
+                 methods: %i[get post options put patch delete],
+                 expose: %w[Authorization]
       end
     end
   end

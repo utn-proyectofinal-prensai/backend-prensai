@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/lynndylanhurley/devise_token_auth.git
-  revision: aedef3ca68d4e69bdc4a3e8987fa9d5f45420eec
-  specs:
-    devise_token_auth (1.2.5)
-      bcrypt (~> 3.0)
-      devise (> 3.5.2, < 5)
-      rails (>= 4.2.0, < 8.1)
-
-GIT
   remote: https://github.com/rootstrap/rspec-retry.git
   revision: 8266536fb6f4bc8d005c3863bcdfe8d7a6c9b203
   branch: add-intermittent-callback
@@ -180,6 +171,9 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
+    devise-jwt (0.12.1)
+      devise (~> 4.0)
+      warden-jwt_auth (~> 0.10)
     diff-lcs (1.6.2)
     docile (1.4.1)
     dotenv (3.1.8)
@@ -194,6 +188,9 @@ GEM
       request_store (>= 1.0)
       ruby2_keywords
     drb (2.2.3)
+    dry-auto_inject (1.1.0)
+      dry-core (~> 1.1)
+      zeitwerk (~> 2.6)
     dry-configurable (1.3.0)
       dry-core (~> 1.1)
       zeitwerk (~> 2.6)
@@ -244,6 +241,7 @@ GEM
     faraday-retry (2.3.2)
       faraday (~> 2.0)
     ffi (1.17.0)
+    fiddle (1.1.8)
     flipper (1.3.5)
       concurrent-ruby (< 2)
     flipper-active_record (1.3.5)
@@ -317,6 +315,8 @@ GEM
     jsbundling-rails (1.3.1)
       railties (>= 6.0.0)
     json (2.12.2)
+    jwt (2.10.2)
+      base64
     kaminari (1.2.2)
       activesupport (>= 4.1.0)
       kaminari-actionview (= 1.2.2)
@@ -382,6 +382,7 @@ GEM
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
     orm_adapter (0.5.0)
+    ostruct (0.6.3)
     pagy (9.3.5)
     parallel (1.27.0)
     parallel_tests (5.3.0)
@@ -618,6 +619,11 @@ GEM
     useragent (0.16.11)
     warden (1.2.9)
       rack (>= 2.0.9)
+    warden-jwt_auth (0.11.0)
+      dry-auto_inject (>= 0.8, < 2)
+      dry-configurable (>= 0.13, < 2)
+      jwt (~> 2.1)
+      warden (~> 1.2)
     webmock (3.25.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
@@ -647,16 +653,18 @@ DEPENDENCIES
   binding_of_caller (~> 1.0)
   bootsnap (~> 1.18)
   brakeman (~> 7.0)
+  byebug
   capybara (~> 3.40)
   cssbundling-rails (~> 1.4)
   devise (~> 4.9)
-  devise_token_auth!
+  devise-jwt (~> 0.12.1)
   dotenv-rails (~> 3.1.8)
   draper (~> 4.0)
   factory_bot_rails (~> 6.5)
   faker (~> 3.5)
   faraday
   faraday-retry (~> 2.3)
+  fiddle
   flipper (~> 1.3.5)
   flipper-active_record (~> 1.3.5)
   flipper-ui (~> 1.3.5)
@@ -670,6 +678,7 @@ DEPENDENCIES
   lograge (~> 0.14)
   newrelic_rpm (~> 9.19)
   octokit (~> 10.0)
+  ostruct
   pagy (~> 9.3)
   parallel_tests (~> 5.3)
   pg (~> 1.5)
@@ -681,6 +690,7 @@ DEPENDENCIES
   pundit (~> 2.5)
   rack-cors (~> 3.0)
   rails (~> 8.0.2)
+  rails-i18n
   rails_best_practices (~> 1.20)
   reek (~> 6.5)
   rspec-openapi (~> 0.19)

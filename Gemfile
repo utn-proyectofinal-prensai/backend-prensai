@@ -13,7 +13,7 @@ gem 'aws-sdk-s3', '~> 1.192', require: false
 gem 'bootsnap', '~> 1.18'
 gem 'cssbundling-rails', '~> 1.4'
 gem 'devise', '~> 4.9'
-gem 'devise_token_auth', github: 'lynndylanhurley/devise_token_auth'
+gem 'devise-jwt', '~> 0.12.1'
 gem 'draper', '~> 4.0'
 gem 'faraday'
 gem 'flipper', '~> 1.3.5'
@@ -29,12 +29,18 @@ gem 'pg', '~> 1.5'
 gem 'puma', '~> 6.6'
 gem 'pundit', '~> 2.5'
 gem 'rack-cors', '~> 3.0'
+gem 'rails-i18n'
 gem 'rswag-api', '~> 2.16.0'
 gem 'rswag-ui', '~> 2.16.0'
 gem 'sendgrid', '~> 1.2.4'
 gem 'sprockets-rails', '~> 3.5', '>= 3.5.2'
 gem 'strong_migrations', '~> 2.4'
 gem 'yaaf', '~> 3.0'
+
+# Gems para compatibilidad con Ruby 3.5.0+
+gem 'fiddle'
+gem 'ostruct'
+
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 4.0'
 # Use Active Model has_secure_password
@@ -44,6 +50,7 @@ gem 'yaaf', '~> 3.0'
 
 group :development, :test do
   gem 'annotaterb', '~> 4.17.0'
+  gem 'byebug'
   gem 'dotenv-rails', '~> 3.1.8'
   gem 'factory_bot_rails', '~> 6.5'
   gem 'faker', '~> 3.5'

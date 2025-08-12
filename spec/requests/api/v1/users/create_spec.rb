@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 describe 'POST api/v1/users' do
-  subject { post user_registration_path, params:, as: :json }
+  subject { post api_v1_users_path, params:, headers: admin_headers, as: :json }
 
+  let(:admin) { create(:user, :admin) }
   let(:user) { User.last }
   let(:email) { 'test@example.com' }
-
   let(:params) do
     {
       user: {
@@ -18,9 +18,10 @@ describe 'POST api/v1/users' do
       }
     }
   end
+  let(:admin_headers) { admin.create_new_auth_token }
 
-  it_behaves_like 'does not check authenticity token'
-  it_behaves_like 'there must not be a Set-Cookie in Header'
+
+
 
   it 'returns a successful response' do
     subject
@@ -36,8 +37,6 @@ describe 'POST api/v1/users' do
     expect(json[:user][:id]).to eq(user.id)
     expect(json[:user][:email]).to eq(user.email)
     expect(json[:user][:username]).to eq(user.username)
-    expect(json[:user][:uid]).to eq(user.uid)
-    expect(json[:user][:provider]).to eq('email')
     expect(json[:user][:first_name]).to eq(user.first_name)
     expect(json[:user][:last_name]).to eq(user.last_name)
   end

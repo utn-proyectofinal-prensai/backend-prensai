@@ -4,4 +4,7 @@ es:
     errors:
       invalid_content_type: Tipo de contenido inválido
       missing_param: Falta un parámetro requerido
-      not_found: No se encontró el registro 
+      not_found: No se encontró el registro
+      forbidden: No tenés permisos para realizar esta acción 
+      unauthorized: No estás autenticado o tu token expiró
+      invalid_credentials: Credenciales inválidas

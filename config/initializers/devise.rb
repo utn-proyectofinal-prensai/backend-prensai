@@ -23,6 +23,8 @@ Devise.setup do |config|
   # :mongoid (bson_ext recommended) by default. Other ORMs may be
   # available as additional gems.
   require 'devise/orm/active_record'
+  # API usa JSON; Admin (ActiveAdmin) usa HTML
+  config.navigational_formats = [:html]
 
   # ==> Configuration for any authentication mechanism
   # Configure which keys are used when authenticating a user. The default is
@@ -73,7 +75,7 @@ Devise.setup do |config|
   # It will change confirmation, password recovery and other workflows
   # to behave the same regardless if the e-mail provided was right or wrong.
   # Does not affect registerable.
-  # config.paranoid = true
+  config.paranoid = true
 
   # By default Devise will store the user in session. You can skip storage for
   # particular strategies by setting this option.
@@ -93,6 +95,11 @@ Devise.setup do |config|
   # requires the Devise mappings to be loaded during boot time the application
   # won't boot properly.
   config.reload_routes = false
+
+  # FailureApp JSON para 401
+  config.warden do |manager|
+    manager.failure_app = JsonFailureApp
+  end
 
   # ==> Configuration for :database_authenticatable
   # For bcrypt, this is the cost for hashing the password and defaults to 11. If

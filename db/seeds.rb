@@ -12,7 +12,7 @@ if Rails.env.development?
     last_name: 'Sistema',
     role: 'admin'
   )
-  
+
   # Crear usuario normal de prueba
   User.create!(
     email: 'user@prensai.com',

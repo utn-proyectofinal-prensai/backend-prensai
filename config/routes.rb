@@ -24,6 +24,12 @@
 #                              api_v1_user GET        /api/v1/user(.:format)                                                                            api/v1/users#show {format: :json}
 #                                          PATCH      /api/v1/user(.:format)                                                                            api/v1/users#update {format: :json}
 #                                          PUT        /api/v1/user(.:format)                                                                            api/v1/users#update {format: :json}
+#                             api_v1_users GET        /api/v1/users(.:format)                                                                           api/v1/users#index {format: :json}
+#                                          POST       /api/v1/users(.:format)                                                                           api/v1/users#create {format: :json}
+#                                          GET        /api/v1/users/:id(.:format)                                                                       api/v1/users#show {format: :json}
+#                                          PATCH      /api/v1/users/:id(.:format)                                                                       api/v1/users#update {format: :json}
+#                                          PUT        /api/v1/users/:id(.:format)                                                                       api/v1/users#update {format: :json}
+#                                          DELETE     /api/v1/users/:id(.:format)                                                                       api/v1/users#destroy {format: :json}
 #              must_update_api_v1_settings GET        /api/v1/settings/must_update(.:format)                                                            api/v1/settings#must_update {format: :json}
 #                   new_admin_user_session GET        /admin/login(.:format)                                                                            active_admin/devise/sessions#new
 #                       admin_user_session POST       /admin/login(.:format)                                                                            active_admin/devise/sessions#create
@@ -122,21 +128,23 @@
 # Routes for Rswag::Api::Engine:
 
 Rails.application.routes.draw do
-  scope format: :json do
-    mount_devise_token_auth_for 'User', at: '/api/v1/users', controllers: {
-      registrations: 'api/v1/registrations',
-      sessions: 'api/v1/sessions',
-      passwords: 'api/v1/passwords'
-    }
-  end
+  # Rutas de autenticación con devise-jwt
+  devise_for :users,
+             path: '/api/v1/users',
+             defaults: { format: :json },
+             skip: [:registrations],
+             controllers: {
+               sessions: 'api/v1/sessions',
+               passwords: 'api/v1/passwords'
+             }
 
   namespace :api do
     namespace :v1, defaults: { format: :json } do
       get :status, to: 'health#status'
-      resources :impersonations, only: %i[create], constraints: Impersonation::EnabledConstraint.new
       devise_scope :user do
         resource :user, only: %i[update show]
       end
+      resources :users, only: %i[index show create update destroy]
       resources :settings, only: [] do
         get :must_update, on: :collection
       end

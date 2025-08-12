@@ -1,16 +1,9 @@
 # frozen_string_literal: true
 
 ActiveAdmin.register User do
-  permit_params :email, :first_name, :last_name, :username, :password, :password_confirmation
+  permit_params :email, :first_name, :last_name, :username, :password, :password_confirmation, :role
 
-  if ENV['IMPERSONATION_URL'].present?
-    member_action :impersonate, method: :post do
-      signed_data = Impersonation::Verifier.new.sign!(
-        user_id: resource.id, admin_user_id: current_admin_user.id
-      )
-      redirect_to "#{ENV.fetch('IMPERSONATION_URL')}?auth=#{signed_data}", allow_other_host: true
-    end
-  end
+
 
   form do |f|
     f.inputs 'Details' do
@@ -18,6 +11,7 @@ ActiveAdmin.register User do
       f.input :first_name
       f.input :last_name
       f.input :username
+      f.input :role, as: :select, collection: User.roles.keys.map { |key| [key.humanize, key] }
 
       if f.object.new_record?
         f.input :password
@@ -35,6 +29,9 @@ ActiveAdmin.register User do
     column :first_name
     column :last_name
     column :username
+    column :role do |user|
+      status_tag user.role.humanize, class: user.admin? ? 'important' : 'ok'
+    end
     column :sign_in_count
     column :created_at
     column :updated_at
@@ -47,6 +44,7 @@ ActiveAdmin.register User do
   filter :username
   filter :first_name
   filter :last_name
+  filter :role, as: :select, collection: User.roles.keys.map { |key| [key.humanize, key] }
   filter :created_at
   filter :updated_at
 
@@ -57,16 +55,12 @@ ActiveAdmin.register User do
       row :first_name
       row :last_name
       row :username
+      row :role do |user|
+        status_tag user.role.humanize, class: user.admin? ? 'important' : 'ok'
+      end
       row :sign_in_count
       row :created_at
       row :updated_at
-    end
-  end
-
-  if ENV['IMPERSONATION_URL'].present?
-    action_item :user_impersonation, only: :show, if: proc { Flipper.enabled?(:impersonation_tool) } do
-      link_to 'Impersonate User', impersonate_admin_user_path(resource), method: :post,
-                                                                         target: '_blank', rel: 'noopener'
     end
   end
 end
