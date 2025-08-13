@@ -10,7 +10,12 @@ module API
       private
 
       def respond_with(current_user, _opts = {})
-        render :create, formats: [:json], locals: { user: current_user }
+        token = request.env['warden-jwt_auth.token']
+        render json: {
+          token: token,
+          token_type: 'Bearer',
+          expires_in: Warden::JWTAuth.config.expiration_time
+        }
       end
 
       def respond_to_on_destroy
