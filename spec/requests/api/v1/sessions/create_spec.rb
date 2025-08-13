@@ -61,7 +61,7 @@ describe 'POST api/v1/users/sign_in' do
     it 'return errors upon failure' do
       subject
       expect(json[:errors]).to be_present
-      expect(json[:errors].first[:message]).to include('Email o contraseña incorrectos')
+      expect(json[:errors].first[:message]).to include('Credenciales inválidas')
     end
   end
 end

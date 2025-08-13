@@ -25,7 +25,18 @@ require 'rspec/rails'
 require 'rspec/retry'
 require 'support/retry/message_formatter'
 
-ActiveRecord::Migration.maintain_test_schema!
+# Ensure test database is prepared and migrated before running the test suite
+begin
+  ActiveRecord::Migration.maintain_test_schema!
+rescue ActiveRecord::PendingMigrationError => e
+  puts "Pending migrations detected. Preparing test database..."
+  system('bundle exec rails db:test:prepare')
+  retry
+rescue ActiveRecord::NoDatabaseError
+  puts "Test database does not exist. Creating it..."
+  system('bundle exec rails db:test:prepare')
+  retry
+end
 WebMock.disable_net_connect!(
   allow_localhost: true,
   allow: ['api.github.com', 'chrome-server:4444']
@@ -72,6 +83,18 @@ RSpec.configure do |config|
   config.intermittent_callback = proc do |ex|
     text = Retry::MessageFormatter.new(ex).to_s
     Retry::PullRequestComment.new.comment(text)
+  end
+
+  # Drop test database after suite completion to ensure idempotent test runs
+  config.after(:suite) do
+    puts "Cleaning up test database..."
+    begin
+      ActiveRecord::Base.connection_pool.disconnect!
+      system('bundle exec rails db:drop RAILS_ENV=test')
+      puts "Test database dropped successfully"
+    rescue => e
+      puts "Error dropping test database: #{e.message}"
+    end
   end
 end
 
