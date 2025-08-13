@@ -51,4 +51,12 @@ class User < ApplicationRecord
 
     "#{first_name} #{last_name}"
   end
+
+  def jwt_payload
+    {
+      'role' => role,
+      'email' => email,
+      'full_name' => full_name
+    }
+  end
 end
