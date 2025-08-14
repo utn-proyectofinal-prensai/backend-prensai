@@ -3,11 +3,11 @@
 describe 'GET api/v1/users' do
   subject { get api_v1_users_path, headers: auth_headers, as: :json }
 
-  let!(:user1) { create(:user, :with_name) }
-  let!(:user2) { create(:user, :with_name) }
+  let!(:first_user) { create(:user, :with_name) }
+  let!(:second_user) { create(:user, :with_name) }
 
   context 'when authenticated as admin user' do
-    include_context 'authenticated admin user via JWT'
+    include_context 'with authenticated admin user via JWT'
 
     it 'returns a successful response' do
       subject
@@ -17,17 +17,17 @@ describe 'GET api/v1/users' do
     it 'returns all users including admin', :aggregate_failures do
       subject
       expect(json[:users]).to be_an(Array)
-      expect(json[:users].size).to eq(3) # admin_user + user1 + user2
-      
+      expect(json[:users].size).to eq(3) # admin_user + first_user + second_user
+
       # Verificar que incluye todos los usuarios
       user_ids = json[:users].pluck(:id)
-      expect(user_ids).to include(admin_user.id, user1.id, user2.id)
+      expect(user_ids).to include(admin_user.id, first_user.id, second_user.id)
     end
 
     it 'returns correct user data structure for each user', :aggregate_failures do
       subject
       first_user = json[:users].first
-      
+
       expect(first_user).to have_key(:id)
       expect(first_user).to have_key(:email)
       expect(first_user).to have_key(:username)
@@ -46,7 +46,7 @@ describe 'GET api/v1/users' do
   end
 
   context 'when authenticated as regular user' do
-    include_context 'authenticated regular user via JWT'
+    include_context 'with authenticated regular user via JWT'
 
     it 'returns a successful response' do
       subject
@@ -65,7 +65,7 @@ describe 'GET api/v1/users' do
     it 'does not return other users data', :aggregate_failures do
       subject
       user_ids = json[:users].pluck(:id)
-      expect(user_ids).not_to include(user1.id, user2.id)
+      expect(user_ids).not_to include(first_user.id, second_user.id)
     end
   end
 

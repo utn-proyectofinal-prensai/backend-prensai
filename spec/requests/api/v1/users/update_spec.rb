@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 describe 'PUT/PATCH api/v1/users/:id' do
-  let!(:target_user) { create(:user, :with_name) }
-  let!(:other_user) { create(:user, :with_name) }
+  let(:target_user) { create(:user, :with_name) }
+  let(:other_user) { create(:user, :with_name) }
 
-  context 'as admin user' do
-    include_context 'authenticated admin user via JWT'
-    
-    context 'updating another user' do
+  context 'when user is admin' do
+    include_context 'with authenticated admin user via JWT'
+
+    context 'when updating another user' do
       subject { put "/api/v1/users/#{target_user.id}", params:, headers: auth_headers, as: :json }
 
       context 'with valid params' do
@@ -30,7 +30,7 @@ describe 'PUT/PATCH api/v1/users/:id' do
         end
       end
 
-      context 'when updating role' do
+      context 'with role update' do
         let(:params) { { user: { role: 'admin' } } }
 
         it 'returns success' do
@@ -49,8 +49,10 @@ describe 'PUT/PATCH api/v1/users/:id' do
         end
       end
 
-      context 'when trying to change password' do
-        let(:params) { { user: { username: 'test', password: 'newpassword123', password_confirmation: 'newpassword123' } } }
+      context 'with password change attempt' do
+        let(:params) do
+          { user: { username: 'test', password: 'newpassword123', password_confirmation: 'newpassword123' } }
+        end
 
         it 'ignores password parameter' do
           subject
@@ -85,7 +87,7 @@ describe 'PUT/PATCH api/v1/users/:id' do
       end
     end
 
-    context 'updating self' do
+    context 'when updating self' do
       subject { put "/api/v1/users/#{admin_user.id}", params:, headers: auth_headers, as: :json }
 
       context 'with valid params' do
@@ -104,7 +106,7 @@ describe 'PUT/PATCH api/v1/users/:id' do
     end
 
     context 'when record is not found' do
-      subject { put "/api/v1/users/99999", params:, headers: auth_headers, as: :json }
+      subject { put '/api/v1/users/99999', params:, headers: auth_headers, as: :json }
 
       let(:params) { { user: { username: 'not_found_test' } } }
 
@@ -121,10 +123,10 @@ describe 'PUT/PATCH api/v1/users/:id' do
     end
   end
 
-  context 'as regular user' do
-    include_context 'authenticated regular user via JWT'
-    
-    context 'trying to update another user' do
+  context 'when user is regular' do
+    include_context 'with authenticated regular user via JWT'
+
+    context 'when trying to update another user' do
       subject { put "/api/v1/users/#{target_user.id}", params:, headers: auth_headers, as: :json }
 
       let(:params) { { user: { username: 'hacker_attempt' } } }
@@ -147,7 +149,7 @@ describe 'PUT/PATCH api/v1/users/:id' do
       end
     end
 
-    context 'trying to update self' do
+    context 'when trying to update self' do
       subject { put "/api/v1/users/#{regular_user.id}", params:, headers: auth_headers, as: :json }
 
       let(:params) { { user: { username: 'self_attempt' } } }
@@ -172,10 +174,9 @@ describe 'PUT/PATCH api/v1/users/:id' do
   end
 
   context 'when not authenticated' do
-    let(:auth_headers) { {} }
-    
     subject { put "/api/v1/users/#{target_user.id}", params:, headers: auth_headers, as: :json }
 
+    let(:auth_headers) { {} }
     let(:params) { { user: { username: 'unauthorized_attempt' } } }
 
     it 'returns unauthorized status' do

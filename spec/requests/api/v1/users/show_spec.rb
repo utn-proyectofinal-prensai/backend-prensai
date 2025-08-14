@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 describe 'GET api/v1/users/:id' do
-  let!(:target_user) { create(:user, :with_name) }
-  let!(:other_user) { create(:user, :with_name) }
+  let(:target_user) { create(:user, :with_name) }
+  let(:other_user) { create(:user, :with_name) }
 
-  context 'as admin user' do
-    include_context 'authenticated admin user via JWT'
-    
-    context 'viewing another user' do
+  context 'when user is admin' do
+    include_context 'with authenticated admin user via JWT'
+
+    context 'when viewing another user' do
       subject { get "/api/v1/users/#{target_user.id}", headers: auth_headers }
 
       it 'returns success' do
@@ -24,7 +24,7 @@ describe 'GET api/v1/users/:id' do
       end
     end
 
-    context 'viewing self' do
+    context 'when viewing self' do
       subject { get "/api/v1/users/#{admin_user.id}", headers: auth_headers }
 
       it 'returns success' do
@@ -41,7 +41,7 @@ describe 'GET api/v1/users/:id' do
     end
 
     context 'when record is not found' do
-      subject { get "/api/v1/users/99999", headers: auth_headers }
+      subject { get '/api/v1/users/99999', headers: auth_headers }
 
       it 'returns status 404 not found' do
         subject
@@ -56,10 +56,10 @@ describe 'GET api/v1/users/:id' do
     end
   end
 
-  context 'as regular user' do
-    include_context 'authenticated regular user via JWT'
-    
-    context 'viewing another user' do
+  context 'when user is regular' do
+    include_context 'with authenticated regular user via JWT'
+
+    context 'when viewing another user' do
       subject { get "/api/v1/users/#{target_user.id}", headers: auth_headers }
 
       it 'returns forbidden status' do
@@ -74,7 +74,7 @@ describe 'GET api/v1/users/:id' do
       end
     end
 
-    context 'viewing self' do
+    context 'when viewing self' do
       subject { get "/api/v1/users/#{regular_user.id}", headers: auth_headers }
 
       it 'returns success' do
@@ -93,9 +93,9 @@ describe 'GET api/v1/users/:id' do
   end
 
   context 'when not authenticated' do
-    let(:auth_headers) { {} }
-    
     subject { get "/api/v1/users/#{target_user.id}", headers: auth_headers }
+
+    let(:auth_headers) { {} }
 
     it 'returns unauthorized status' do
       subject
@@ -109,10 +109,10 @@ describe 'GET api/v1/users/:id' do
     end
   end
 
-  context 'accessing current user profile (/api/v1/user)' do
-    include_context 'authenticated regular user via JWT'
-    
+  context 'when accessing current user profile (/api/v1/user)' do
     subject { get api_v1_user_path, headers: auth_headers }
+
+    include_context 'with authenticated regular user via JWT'
 
     it_behaves_like 'there must not be a Set-Cookie in Header'
 

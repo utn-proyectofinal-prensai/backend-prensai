@@ -4,10 +4,10 @@ describe 'DELETE api/v1/users/:id' do
   let!(:target_user) { create(:user, :with_name) }
   let!(:other_user) { create(:user, :with_name) }
 
-  context 'as admin user' do
-    include_context 'authenticated admin user via JWT'
-    
-    context 'destroying another user' do
+  context 'when user is admin' do
+    include_context 'with authenticated admin user via JWT'
+
+    context 'when destroying another user' do
       subject { delete "/api/v1/users/#{target_user.id}", headers: auth_headers }
 
       it 'returns no content status' do
@@ -26,7 +26,7 @@ describe 'DELETE api/v1/users/:id' do
       end
     end
 
-    context 'trying to destroy self' do
+    context 'when trying to destroy self' do
       subject { delete "/api/v1/users/#{admin_user.id}", headers: auth_headers }
 
       it 'returns forbidden status' do
@@ -47,25 +47,25 @@ describe 'DELETE api/v1/users/:id' do
     end
 
     context 'when record is not found' do
-        subject { delete "/api/v1/users/99999", headers: auth_headers }
-    
-        it 'returns status 404 not found' do
-          subject
-          expect(response).to have_http_status(:not_found)
-        end
-    
-        it 'returns error message' do
-          subject
-          expect(json[:errors]).to be_present
-          expect(json[:errors].first[:message]).to be_present
-        end
+      subject { delete '/api/v1/users/99999', headers: auth_headers }
+
+      it 'returns status 404 not found' do
+        subject
+        expect(response).to have_http_status(:not_found)
       end
+
+      it 'returns error message' do
+        subject
+        expect(json[:errors]).to be_present
+        expect(json[:errors].first[:message]).to be_present
+      end
+    end
   end
 
-  context 'as regular user' do
-    include_context 'authenticated regular user via JWT'
-    
-    context 'trying to destroy another user' do
+  context 'when user is regular' do
+    include_context 'with authenticated regular user via JWT'
+
+    context 'when trying to destroy another user' do
       subject { delete "/api/v1/users/#{target_user.id}", headers: auth_headers }
 
       it 'returns forbidden status' do
@@ -85,7 +85,7 @@ describe 'DELETE api/v1/users/:id' do
       end
     end
 
-    context 'trying to destroy self' do
+    context 'when trying to destroy self' do
       subject { delete "/api/v1/users/#{regular_user.id}", headers: auth_headers }
 
       it 'returns forbidden status' do
@@ -107,9 +107,9 @@ describe 'DELETE api/v1/users/:id' do
   end
 
   context 'when not authenticated' do
+    subject { delete "/api/v1/users/#{target_user.id}", headers: auth_headers }
+
     let(:auth_headers) { {} }
-    
-          subject { delete "/api/v1/users/#{target_user.id}", headers: auth_headers }
 
     it 'returns unauthorized status' do
       subject
@@ -126,5 +126,5 @@ describe 'DELETE api/v1/users/:id' do
       expect(json[:errors]).to be_present
       expect(json[:errors].first[:message]).to be_present
     end
-  end  
+  end
 end

@@ -28,12 +28,12 @@ require 'support/retry/message_formatter'
 # Ensure test database is prepared and migrated before running the test suite
 begin
   ActiveRecord::Migration.maintain_test_schema!
-rescue ActiveRecord::PendingMigrationError => e
-  puts "Pending migrations detected. Preparing test database..."
+rescue ActiveRecord::PendingMigrationError
+  puts 'Pending migrations detected. Preparing test database...'
   system('bundle exec rails db:test:prepare')
   retry
-rescue ActiveRecord::NoDatabaseError, ActiveRecord::DatabaseConnectionError => e
-  puts "Test database does not exist or connection failed. Creating it..."
+rescue ActiveRecord::NoDatabaseError, ActiveRecord::DatabaseConnectionError
+  puts 'Test database does not exist or connection failed. Creating it...'
   system('bundle exec rails db:create RAILS_ENV=test')
   system('bundle exec rails db:migrate RAILS_ENV=test')
   retry

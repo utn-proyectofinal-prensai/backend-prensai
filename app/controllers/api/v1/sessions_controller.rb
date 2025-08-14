@@ -9,7 +9,7 @@ module API
 
       private
 
-      def respond_with(current_user, _opts = {})
+      def respond_with(_current_user, _opts = {})
         token = request.env['warden-jwt_auth.token']
         render json: {
           token: token,

@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 describe 'POST api/v1/users' do
-  include_context 'authenticated admin user via JWT'
-  
   subject { post api_v1_users_path, params:, headers: auth_headers, as: :json }
+
+  include_context 'with authenticated admin user via JWT'
+
 
   let(:created_user) { User.find_by(email:) }
   let(:email) { 'newuser@example.com' }

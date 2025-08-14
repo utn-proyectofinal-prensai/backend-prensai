@@ -9,9 +9,7 @@ class UserPolicy < ApplicationPolicy
 
   def update? = user.admin?
 
-  def destroy?
-    user.admin? && user.id != record.id
-  end
+  def destroy? = user.admin? && user.id != record.id
 
   class Scope < Scope
     def resolve

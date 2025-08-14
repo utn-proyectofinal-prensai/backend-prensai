@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.shared_context 'authenticated admin user via JWT' do
+RSpec.shared_context 'with authenticated admin user via JWT' do
   let!(:admin_user) { create(:user, :admin, password: 'password') }
   let(:auth_token) do
     # Generate a real JWT token using Devise-JWT
@@ -11,7 +11,7 @@ RSpec.shared_context 'authenticated admin user via JWT' do
   let(:auth_headers) { { 'Authorization' => "Bearer #{auth_token}" } }
 end
 
-RSpec.shared_context 'authenticated regular user via JWT' do
+RSpec.shared_context 'with authenticated regular user via JWT' do
   let!(:regular_user) { create(:user, password: 'password') }
   let(:auth_token) do
     # Generate a real JWT token using Devise-JWT
