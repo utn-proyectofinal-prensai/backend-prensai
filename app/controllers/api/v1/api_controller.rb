@@ -27,11 +27,11 @@ module API
       end
 
       def render_record_invalid(exception)
-        render_error(exception, exception.record.errors.as_json, :bad_request)
+        render_error(exception, exception.record.errors.as_json, :unprocessable_entity)
       end
 
       def render_parameter_missing(exception)
-        render_error(exception, { message: I18n.t('api.errors.missing_param') }, :unprocessable_entity)
+        render_error(exception, { message: I18n.t('api.errors.missing_param') }, :bad_request)
       end
 
       def render_forbidden(exception)

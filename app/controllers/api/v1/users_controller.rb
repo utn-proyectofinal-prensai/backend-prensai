@@ -16,7 +16,7 @@ module API
 
       def create
         authorize User, :create?
-        @user = User.new(user_params)
+        @user = User.new(create_user_params)
         @user.save!
         render :show, status: :created
       end
@@ -39,8 +39,8 @@ module API
         @user = params[:id].present? ? User.find(params[:id]) : current_user
       end
 
-      def user_params
-        params.expect(user: [permitted_attributes(User)])
+      def create_user_params
+        params.expect(user: %i[username first_name last_name email role password password_confirmation])
       end
 
       def update_user_params

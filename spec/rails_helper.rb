@@ -32,9 +32,10 @@ rescue ActiveRecord::PendingMigrationError => e
   puts "Pending migrations detected. Preparing test database..."
   system('bundle exec rails db:test:prepare')
   retry
-rescue ActiveRecord::NoDatabaseError
-  puts "Test database does not exist. Creating it..."
-  system('bundle exec rails db:test:prepare')
+rescue ActiveRecord::NoDatabaseError, ActiveRecord::DatabaseConnectionError => e
+  puts "Test database does not exist or connection failed. Creating it..."
+  system('bundle exec rails db:create RAILS_ENV=test')
+  system('bundle exec rails db:migrate RAILS_ENV=test')
   retry
 end
 WebMock.disable_net_connect!(
@@ -85,17 +86,8 @@ RSpec.configure do |config|
     Retry::PullRequestComment.new.comment(text)
   end
 
-  # Drop test database after suite completion to ensure idempotent test runs
-  config.after(:suite) do
-    puts "Cleaning up test database..."
-    begin
-      ActiveRecord::Base.connection_pool.disconnect!
-      system('bundle exec rails db:drop RAILS_ENV=test')
-      puts "Test database dropped successfully"
-    rescue => e
-      puts "Error dropping test database: #{e.message}"
-    end
-  end
+  # Database cleanup is handled by transactional fixtures
+  # No need to drop the database - schema is maintained automatically
 end
 
 Shoulda::Matchers.configure do |config|
