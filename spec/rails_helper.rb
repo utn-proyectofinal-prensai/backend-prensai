@@ -25,7 +25,19 @@ require 'rspec/rails'
 require 'rspec/retry'
 require 'support/retry/message_formatter'
 
-ActiveRecord::Migration.maintain_test_schema!
+# Ensure test database is prepared and migrated before running the test suite
+begin
+  ActiveRecord::Migration.maintain_test_schema!
+rescue ActiveRecord::PendingMigrationError
+  puts 'Pending migrations detected. Preparing test database...'
+  system('bundle exec rails db:test:prepare')
+  retry
+rescue ActiveRecord::NoDatabaseError, ActiveRecord::DatabaseConnectionError
+  puts 'Test database does not exist or connection failed. Creating it...'
+  system('bundle exec rails db:create RAILS_ENV=test')
+  system('bundle exec rails db:migrate RAILS_ENV=test')
+  retry
+end
 WebMock.disable_net_connect!(
   allow_localhost: true,
   allow: ['api.github.com', 'chrome-server:4444']
@@ -73,6 +85,9 @@ RSpec.configure do |config|
     text = Retry::MessageFormatter.new(ex).to_s
     Retry::PullRequestComment.new.comment(text)
   end
+
+  # Database cleanup is handled by transactional fixtures
+  # No need to drop the database - schema is maintained automatically
 end
 
 Shoulda::Matchers.configure do |config|

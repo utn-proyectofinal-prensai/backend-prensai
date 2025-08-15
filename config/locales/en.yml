@@ -11,3 +11,5 @@ en:
       missing_param: A required param is missing
       not_found: Couldn't find the record
       forbidden: You are not allowed to perform this action
+      unauthorized: You are not authenticated or your token has expired
+      invalid_credentials: Invalid credentials

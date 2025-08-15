@@ -27,19 +27,19 @@ describe 'POST api/v1/users/sign_in' do
       expect(response).to be_successful
     end
 
-    it 'returns the user' do
-      expect(json[:user][:id]).to eq(user.id)
-      expect(json[:user][:email]).to eq(user.email)
-      expect(json[:user][:username]).to eq(user.username)
-      expect(json[:user][:first_name]).to eq(user.first_name)
-      expect(json[:user][:last_name]).to eq(user.last_name)
-      expect(json[:user][:role]).to eq(user.role)
+    it 'returns token and metadata' do
+      expect(json[:token]).to be_present
+      expect(json[:token_type]).to eq('Bearer')
+      expect(json[:expires_in]).to be_present
     end
 
-    it 'returns a valid client and access token' do
-      token = response.header['access-token']
-      client = response.header['client']
-      expect(user.reload).to be_valid_token(token, client)
+    it 'includes custom claims in JWT' do
+      token = json[:token]
+      payload, = JWT.decode(token, Rails.application.secret_key_base, true, { algorithm: 'HS256' })
+      expect(payload['sub'].to_s).to eq(user.id.to_s)
+      expect(payload['role']).to eq(user.role)
+      expect(payload['email']).to eq(user.email)
+      expect(payload['full_name']).to eq(user.full_name)
     end
   end
 
@@ -61,7 +61,7 @@ describe 'POST api/v1/users/sign_in' do
     it 'return errors upon failure' do
       subject
       expect(json[:errors]).to be_present
-      expect(json[:errors].first[:message]).to include('Email o contraseña incorrectos')
+      expect(json[:errors].first[:message]).to include('Credenciales inválidas')
     end
   end
 end

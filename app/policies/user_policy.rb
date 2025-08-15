@@ -11,10 +11,6 @@ class UserPolicy < ApplicationPolicy
 
   def destroy? = user.admin? && user.id != record.id
 
-  def permitted_attributes
-    %i[username first_name last_name email role password password_confirmation]
-  end
-
   class Scope < Scope
     def resolve
       user.admin? ? scope.all : scope.where(id: user.id)
