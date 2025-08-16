@@ -43,5 +43,7 @@ class New < ApplicationRecord
   validates :title, :publication_type, :date, :support, :media, presence: true
   validates :mentions, length: { maximum: 5 }
   
+  enum valuation: { positive: 'positive', neutral: 'neutral', negative: 'negative' }
+  
   scope :ordered, -> { order(date: :desc) }
 end
