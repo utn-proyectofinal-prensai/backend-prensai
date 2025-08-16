@@ -145,6 +145,8 @@ Rails.application.routes.draw do
         resource :user, only: %i[update show]
       end
       resources :users, only: %i[index show create update destroy]
+      resources :topics, only: %i[index create]
+      resources :mentions, only: %i[index create]
       resources :settings, only: [] do
         get :must_update, on: :collection
       end
