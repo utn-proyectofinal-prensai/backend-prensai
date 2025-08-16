@@ -2,7 +2,7 @@ module API
   module V1
     class NewsController < API::V1::APIController
       def index
-        @news = policy_scope(New).ordered
+        @pagy, @news = pagy(policy_scope(New).ordered)
       end
 
       def batch_process

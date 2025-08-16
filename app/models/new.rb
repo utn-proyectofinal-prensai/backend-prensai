@@ -42,4 +42,6 @@ class New < ApplicationRecord
   
   validates :title, :publication_type, :date, :support, :media, presence: true
   validates :mentions, length: { maximum: 5 }
+  
+  scope :ordered, -> { order(date: :desc) }
 end
