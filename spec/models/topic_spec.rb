@@ -173,7 +173,7 @@ describe Topic do
       it 'raises validation error for duplicate name' do
         duplicate_topic = build(:topic, name: 'Test Topic')
         expect(duplicate_topic).not_to be_valid
-        expect(duplicate_topic.errors[:name]).to include('ya está en uso')
+        expect(duplicate_topic.errors[:name]).to include(I18n.t('errors.messages.taken'))
       end
     end
   end

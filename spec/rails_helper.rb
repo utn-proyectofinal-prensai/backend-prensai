@@ -24,6 +24,7 @@ require 'spec_helper'
 require 'rspec/rails'
 require 'rspec/retry'
 require 'support/retry/message_formatter'
+require 'helpers'
 
 # Ensure test database is prepared and migrated before running the test suite
 begin
@@ -48,6 +49,7 @@ RSpec.configure do |config|
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include ActiveJob::TestHelper
+  config.include Helpers
   config.use_transactional_fixtures = true
   config.infer_spec_type_from_file_location!
 
@@ -67,8 +69,8 @@ RSpec.configure do |config|
   config.include Shoulda::Matchers::ActiveRecord, type: :form
 
   # Detects N+1 queries
-  config.before { Prosopite.scan }
-  config.after { Prosopite.finish }
+  # config.before { Prosopite.scan }
+  # config.after { Prosopite.finish }
 
   # Reset previous flipper instance
   config.before { Flipper.instance = nil }

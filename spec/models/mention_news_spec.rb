@@ -25,7 +25,7 @@ describe MentionNews do
       it 'prevents duplicate associations' do
         duplicate_association = build(:mention_news, mention: mention, news: news)
         expect(duplicate_association).not_to be_valid
-        expect(duplicate_association.errors[:mention_id]).to include('ya está en uso')
+        expect(duplicate_association.errors[:mention_id]).to include(I18n.t('errors.messages.taken'))
       end
     end
 

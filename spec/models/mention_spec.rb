@@ -32,7 +32,7 @@ describe Mention do
       it 'raises validation error for duplicate name' do
         duplicate_mention = build(:mention, name: 'Test Mention')
         expect(duplicate_mention).not_to be_valid
-        expect(duplicate_mention.errors[:name]).to include('ya está en uso')
+        expect(duplicate_mention.errors[:name]).to include(I18n.t('errors.messages.taken'))
       end
     end
   end
