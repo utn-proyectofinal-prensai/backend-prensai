@@ -13,8 +13,8 @@ gem 'aws-sdk-s3', '~> 1.192', require: false
 gem 'bootsnap', '~> 1.18'
 gem 'cssbundling-rails', '~> 1.4'
 gem 'devise', '~> 4.9'
-gem 'devise-jwt', '~> 0.12.1'
 gem 'devise-i18n'
+gem 'devise-jwt', '~> 0.12.1'
 gem 'draper', '~> 4.0'
 gem 'faraday'
 gem 'flipper', '~> 1.3.5'
@@ -69,14 +69,18 @@ group :development do
   gem 'listen', '~> 3.9'
   gem 'rails_best_practices', '~> 1.20'
   gem 'reek', '~> 6.5'
-  gem 'rubocop', '~> 1.78', require: false
+  gem 'rubocop'
   gem 'rubocop-capybara', '~> 2.22'
   gem 'rubocop-factory_bot', '~> 2.27', require: false
-  gem 'rubocop-performance', '~> 1.25', require: false
+  gem 'rubocop-packaging'
+  gem 'rubocop-performance'
   gem 'rubocop-rails', '~> 2.32', require: false
   gem 'rubocop-rake', '~> 0.7.1', require: false
-  gem 'rubocop-rspec', '~> 3.6', require: false
+  gem 'rubocop-rspec'
   gem 'rubocop-rspec_rails', '~> 2.31.0', require: false
+  gem 'rubocop-shopify'
+  gem 'rubocop-thread_safety'
+  gem 'ruby-lsp'
 end
 
 group :test do

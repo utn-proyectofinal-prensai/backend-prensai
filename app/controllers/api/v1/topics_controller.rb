@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module API
   module V1
     class TopicsController < API::V1::APIController
@@ -8,7 +10,7 @@ module API
       def create
         @topic = Topic.new(topic_params)
         authorize @topic
-        
+
         if @topic.save
           render :show, status: :created
         else

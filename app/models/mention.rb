@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: mentions
@@ -15,8 +17,8 @@
 class Mention < ApplicationRecord
   has_many :mention_news, dependent: :destroy
   has_many :news, through: :mention_news
-  
+
   validates :name, presence: true, uniqueness: true
-  
+
   scope :ordered, -> { order(:name) }
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: topics
@@ -15,8 +17,8 @@
 #
 class Topic < ApplicationRecord
   has_many :news, dependent: :restrict_with_error
-  
+
   validates :name, presence: true, uniqueness: true
-  
+
   scope :ordered, -> { order(:name) }
 end

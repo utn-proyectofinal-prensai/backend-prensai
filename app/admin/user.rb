@@ -3,8 +3,6 @@
 ActiveAdmin.register User do
   permit_params :email, :first_name, :last_name, :username, :password, :password_confirmation, :role
 
-
-
   form do |f|
     f.inputs 'Details' do
       f.input :email

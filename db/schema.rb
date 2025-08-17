@@ -177,12 +177,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_224450) do
 
   create_table "mention_news", force: :cascade do |t|
     t.bigint "mention_id", null: false
-    t.bigint "new_id", null: false
+    t.bigint "news_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["mention_id", "new_id"], name: "index_mention_news_on_mention_id_and_new_id", unique: true
+    t.index ["mention_id", "news_id"], name: "index_mention_news_on_mention_id_and_news_id", unique: true
     t.index ["mention_id"], name: "index_mention_news_on_mention_id"
-    t.index ["new_id"], name: "index_mention_news_on_new_id"
+    t.index ["news_id"], name: "index_mention_news_on_news_id"
   end
 
   create_table "mentions", force: :cascade do |t|
@@ -258,6 +258,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_224450) do
 
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "mention_news", "mentions"
-  add_foreign_key "mention_news", "news", column: "new_id"
+  add_foreign_key "mention_news", "news"
   add_foreign_key "news", "topics"
 end

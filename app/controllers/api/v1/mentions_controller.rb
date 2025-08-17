@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module API
   module V1
     class MentionsController < API::V1::APIController
@@ -8,7 +10,7 @@ module API
       def create
         @mention = Mention.new(mention_params)
         authorize @mention
-        
+
         if @mention.save
           render :show, status: :created
         else

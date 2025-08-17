@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: news
@@ -34,16 +36,16 @@
 #
 #  fk_rails_...  (topic_id => topics.id)
 #
-class New < ApplicationRecord
+class News < ApplicationRecord
   belongs_to :topic, optional: true
-  
+
   has_many :mention_news, dependent: :destroy
   has_many :mentions, through: :mention_news
-  
+
   validates :title, :publication_type, :date, :support, :media, presence: true
   validates :mentions, length: { maximum: 5 }
-  
-  enum valuation: { positive: 'positive', neutral: 'neutral', negative: 'negative' }
-  
+
+  enum :valuation, { positive: 'positive', neutral: 'neutral', negative: 'negative' }, prefix: true
+
   scope :ordered, -> { order(date: :desc) }
 end
