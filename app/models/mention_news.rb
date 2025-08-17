@@ -23,7 +23,7 @@
 #
 class MentionNews < ApplicationRecord
   belongs_to :mention
-  belongs_to :new
+  belongs_to :news
 
-  validates :mention_id, uniqueness: { scope: :new_id }
+  validates :mention_id, uniqueness: { scope: :news_id }
 end

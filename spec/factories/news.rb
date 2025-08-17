@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :new do
-    title            { Faker::Headlines.title }
+  factory :news do
+    title            { Faker::Lorem.sentence(word_count: 6) }
     publication_type { %w[article interview editorial opinion].sample }
     date             { Faker::Date.between(from: 1.year.ago, to: Date.current) }
     support          { %w[positive negative neutral].sample }

@@ -5,13 +5,11 @@ json.extract! news, :id, :title, :publication_type, :date, :support, :media, :se
               :updated_at
 
 json.topic do
-  if news.topic
-    json.partial! 'api/v1/topics/topic', topic: news.topic
-  else
-    json.null
-  end
+  json.id news.topic.id
+  json.name news.topic.name
 end
 
 json.mentions news.mentions do |mention|
-  json.partial! 'api/v1/mentions/mention', mention: mention
+  json.id mention.id
+  json.name mention.name
 end

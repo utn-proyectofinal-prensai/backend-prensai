@@ -3,6 +3,6 @@
 FactoryBot.define do
   factory :mention_new do
     mention { association :mention }
-    new     { association :new }
+    news { association :news }
   end
 end
