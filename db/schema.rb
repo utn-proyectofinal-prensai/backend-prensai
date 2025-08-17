@@ -230,6 +230,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_224450) do
     t.string "name", null: false
     t.text "description"
     t.boolean "enabled", default: true
+    t.boolean "crisis", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_topics_on_name", unique: true

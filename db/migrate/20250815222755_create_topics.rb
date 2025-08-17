@@ -4,6 +4,7 @@ class CreateTopics < ActiveRecord::Migration[8.0]
       t.string :name, null: false
       t.text :description
       t.boolean :enabled, default: true
+      t.boolean :crisis, default: false
 
       t.timestamps
     end

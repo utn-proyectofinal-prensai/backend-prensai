@@ -5,5 +5,6 @@ FactoryBot.define do
     name        { Faker::Lorem.unique.word.capitalize }
     description { Faker::Lorem.paragraph }
     enabled     { true }
+    crisis      { false }
   end
 end

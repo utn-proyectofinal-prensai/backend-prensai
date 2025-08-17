@@ -5,6 +5,7 @@
 # Table name: topics
 #
 #  id          :bigint           not null, primary key
+#  crisis      :boolean          default(FALSE)
 #  description :text
 #  enabled     :boolean          default(TRUE)
 #  name        :string           not null
@@ -21,4 +22,14 @@ class Topic < ApplicationRecord
   validates :name, presence: true, uniqueness: true
 
   scope :ordered, -> { order(:name) }
+
+  def check_crisis!
+    update!(crisis: should_be_crisis?)
+  end
+
+  private
+
+  def should_be_crisis?
+    news.valuation_negative.count > 5
+  end
 end

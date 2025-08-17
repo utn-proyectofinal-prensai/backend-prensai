@@ -48,4 +48,17 @@ class News < ApplicationRecord
   enum :valuation, { positive: 'positive', neutral: 'neutral', negative: 'negative' }, prefix: true
 
   scope :ordered, -> { order(date: :desc) }
+
+  after_create :check_topic_crisis
+  after_update :check_topic_crisis, if: -> { saved_change_to_valuation? || saved_change_to_topic_id? }
+  after_destroy :check_topic_crisis
+
+  private
+
+  def check_topic_crisis
+    if topic_id_before_last_save.present? && topic_id_before_last_save != topic_id
+      Topic.find(topic_id_before_last_save).check_crisis!
+    end
+    topic&.check_crisis!
+  end
 end
