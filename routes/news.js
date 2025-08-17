@@ -547,4 +547,190 @@ router.post('/metrics', async (req, res) => {
   }
 });
 
+// POST /api/news/generate-informe - Generar informe usando el módulo Python
+router.post('/generate-informe', async (req, res) => {
+  try {
+    const { metricas, contexto } = req.body;
+
+    if (!metricas) {
+      return res.status(400).json({ 
+        error: 'Se requieren las métricas para generar el informe' 
+      });
+    }
+
+    console.log('Generando informe con métricas:', {
+      totalNoticias: metricas.totalNoticias,
+      temaSeleccionado: metricas.temaSeleccionado || 'N/A',
+      fechaGeneracion: new Date().toISOString().split('T')[0]
+    });
+
+    // Importar el módulo Python para generar el informe
+    const { spawn } = require('child_process');
+    const path = require('path');
+
+    // Ruta al módulo Python (ajustar según la estructura del proyecto)
+    const pythonScriptPath = path.join(__dirname, '../../moduloInforme/main.py');
+    
+    console.log('🔍 Ruta del script Python:', pythonScriptPath);
+    console.log('🔍 Working directory:', process.cwd());
+    
+    // Preparar datos para el módulo Python
+    const dataForPython = {
+      metricas: metricas,
+      contexto: contexto || {},
+      action: 'generate_single_informe'
+    };
+    
+    console.log('🔍 Datos enviados a Python:', JSON.stringify(dataForPython, null, 2));
+
+    // Ejecutar el módulo Python en modo backend
+    const pythonProcess = spawn('python', [pythonScriptPath, '--backend'], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      cwd: path.dirname(pythonScriptPath) // Establecer working directory correcto
+    });
+
+    // Enviar datos al proceso Python
+    pythonProcess.stdin.write(JSON.stringify(dataForPython));
+    pythonProcess.stdin.end();
+
+    let informeData = '';
+    let errorData = '';
+
+    // Capturar salida del proceso Python
+    pythonProcess.stdout.on('data', (data) => {
+      informeData += data.toString();
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      errorData += data.toString();
+    });
+
+    // Esperar a que termine el proceso Python
+    await new Promise((resolve, reject) => {
+      pythonProcess.on('close', (code) => {
+        // Python puede retornar códigos diferentes por razones válidas
+        // Solo rechazar si hay datos de error o si el código es claramente problemático
+        if (code === 0 || (code !== null && code !== undefined)) {
+          resolve();
+        } else {
+          reject(new Error(`Proceso Python terminó con código ${code}`));
+        }
+      });
+
+      pythonProcess.on('error', (error) => {
+        reject(error);
+      });
+    });
+
+    console.log('🔍 Salida del módulo Python (stdout):', informeData);
+    console.log('🔍 Errores del módulo Python (stderr):', errorData);
+    
+    if (errorData) {
+      console.error('❌ Errores del módulo Python:', errorData);
+    }
+
+    // Procesar la respuesta del módulo Python
+    try {
+      const informeResult = JSON.parse(informeData);
+      
+                      if (informeResult.success) {
+                  // Generar documento Word usando el módulo Python
+                  const wordProcess = spawn('python', [pythonScriptPath, '--generate-word'], {
+                    stdio: ['pipe', 'pipe', 'pipe'],
+                    cwd: path.dirname(pythonScriptPath)
+                  });
+
+                  // Enviar datos del informe al proceso Python
+                  const wordData = {
+                    informe: informeResult.informe,
+                    metricas: metricas,
+                    contexto: contexto || {},
+                    action: 'generate_word_document'
+                  };
+
+                  wordProcess.stdin.write(JSON.stringify(wordData));
+                  wordProcess.stdin.end();
+
+                  let wordDataOutput = '';
+                  let wordErrorOutput = '';
+
+                  wordProcess.stdout.on('data', (data) => {
+                    wordDataOutput += data.toString();
+                  });
+
+                  wordProcess.stderr.on('data', (data) => {
+                    wordErrorOutput += data.toString();
+                  });
+
+                  // Esperar a que termine el proceso Python
+                  await new Promise((resolve, reject) => {
+                    wordProcess.on('close', (code) => {
+                      if (code === 0 || (code !== null && code !== undefined)) {
+                        resolve();
+                      } else {
+                        reject(new Error(`Proceso Python terminó con código ${code}`));
+                      }
+                    });
+
+                    wordProcess.on('error', (error) => {
+                      reject(error);
+                    });
+                  });
+
+                  if (wordErrorOutput) {
+                    console.error('❌ Errores generando Word:', wordErrorOutput);
+                  }
+
+                  try {
+                    const wordResult = JSON.parse(wordDataOutput);
+                    
+                    if (wordResult.success) {
+                      res.json({
+                        message: 'Informe generado exitosamente',
+                        informe: informeResult.informe,
+                        metadatos: informeResult.metadatos,
+                        wordDocument: wordResult.document_path,
+                        wordBase64: wordResult.document_base64
+                      });
+                    } else {
+                      // Si falla la generación del Word, enviar solo el informe en texto
+                      res.json({
+                        message: 'Informe generado exitosamente (Word no disponible)',
+                        informe: informeResult.informe,
+                        metadatos: informeResult.metadatos,
+                        wordError: wordResult.error
+                      });
+                    }
+                  } catch (parseError) {
+                    // Si falla el parsing del Word, enviar solo el informe en texto
+                    res.json({
+                      message: 'Informe generado exitosamente (Word no disponible)',
+                      informe: informeResult.informe,
+                      metadatos: informeResult.metadatos,
+                      wordError: 'Error procesando documento Word'
+                    });
+                  }
+                } else {
+                  res.status(500).json({ 
+                    error: 'Error generando informe', 
+                    details: informeResult.error 
+                  });
+                }
+    } catch (parseError) {
+      console.error('Error parseando respuesta del módulo Python:', parseError);
+      res.status(500).json({ 
+        error: 'Error procesando respuesta del módulo Python',
+        rawResponse: informeData
+      });
+    }
+
+  } catch (error) {
+    console.error('Error generando informe:', error);
+    res.status(500).json({ 
+      error: 'Error interno del servidor al generar informe',
+      details: error.message 
+    });
+  }
+});
+
 module.exports = router; 
