@@ -13,4 +13,4 @@
 *.rake text eol=lf
 *.ru text eol=lf
 *.gemspec text eol=lf
-*.json.jbuilder text eol=lf
+*.jbuilder text eol=lf
