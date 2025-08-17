@@ -1,4 +1,5 @@
-# Metadatos de paginación
+# frozen_string_literal: true
+
 json.pagination do
   json.page @pagy.page
   json.count @pagy.count
