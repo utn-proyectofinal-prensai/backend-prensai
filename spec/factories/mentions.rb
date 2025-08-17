@@ -6,7 +6,7 @@ FactoryBot.define do
 
     trait :with_news do
       after(:create) do |mention|
-        create_list(:new, rand(1..3), mentions: [mention])
+        create_list(:news, rand(1..3), mentions: [mention])
       end
     end
   end
