@@ -574,6 +574,16 @@ router.post('/generate-informe', async (req, res) => {
     console.log('🔍 Ruta del script Python:', pythonScriptPath);
     console.log('🔍 Working directory:', process.cwd());
     
+    // Verificar que el archivo Python existe
+    const fs = require('fs');
+    if (!fs.existsSync(pythonScriptPath)) {
+      console.error('❌ El script Python no existe en:', pythonScriptPath);
+      return res.status(500).json({ 
+        error: 'Script Python no encontrado',
+        path: pythonScriptPath
+      });
+    }
+    
     // Preparar datos para el módulo Python
     const dataForPython = {
       metricas: metricas,
@@ -583,10 +593,11 @@ router.post('/generate-informe', async (req, res) => {
     
     console.log('🔍 Datos enviados a Python:', JSON.stringify(dataForPython, null, 2));
 
-    // Ejecutar el módulo Python en modo backend
+    // Ejecutar el módulo Python en modo backend con timeout
     const pythonProcess = spawn('python', [pythonScriptPath, '--backend'], {
       stdio: ['pipe', 'pipe', 'pipe'],
-      cwd: path.dirname(pythonScriptPath) // Establecer working directory correcto
+      cwd: path.dirname(pythonScriptPath), // Establecer working directory correcto
+      timeout: 120000 // 2 minutos de timeout
     });
 
     // Enviar datos al proceso Python
@@ -599,128 +610,153 @@ router.post('/generate-informe', async (req, res) => {
     // Capturar salida del proceso Python
     pythonProcess.stdout.on('data', (data) => {
       informeData += data.toString();
+      console.log('🔍 Datos recibidos de Python:', data.toString());
     });
 
     pythonProcess.stderr.on('data', (data) => {
       errorData += data.toString();
+      console.log('🔍 Errores de Python:', data.toString());
     });
 
-    // Esperar a que termine el proceso Python
-    await new Promise((resolve, reject) => {
+    // Esperar a que termine el proceso Python con timeout
+    const result = await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        pythonProcess.kill('SIGTERM');
+        reject(new Error('Timeout: El proceso Python tardó demasiado'));
+      }, 120000); // 2 minutos
+
       pythonProcess.on('close', (code) => {
-        // Python puede retornar códigos diferentes por razones válidas
-        // Solo rechazar si hay datos de error o si el código es claramente problemático
+        clearTimeout(timeout);
+        console.log(`🔍 Proceso Python terminó con código: ${code}`);
+        
         if (code === 0 || (code !== null && code !== undefined)) {
-          resolve();
+          resolve({ code, informeData, errorData });
         } else {
           reject(new Error(`Proceso Python terminó con código ${code}`));
         }
       });
 
       pythonProcess.on('error', (error) => {
+        clearTimeout(timeout);
         reject(error);
       });
     });
 
-    console.log('🔍 Salida del módulo Python (stdout):', informeData);
-    console.log('🔍 Errores del módulo Python (stderr):', errorData);
+    console.log('🔍 Salida del módulo Python (stdout):', result.informeData);
+    console.log('🔍 Errores del módulo Python (stderr):', result.errorData);
     
-    if (errorData) {
-      console.error('❌ Errores del módulo Python:', errorData);
+    if (result.errorData) {
+      console.error('❌ Errores del módulo Python:', result.errorData);
     }
 
     // Procesar la respuesta del módulo Python
     try {
-      const informeResult = JSON.parse(informeData);
+      if (!result.informeData || result.informeData.trim() === '') {
+        throw new Error('No se recibió respuesta del módulo Python');
+      }
       
-                      if (informeResult.success) {
-                  // Generar documento Word usando el módulo Python
-                  const wordProcess = spawn('python', [pythonScriptPath, '--generate-word'], {
-                    stdio: ['pipe', 'pipe', 'pipe'],
-                    cwd: path.dirname(pythonScriptPath)
-                  });
+      const informeResult = JSON.parse(result.informeData);
+      
+      if (informeResult.success) {
+        // Generar documento Word usando el módulo Python
+        const wordProcess = spawn('python', [pythonScriptPath, '--generate-word'], {
+          stdio: ['pipe', 'pipe', 'pipe'],
+          cwd: path.dirname(pythonScriptPath),
+          timeout: 60000 // 1 minuto para Word
+        });
 
-                  // Enviar datos del informe al proceso Python
-                  const wordData = {
-                    informe: informeResult.informe,
-                    metricas: metricas,
-                    contexto: contexto || {},
-                    action: 'generate_word_document'
-                  };
+        // Enviar datos del informe al proceso Python
+        const wordData = {
+          informe: informeResult.informe,
+          metricas: metricas,
+          contexto: contexto || {},
+          action: 'generate_word_document'
+        };
 
-                  wordProcess.stdin.write(JSON.stringify(wordData));
-                  wordProcess.stdin.end();
+        wordProcess.stdin.write(JSON.stringify(wordData));
+        wordProcess.stdin.end();
 
-                  let wordDataOutput = '';
-                  let wordErrorOutput = '';
+        let wordDataOutput = '';
+        let wordErrorOutput = '';
 
-                  wordProcess.stdout.on('data', (data) => {
-                    wordDataOutput += data.toString();
-                  });
+        wordProcess.stdout.on('data', (data) => {
+          wordDataOutput += data.toString();
+        });
 
-                  wordProcess.stderr.on('data', (data) => {
-                    wordErrorOutput += data.toString();
-                  });
+        wordProcess.stderr.on('data', (data) => {
+          wordErrorOutput += data.toString();
+        });
 
-                  // Esperar a que termine el proceso Python
-                  await new Promise((resolve, reject) => {
-                    wordProcess.on('close', (code) => {
-                      if (code === 0 || (code !== null && code !== undefined)) {
-                        resolve();
-                      } else {
-                        reject(new Error(`Proceso Python terminó con código ${code}`));
-                      }
-                    });
+        // Esperar a que termine el proceso Python
+        await new Promise((resolve, reject) => {
+          const wordTimeout = setTimeout(() => {
+            wordProcess.kill('SIGTERM');
+            reject(new Error('Timeout generando Word'));
+          }, 60000);
 
-                    wordProcess.on('error', (error) => {
-                      reject(error);
-                    });
-                  });
+          wordProcess.on('close', (code) => {
+            clearTimeout(wordTimeout);
+            if (code === 0 || (code !== null && code !== undefined)) {
+              resolve();
+            } else {
+              reject(new Error(`Proceso Word terminó con código ${code}`));
+            }
+          });
 
-                  if (wordErrorOutput) {
-                    console.error('❌ Errores generando Word:', wordErrorOutput);
-                  }
+          wordProcess.on('error', (error) => {
+            clearTimeout(wordTimeout);
+            reject(error);
+          });
+        });
 
-                  try {
-                    const wordResult = JSON.parse(wordDataOutput);
-                    
-                    if (wordResult.success) {
-                      res.json({
-                        message: 'Informe generado exitosamente',
-                        informe: informeResult.informe,
-                        metadatos: informeResult.metadatos,
-                        wordDocument: wordResult.document_path,
-                        wordBase64: wordResult.document_base64
-                      });
-                    } else {
-                      // Si falla la generación del Word, enviar solo el informe en texto
-                      res.json({
-                        message: 'Informe generado exitosamente (Word no disponible)',
-                        informe: informeResult.informe,
-                        metadatos: informeResult.metadatos,
-                        wordError: wordResult.error
-                      });
-                    }
-                  } catch (parseError) {
-                    // Si falla el parsing del Word, enviar solo el informe en texto
-                    res.json({
-                      message: 'Informe generado exitosamente (Word no disponible)',
-                      informe: informeResult.informe,
-                      metadatos: informeResult.metadatos,
-                      wordError: 'Error procesando documento Word'
-                    });
-                  }
-                } else {
-                  res.status(500).json({ 
-                    error: 'Error generando informe', 
-                    details: informeResult.error 
-                  });
-                }
+        if (wordErrorOutput) {
+          console.error('❌ Errores generando Word:', wordErrorOutput);
+        }
+
+        try {
+          const wordResult = JSON.parse(wordDataOutput);
+          
+          if (wordResult.success) {
+            res.json({
+              message: 'Informe generado exitosamente',
+              informe: informeResult.informe,
+              metadatos: informeResult.metadatos,
+              wordDocument: wordResult.document_path,
+              wordBase64: wordResult.document_base64
+            });
+          } else {
+            // Si falla la generación del Word, enviar solo el informe en texto
+            res.json({
+              message: 'Informe generado exitosamente (Word no disponible)',
+              informe: informeResult.informe,
+              metadatos: informeResult.metadatos,
+              wordError: wordResult.error
+            });
+          }
+        } catch (parseError) {
+          // Si falla el parsing del Word, enviar solo el informe en texto
+          res.json({
+            message: 'Informe generado exitosamente (Word no disponible)',
+            informe: informeResult.informe,
+            metadatos: informeResult.metadatos,
+            wordError: 'Error procesando documento Word'
+          });
+        }
+      } else {
+        res.status(500).json({ 
+          error: 'Error generando informe', 
+          details: informeResult.error,
+          pythonErrors: result.errorData
+        });
+      }
     } catch (parseError) {
       console.error('Error parseando respuesta del módulo Python:', parseError);
+      console.error('Respuesta raw:', result.informeData);
       res.status(500).json({ 
         error: 'Error procesando respuesta del módulo Python',
-        rawResponse: informeData
+        parseError: parseError.message,
+        rawResponse: result.informeData,
+        pythonErrors: result.errorData
       });
     }
 
