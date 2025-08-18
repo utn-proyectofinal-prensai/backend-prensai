@@ -9,14 +9,9 @@ module API
       end
 
       def create
-        @topic = Topic.new(topic_params)
-        authorize @topic
-
-        if @topic.save
-          render :show, status: :created
-        else
-          render json: { errors: @topic.errors }, status: :unprocessable_entity
-        end
+        authorize Topic, :create?
+        @topic = Topic.create!(topic_params)
+        render :show, status: :created
       end
 
       def update

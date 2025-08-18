@@ -9,14 +9,9 @@ module API
       end
 
       def create
-        @mention = Mention.new(mention_params)
-        authorize @mention
-
-        if @mention.save
-          render :show, status: :created
-        else
-          render json: { errors: @mention.errors }, status: :unprocessable_entity
-        end
+        authorize Mention, :create?
+        @mention = Mention.create!(mention_params)
+        render :show, status: :created
       end
 
       def update

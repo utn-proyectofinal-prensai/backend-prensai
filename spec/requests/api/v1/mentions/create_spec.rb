@@ -58,7 +58,7 @@ describe 'POST api/v1/mentions' do
       it 'returns validation errors', :aggregate_failures do
         subject
         expect(json[:errors]).to be_present
-        expect(json[:errors]).to have_key(:name)
+        expect(json[:errors].first).to have_key(:name)
       end
     end
 
