@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateMentions < ActiveRecord::Migration[8.0]
   def change
     create_table :mentions do |t|
@@ -5,7 +7,7 @@ class CreateMentions < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
+
     add_index :mentions, :name, unique: true
   end
 end

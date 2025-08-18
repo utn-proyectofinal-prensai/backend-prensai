@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateNews < ActiveRecord::Migration[8.0]
   def change
     create_table :news do |t|
@@ -17,10 +19,10 @@ class CreateNews < ActiveRecord::Migration[8.0]
       t.string :management
       t.text :plain_text
       t.references :topic, foreign_key: true
-      
+
       t.timestamps
     end
-    
+
     add_index :news, :date
     add_index :news, :media
     add_index :news, :publication_type

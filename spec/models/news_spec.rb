@@ -15,7 +15,6 @@ describe News do
     it { is_expected.to validate_presence_of(:date) }
     it { is_expected.to validate_presence_of(:support) }
     it { is_expected.to validate_presence_of(:media) }
-    it { is_expected.to validate_length_of(:mentions).is_at_most(5) }
   end
 
   describe 'enums' do

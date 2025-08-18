@@ -16,7 +16,7 @@ FactoryBot.define do
     section          { %w[politics economy society sports culture].sample }
     valuation        { %w[positive neutral negative].sample }
     quotation        { Faker::Number.decimal(l_digits: 2, r_digits: 2) }
-    audience_size    { Faker::Number.between(from: 1000, to: 1000000) }
+    audience_size    { Faker::Number.between(from: 1000, to: 1_000_000) }
     topic            { association :topic }
 
     trait :with_mentions do

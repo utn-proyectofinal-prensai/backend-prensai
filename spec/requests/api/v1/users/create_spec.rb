@@ -5,7 +5,6 @@ describe 'POST api/v1/users' do
 
   include_context 'with authenticated admin user via JWT'
 
-
   let(:created_user) { User.find_by(email:) }
   let(:email) { 'newuser@example.com' }
   let(:params) do

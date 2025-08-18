@@ -33,3 +33,5 @@ class Topic < ApplicationRecord
     news.valuation_negative.count > 5
   end
 end
+
+# TODO: como max 5 temas activas.

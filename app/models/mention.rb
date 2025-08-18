@@ -21,4 +21,6 @@ class Mention < ApplicationRecord
   validates :name, presence: true, uniqueness: true
 
   scope :ordered, -> { order(:name) }
+
+  # TODO: como max 5 menciones activas.
 end

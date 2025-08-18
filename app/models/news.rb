@@ -43,7 +43,6 @@ class News < ApplicationRecord
   has_many :mentions, through: :mention_news
 
   validates :title, :publication_type, :date, :support, :media, presence: true
-  validates :mentions, length: { maximum: 5 }
 
   enum :valuation, { positive: 'positive', neutral: 'neutral', negative: 'negative' }, prefix: true
 
