@@ -5,9 +5,9 @@
 # Table name: topics
 #
 #  id          :bigint           not null, primary key
-#  crisis      :boolean          default(FALSE)
+#  crisis      :boolean          default(FALSE), not null
 #  description :text
-#  enabled     :boolean          default(TRUE)
+#  enabled     :boolean          default(TRUE), not null
 #  name        :string           not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null

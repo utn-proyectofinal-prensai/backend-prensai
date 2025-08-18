@@ -3,6 +3,7 @@
 FactoryBot.define do
   factory :mention do
     name { Faker::Lorem.unique.word.capitalize }
+    enabled { true }
 
     trait :with_news do
       after(:create) do |mention|

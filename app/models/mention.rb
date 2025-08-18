@@ -5,6 +5,7 @@
 # Table name: mentions
 #
 #  id         :bigint           not null, primary key
+#  enabled    :boolean          default(TRUE), not null
 #  name       :string           not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
@@ -21,6 +22,4 @@ class Mention < ApplicationRecord
   validates :name, presence: true, uniqueness: true
 
   scope :ordered, -> { order(:name) }
-
-  # TODO: como max 5 menciones activas.
 end
