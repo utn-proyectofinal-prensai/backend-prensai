@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-json.extract! mention, :id, :name, :created_at, :updated_at
+json.extract! mention, :id, :name, :enabled, :created_at, :updated_at

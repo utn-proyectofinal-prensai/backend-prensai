@@ -3,6 +3,7 @@
 module API
   module V1
     class MentionsController < API::V1::APIController
+      before_action :set_mention, only: %i[update]
       def index
         @mentions = policy_scope(Mention).ordered
       end
@@ -18,10 +19,20 @@ module API
         end
       end
 
+      def update
+        authorize @mention
+        @mention.update!(mention_params)
+        render :show, status: :ok
+      end
+
       private
 
+      def set_mention
+        @mention = Mention.find(params[:id])
+      end
+
       def mention_params
-        params.expect(mention: %i[name])
+        params.expect(mention: %i[name enabled])
       end
     end
   end
