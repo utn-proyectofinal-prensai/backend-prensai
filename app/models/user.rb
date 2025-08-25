@@ -18,7 +18,6 @@
 #  reset_password_token   :string
 #  role                   :string           default("user"), not null
 #  sign_in_count          :integer          default(0), not null
-#  tokens                 :json
 #  username               :string           default("")
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
@@ -27,7 +26,6 @@
 #
 #  index_users_on_email                 (email) UNIQUE
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
-#  index_users_on_role                  (role)
 #
 class User < ApplicationRecord
   # Include default devise modules. Others available are:

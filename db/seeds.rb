@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-AdminUser.create!(email: 'admin@example.com', password: 'password') if Rails.env.development?
-
-# Crear usuario administrador de prueba
 if Rails.env.development?
+  AdminUser.create!(email: 'admin@example.com', password: 'password')
+
   User.create!(
     email: 'admin@prensai.com',
     password: 'admin123456',
@@ -22,6 +21,24 @@ if Rails.env.development?
     last_name: 'Normal',
     role: 'user'
   )
+
+  topics = []
+  5.times do
+    topics << FactoryBot.create(:topic)
+  end
+  
+  mentions = []
+  5.times do
+    mentions << FactoryBot.create(:mention)
+  end
+
+  news_items = []
+  10.times do
+    news_item = FactoryBot.create(:news, topic: topics.sample)
+    selected_mentions = mentions.sample(rand(1..3))
+    news_item.mentions << selected_mentions
+    news_items << news_item
+  end
 end
 
 Setting.create_or_find_by!(key: 'min_version', value: '0.0')

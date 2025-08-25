@@ -12,8 +12,6 @@ plugins:
   - rubocop-rake
   - rubocop-rspec
   - rubocop-rspec_rails
-
-require:
   - rubocop-factory_bot
 
 AllCops:

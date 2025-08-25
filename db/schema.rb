@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_11_050500) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_224450) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -175,12 +175,66 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_050500) do
     t.index ["jti"], name: "index_jwt_denylists_on_jti", unique: true
   end
 
+  create_table "mention_news", force: :cascade do |t|
+    t.bigint "mention_id", null: false
+    t.bigint "news_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["mention_id", "news_id"], name: "index_mention_news_on_mention_id_and_news_id", unique: true
+    t.index ["mention_id"], name: "index_mention_news_on_mention_id"
+    t.index ["news_id"], name: "index_mention_news_on_news_id"
+  end
+
+  create_table "mentions", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "enabled", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_mentions_on_name", unique: true
+  end
+
+  create_table "news", force: :cascade do |t|
+    t.string "title", null: false
+    t.string "publication_type", null: false
+    t.date "date", null: false
+    t.string "support", null: false
+    t.string "media", null: false
+    t.string "section"
+    t.string "author"
+    t.string "interviewee"
+    t.string "link"
+    t.integer "audience_size"
+    t.decimal "quotation", precision: 10, scale: 2, default: "0.0"
+    t.string "valuation"
+    t.string "political_factor"
+    t.string "management"
+    t.text "plain_text"
+    t.bigint "topic_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_news_on_date"
+    t.index ["media"], name: "index_news_on_media"
+    t.index ["publication_type"], name: "index_news_on_publication_type"
+    t.index ["topic_id"], name: "index_news_on_topic_id"
+    t.index ["valuation"], name: "index_news_on_valuation"
+  end
+
   create_table "settings", force: :cascade do |t|
     t.string "key", null: false
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_settings_on_key", unique: true
+  end
+
+  create_table "topics", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "enabled", default: true, null: false
+    t.boolean "crisis", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_topics_on_name", unique: true
   end
 
   create_table "users", id: :serial, force: :cascade do |t|
@@ -199,12 +253,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_050500) do
     t.string "username", default: ""
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.json "tokens"
     t.string "role", default: "user", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-    t.index ["role"], name: "index_users_on_role"
   end
 
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "mention_news", "mentions"
+  add_foreign_key "mention_news", "news"
+  add_foreign_key "news", "topics"
 end
