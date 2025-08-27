@@ -17,6 +17,11 @@ RSpec.describe NewsProcessingService, type: :service do
   end
 
   before do
+    # Clean up all news to ensure test idempotency
+    News.destroy_all
+  end
+
+  before do
     create(:topic, name: 'Transport')
     create(:mention, name: 'Mention1')
   end
@@ -30,24 +35,21 @@ RSpec.describe NewsProcessingService, type: :service do
           processed: 2,
           news: [
             {
-              'titulo' => 'Test News 1',
-              'tipo_publicacion' => 'nota',
-              'fecha' => '2025-01-09',
-              'soporte' => 'web',
-              'medio' => 'Test Media',
-              'seccion' => 'Politics',
-              'autor' => 'Test Author',
-              'entrevistado' => nil,
-              'tema' => 'Transport',
-              'link' => 'https://example.com/news-1',
-              'alcance' => 10_000,
-              'cotizacion' => 0.0,
-              'valoracion' => 'neutral',
-              'factor_politico' => 'medio',
-              'gestion' => 'GCBA',
-              'texto_plano' => 'Test content',
-              'crisis' => 'no',
-              'menciones' => ['Mention1']
+              'TITULO' => 'Test News 1',
+              'TIPO PUBLICACION' => 'nota',
+              'FECHA' => '2025-01-09',
+              'SOPORTE' => 'web',
+              'MEDIO' => 'Test Media',
+              'SECCION' => 'Politics',
+              'AUTOR' => 'Test Author',
+              'ENTREVISTADO' => nil,
+              'TEMA' => 'Transport',
+              'LINK' => 'https://example.com/news-1',
+              'ALCANCE' => 10_000,
+              'COTIZACION' => 0.0,
+              'VALORACION' => 'neutral',
+              'FACTOR POLITICO' => 'medio',
+              'MENCIONES' => ['Mention1']
             }
           ],
           errors: []
@@ -55,12 +57,11 @@ RSpec.describe NewsProcessingService, type: :service do
 
         allow_any_instance_of(described_class).to receive(:call_external_service).and_return(ai_response)
 
-        expect { described_class.call(params) }.to change(News, :count).by(1)
-
-        result = described_class.call(params)
+        result = nil
+        expect { result = described_class.call(params) }.to change(News, :count).by(1)
         expect(result).to be_success
         expect(result.payload[:received]).to eq(2)
-        expect(result.payload[:processed]).to eq(1)
+        expect(result.payload[:processed_by_ai]).to eq(2)
         expect(result.payload[:news]).to be_present
       end
 
@@ -70,24 +71,21 @@ RSpec.describe NewsProcessingService, type: :service do
           processed: 1,
           news: [
             {
-              'titulo' => 'Persisted News',
-              'tipo_publicacion' => 'nota',
-              'fecha' => '2025-01-09',
-              'soporte' => 'web',
-              'medio' => 'Test Media',
-              'seccion' => 'Politics',
-              'autor' => 'Test Author',
-              'entrevistado' => nil,
-              'tema' => 'Transport',
-              'link' => 'https://example.com/news-1',
-              'alcance' => 50_000,
-              'cotizacion' => 100.50,
-              'valoracion' => 'positivo',
-              'factor_politico' => 'alto',
-              'gestion' => 'GCBA',
-              'texto_plano' => 'Full news content',
-              'crisis' => 'no',
-              'menciones' => ['Mention1']
+              'TITULO' => 'Persisted News',
+              'TIPO PUBLICACION' => 'nota',
+              'FECHA' => '2025-01-09',
+              'SOPORTE' => 'web',
+              'MEDIO' => 'Test Media',
+              'SECCION' => 'Politics',
+              'AUTOR' => 'Test Author',
+              'ENTREVISTADO' => nil,
+              'TEMA' => 'Transport',
+              'LINK' => 'https://example.com/news-1',
+              'ALCANCE' => 50_000,
+              'COTIZACION' => 100.50,
+              'VALORACION' => 'positivo',
+              'FACTOR POLITICO' => 'alto',
+              'MENCIONES' => ['Mention1']
             }
           ],
           errors: []
@@ -108,35 +106,35 @@ RSpec.describe NewsProcessingService, type: :service do
     end
 
     context 'with invalid URLs' do
-      let(:params) { { urls: ['invalid-url'] } }
+      let(:params) { { urls: ['invalid-url'], topics: [], mentions: [] } }
 
       it 'returns failure result' do
         result = described_class.call(params)
 
         expect(result).to be_failure
-        expect(result.error).to include('Invalid URL format')
+        expect(result.error).to include(a_string_including('Invalid URL format'))
       end
     end
 
     context 'with invalid topics' do
-      let(:params) { { urls: valid_urls, topics: ['NonexistentTopic'] } }
+      let(:params) { { urls: valid_urls, topics: ['NonexistentTopic'], mentions: [] } }
 
       it 'returns failure result' do
         result = described_class.call(params)
 
         expect(result).to be_failure
-        expect(result.error).to include('Invalid topics')
+        expect(result.error).to include(a_string_including('Invalid topics'))
       end
     end
 
     context 'with invalid mentions' do
-      let(:params) { { urls: valid_urls, mentions: ['NonexistentMention'] } }
+      let(:params) { { urls: valid_urls, topics: [], mentions: ['NonexistentMention'] } }
 
       it 'returns failure result' do
         result = described_class.call(params)
 
         expect(result).to be_failure
-        expect(result.error).to include('Invalid mentions')
+        expect(result.error).to include(a_string_including('Invalid mentions'))
       end
     end
   end
@@ -144,7 +142,7 @@ RSpec.describe NewsProcessingService, type: :service do
   describe '#call' do
     context 'when AI service fails' do
       before do
-        allow(service).to receive(:call_ai_service).and_raise(StandardError.new('AI service error'))
+        allow(service).to receive(:call_external_service).and_raise(StandardError.new('AI service error'))
       end
 
       it 'handles errors gracefully' do
@@ -166,9 +164,10 @@ RSpec.describe NewsProcessingService, type: :service do
 
     it 'has correct ministers' do
       expect(described_class::MINISTERS).to include(
-        'Pepe Pompin',
+        'Ricardes',
+        'Gabriela Ricardes',
         'Ministro',
-        'Ministro de cultura'
+        'Ministra'
       )
     end
   end
