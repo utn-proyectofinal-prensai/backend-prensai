@@ -6,8 +6,8 @@ RSpec.describe NewsRecordBuilder, type: :service do
   subject(:builder) { described_class.new(news_data) }
 
   let(:topic) { create(:topic, name: 'Transport') }
-  let(:mention1) { create(:mention, name: 'Mention1') }
-  let(:mention2) { create(:mention, name: 'Mention2') }
+  let(:mention) { create(:mention, name: 'Mention1') }
+  let(:another_mention) { create(:mention, name: 'Mention2') }
 
   let(:valid_news_data) do
     {
@@ -32,12 +32,9 @@ RSpec.describe NewsRecordBuilder, type: :service do
   before do
     # Clean up all news to ensure test idempotency
     News.destroy_all
-  end
-
-  before do
     topic
-    mention1
-    mention2
+    mention
+    another_mention
   end
 
   describe '.call' do
