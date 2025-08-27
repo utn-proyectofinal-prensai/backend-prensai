@@ -37,14 +37,14 @@ class NewsPersistenceService
     else
       {
         success: false,
-        error: build_error(news_data[:link], "Failed to save news: #{news_record.errors.full_messages.join(', ')}")
+        error: build_error(news_data['LINK'], "Failed to save news: #{news_record.errors.full_messages.join(', ')}")
       }
     end
   rescue StandardError => e
     Rails.logger.error "Error persisting news: #{e.message}"
     {
       success: false,
-      error: build_error(news_data[:link], "Persistence error: #{e.message}")
+      error: build_error(news_data['LINK'], "Persistence error: #{e.message}")
     }
   end
 

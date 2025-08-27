@@ -42,7 +42,7 @@ class ExternalAiService
   end
 
   def ai_service_url
-    "#{ai_module_base_url}/procesar-noticias"
+    "#{ai_module_base_url.chomp('/')}/procesar-noticias"
   end
 
   def transform_response(ai_data)
