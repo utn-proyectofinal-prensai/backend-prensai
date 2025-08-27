@@ -11,7 +11,6 @@ FactoryBot.define do
     author           { Faker::Name.name }
     interviewee      { Faker::Name.name }
     link             { Faker::Internet.url }
-    management       { Faker::Company.name }
     political_factor { %w[local regional national international].sample }
     section          { %w[politics economy society sports culture].sample }
     valuation        { %w[positive neutral negative].sample }
@@ -24,6 +23,14 @@ FactoryBot.define do
         mentions = create_list(:mention, rand(1..3))
         news_item.mentions << mentions
       end
+    end
+
+    trait :with_creator do
+      creator { association :user }
+    end
+
+    trait :with_reviewer do
+      reviewer { association :user }
     end
   end
 end
