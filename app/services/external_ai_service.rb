@@ -46,18 +46,19 @@ class ExternalAiService
   end
 
   def transform_response(ai_data)
+    Rails.logger.info "AI service response: #{ai_data}"
     validate_response_structure(ai_data)
 
     {
       received: ai_data['recibidas'],
       processed: ai_data['procesadas'],
-      news: ai_data['noticias'],
+      news: ai_data['data'],
       errors: ai_data['errores']
     }
   end
 
   def validate_response_structure(ai_data)
-    required_fields = %w[recibidas procesadas noticias errores]
+    required_fields = %w[recibidas procesadas data]
     missing_fields = required_fields.reject { |field| ai_data.key?(field) }
 
     return if missing_fields.empty?

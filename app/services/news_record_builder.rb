@@ -24,30 +24,28 @@ class NewsRecordBuilder
   # rubocop:disable Metrics/AbcSize
   def news_attributes
     {
-      title: news_data['titulo'],
-      publication_type: news_data['tipo_publicacion'],
-      date: parse_date(news_data['fecha']),
-      support: news_data['soporte'],
-      media: news_data['medio'],
-      section: news_data['seccion'],
-      author: news_data['autor'],
-      interviewee: news_data['entrevistado'],
-      link: news_data['link'],
-      audience_size: news_data['alcance'],
-      quotation: news_data['cotizacion'],
-      valuation: map_valuation(news_data['valoracion']),
-      political_factor: news_data['factor_politico'],
-      management: news_data['gestion'],
-      plain_text: news_data['texto_plano'],
-      topic: find_topic(news_data['tema'])
+      title: news_data['TITULO'],
+      publication_type: news_data['TIPO PUBLICACION'], # puede venir "REVISAR MANUAL"
+      date: parse_date(news_data['FECHA']),
+      support: news_data['SOPORTE'],
+      media: news_data['MEDIO'],
+      section: news_data['SECCION'],
+      author: news_data['AUTOR'],
+      interviewee: news_data['ENTREVISTADO'],
+      link: news_data['LINK'],
+      audience_size: news_data['ALCANCE'],
+      quotation: news_data['COTIZACION'],
+      valuation: map_valuation(news_data['VALORACION']), # puede venir "REVISAR MANUAL"
+      political_factor: news_data['FACTOR POLITICO'], # puede venir "REVISAR MANUAL"
+      topic: find_topic(news_data['TEMA'])
     }
   end
   # rubocop:enable Metrics/AbcSize
 
   def associate_mentions(news_record)
-    return unless news_data['menciones'].is_a?(Array)
+    return unless news_data['MENCIONES'].is_a?(Array)
 
-    news_data['menciones'].each do |mention_name|
+    news_data['MENCIONES'].each do |mention_name|
       mention = Mention.find_by(name: mention_name)
       news_record.mentions << mention if mention
     end
@@ -69,11 +67,11 @@ class NewsRecordBuilder
 
   def map_valuation(valuation)
     case valuation&.downcase
-    when 'positivo', 'positive'
+    when 'positiva', 'positivo', 'positive'
       'positive'
-    when 'negativo', 'negative'
+    when 'negativa', 'negativo', 'negative'
       'negative'
-    else
+    when 'neutra', 'neutro', 'neutral'
       'neutral'
     end
   end

@@ -75,8 +75,8 @@ class NewsProcessingService
       urls: urls,
       temas: topics,
       menciones: mentions,
-      ministerio: MINISTRIES,
-      ministro: MINISTERS
+      ministerios_key_words: MINISTRIES,
+      ministro_key_words: MINISTERS
     }
   end
 
