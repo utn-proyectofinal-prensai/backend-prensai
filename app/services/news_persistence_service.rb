@@ -14,25 +14,13 @@ class NewsPersistenceService
   end
 
   def call
-    success_count = 0
-    persisted_news = []
-    errors = []
-
-    news_items.each do |news_data|
-      result = persist_single_news(news_data)
-
-      if result[:success]
-        success_count += 1
-        persisted_news << result[:news]
-      else
-        errors << result[:error]
-      end
-    end
+    successful_results, failed_results = news_items.map { |news_data| persist_single_news(news_data) }
+                                                   .partition { |result| result[:success] }
 
     {
-      success_count: success_count,
-      persisted_news: persisted_news,
-      errors: errors
+      success_count: successful_results.size,
+      persisted_news: successful_results.pluck(:news),
+      errors: failed_results.pluck(:error)
     }
   end
 
@@ -44,19 +32,23 @@ class NewsPersistenceService
     if news_record.persisted?
       {
         success: true,
-        news: news_record # Retornamos el modelo directamente
+        news: news_record
       }
     else
       {
         success: false,
-        error: "Failed to save news: #{news_record.errors.full_messages.join(', ')}"
+        error: build_error(news_data[:link], "Failed to save news: #{news_record.errors.full_messages.join(', ')}")
       }
     end
   rescue StandardError => e
     Rails.logger.error "Error persisting news: #{e.message}"
     {
       success: false,
-      error: "Persistence error: #{e.message}"
+      error: build_error(news_data[:link], "Persistence error: #{e.message}")
     }
+  end
+
+  def build_error(url, reason)
+    { url:, reason: }
   end
 end

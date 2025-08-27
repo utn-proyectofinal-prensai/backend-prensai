@@ -50,10 +50,8 @@ class NewsProcessingService
   end
 
   def process_external_response(response)
-    received_count = response[:received]
-    ai_processed_count = response[:processed]
-    news_items = response[:news]
-    external_errors = response[:errors]
+    received_count, ai_processed_count, news_items, external_errors =
+      response.values_at(:received, :processed, :news, :errors)
 
     persistence_result = persist_news_items(news_items)
 
@@ -62,7 +60,7 @@ class NewsProcessingService
       processed_by_ai: ai_processed_count,
       persisted: persistence_result[:success_count],
       news: persistence_result[:persisted_news],
-      errors: external_errors + persistence_result[:errors]
+      errors: normalize_errors(external_errors, persistence_result[:errors])
     }
   end
 
@@ -72,7 +70,7 @@ class NewsProcessingService
 
   def build_request_payload
     {
-      urls: urls,
+      urls:,
       temas: topics,
       menciones: mentions,
       ministerios_key_words: MINISTRIES,
@@ -81,11 +79,10 @@ class NewsProcessingService
   end
 
   def urls_format
-    urls.each do |url|
-      next if valid_url?(url)
+    invalid_urls = urls.reject { |url| valid_url?(url) }
+    return if invalid_urls.empty?
 
-      errors.add(:urls, "Invalid URL format: #{url}")
-    end
+    errors.add(:urls, "Invalid URL format: #{invalid_urls.join(', ')}")
   end
 
   def topics_exist
@@ -103,17 +100,24 @@ class NewsProcessingService
   end
 
   def valid_url?(url)
-    uri = URI.parse(url)
-    uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
+    URI.parse(url).then do |uri|
+      uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
+    end
   rescue URI::InvalidURIError
     false
   end
 
   def success_result(payload)
-    ServiceResult.new(success: true, payload: payload)
+    ServiceResult.new(success: true, payload:)
   end
 
   def failure_result(error)
-    ServiceResult.new(success: false, error: error)
+    ServiceResult.new(success: false, error:)
+  end
+
+  def normalize_errors(external_errors, persistence_errors)
+    external_errors.map { |error|
+      { url: error[:url], reason: error[:motivo] }
+    } + persistence_errors
   end
 end
