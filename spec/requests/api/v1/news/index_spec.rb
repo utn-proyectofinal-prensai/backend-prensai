@@ -4,8 +4,8 @@ describe 'GET api/v1/news' do
   subject { get api_v1_news_index_path, headers: auth_headers, as: :json }
 
   let!(:topic) { create(:topic) }
-  let!(:recent_news) { create(:news, title: 'Recent News', topic: topic, date: 1.day.ago) }
-  let!(:old_news) { create(:news, title: 'Old News', topic: topic, date: 1.week.ago) }
+  let!(:recent_news) { create(:news, title: 'Recent News', topic: topic, created_at: 1.day.ago) }
+  let!(:old_news) { create(:news, title: 'Old News', topic: topic, created_at: 1.week.ago) }
 
   context 'when authenticated as admin user' do
     include_context 'with authenticated admin user via JWT'
