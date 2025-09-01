@@ -18,8 +18,9 @@ RSpec.describe NewsProcessingService, type: :service do
     }
   end
 
-  let(:ai_response) do
+  let(:external_ai_service_response) do
     {
+      ok: true,
       received: 2,
       processed: 2,
       news: [
@@ -34,8 +35,8 @@ RSpec.describe NewsProcessingService, type: :service do
           'ENTREVISTADO' => nil,
           'TEMA' => 'Transport',
           'LINK' => 'https://example.com/news-1',
-          'ALCANCE' => 10_000,
-          'COTIZACION' => 0.0,
+          'ALCANCE' => '10.000',
+          'COTIZACION' => '$0.0',
           'VALORACION' => 'neutral',
           'FACTOR POLITICO' => 'medio',
           'MENCIONES' => ['Mention1']
@@ -54,7 +55,7 @@ RSpec.describe NewsProcessingService, type: :service do
 
   describe '.call' do
     before do
-      allow(service).to receive(:call_external_service).and_return(ai_response)
+      allow(service).to receive(:call_external_service).and_return(external_ai_service_response)
     end
 
     context 'with valid parameters' do
@@ -72,7 +73,7 @@ RSpec.describe NewsProcessingService, type: :service do
 
       it 'returns failure result' do
         expect(result).to be_failure
-        expect(result.error).to include(a_string_including('Invalid URL format'))
+        expect(result.errors).to include(a_string_including('Invalid URL format'))
       end
     end
 
@@ -81,7 +82,7 @@ RSpec.describe NewsProcessingService, type: :service do
 
       it 'returns failure result' do
         expect(result).to be_failure
-        expect(result.error).to include(a_string_including('Invalid topics'))
+        expect(result.errors).to include(a_string_including('Invalid topics'))
       end
     end
 
@@ -90,7 +91,7 @@ RSpec.describe NewsProcessingService, type: :service do
 
       it 'returns failure result' do
         expect(result).to be_failure
-        expect(result.error).to include(a_string_including('Invalid mentions'))
+        expect(result.errors).to include(a_string_including('Invalid mentions'))
       end
     end
 
@@ -101,7 +102,7 @@ RSpec.describe NewsProcessingService, type: :service do
 
       it 'handles errors gracefully' do
         expect(result).to be_failure
-        expect(result.error).to include('Processing failed')
+        expect(result.errors).to include('Processing failed')
       end
     end
   end

@@ -30,17 +30,24 @@ class NewsProcessingService
   def call
     return failure_result(errors.full_messages) unless valid?
 
-    external_response = call_external_service
-    return failure_result('External service failed') unless external_response
-
-    result = process_external_response(external_response)
-    success_result(result)
+    handle_response(call_external_service)
   rescue StandardError => e
     Rails.logger.error "NewsProcessingService error: #{e.message}"
     failure_result("Processing failed: #{e.message}")
   end
 
   private
+
+  def handle_response(response)
+    if response.nil?
+      failure_result('External AI service is unreachable')
+    elsif response[:ok]
+      payload = process_external_response(response)
+      success_result(payload)
+    else
+      failure_result(response[:errors] || 'AI service processing error')
+    end
+  end
 
   def call_external_service
     ExternalAiService.call(build_request_payload)
@@ -53,7 +60,7 @@ class NewsProcessingService
     received_count, ai_processed_count, news_items, external_errors =
       response.values_at(:received, :processed, :news, :errors)
 
-    persistence_result = persist_news_items(news_items)
+    persistence_result = persist_news_items(news_items) unless news_items.to_a.empty?
 
     {
       received: received_count,
@@ -111,13 +118,11 @@ class NewsProcessingService
     ServiceResult.new(success: true, payload:)
   end
 
-  def failure_result(error)
-    ServiceResult.new(success: false, error:)
+  def failure_result(errors)
+    ServiceResult.new(success: false, errors:)
   end
 
-  def normalize_errors(external_errors, persistence_errors)
-    external_errors.map { |error|
-      { url: error[:url], reason: error[:motivo] }
-    } + persistence_errors
+  def normalize_errors(external_errors, persistence_errors = [])
+    external_errors + persistence_errors
   end
 end

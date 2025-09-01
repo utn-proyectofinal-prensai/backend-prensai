@@ -58,6 +58,22 @@ RSpec.describe NewsRecordBuilder, type: :service do
       expect(news.topic).to eq(topic)
     end
 
+    it "casts 'ALCANCE' string with thousands separator to integer" do
+      data = valid_news_data.merge('ALCANCE' => '3.500')
+      expect { described_class.call(data) }.to change(News, :count).by(1)
+
+      news = News.last
+      expect(news.audience_size).to eq(3500)
+    end
+
+    it "casts 'COTIZACION' currency string to decimal" do
+      data = valid_news_data.merge('COTIZACION' => '$75.000')
+      expect { described_class.call(data) }.to change(News, :count).by(1)
+
+      news = News.last
+      expect(news.quotation).to eq(75_000.00)
+    end
+
     it 'associates mentions correctly' do
       described_class.call(valid_news_data)
 

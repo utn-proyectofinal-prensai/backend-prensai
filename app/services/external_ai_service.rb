@@ -18,10 +18,10 @@ class ExternalAiService
 
     unless response.success?
       Rails.logger.error "AI service failed with status #{response.status}: #{response.body}"
-      return
+      return { ok: false, errors: response.body['errores'] }
     end
 
-    transform_response(response.body)
+    transform_response(response.body).merge({ ok: true })
   rescue Faraday::Error => e
     Rails.logger.error "AI service connection error: #{e.message}"
     nil
@@ -53,8 +53,19 @@ class ExternalAiService
       received: ai_data['recibidas'],
       processed: ai_data['procesadas'],
       news: ai_data['data'],
-      errors: ai_data['errores']
+      errors: tranform_errors(ai_data['errores'])
     }
+  end
+
+  def tranform_errors(errors)
+    return [] unless errors.is_a?(Array)
+
+    errors.map do |error|
+      {
+        url: error['url'],
+        reason: error['motivo']
+      }
+    end
   end
 
   def validate_response_structure(ai_data)
