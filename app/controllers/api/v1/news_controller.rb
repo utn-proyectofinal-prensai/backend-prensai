@@ -16,7 +16,7 @@ module API
           @result = result.payload
           render :batch_process, status: :ok
         else
-          render json: { error: result.error }, status: :unprocessable_entity
+          render json: { errors: result.errors }, status: :unprocessable_entity
         end
       rescue ActionController::ParameterMissing => e
         render json: { error: 'Missing required parameters', details: e.message }, status: :bad_request

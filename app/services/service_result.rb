@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 class ServiceResult
-  attr_reader :payload, :error
+  attr_reader :payload, :errors
 
-  def initialize(success:, payload: nil, error: nil)
+  def initialize(success:, payload: nil, errors: nil)
     @success = success
     @payload = payload
-    @error = error
+    @errors = errors
   end
 
   def success?

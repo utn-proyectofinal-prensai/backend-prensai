@@ -21,14 +21,14 @@ RSpec.describe ServiceResult, type: :service do
     end
 
     context 'with failure result' do
-      subject(:result) { described_class.new(success: false, error: 'Something went wrong') }
+      subject(:result) { described_class.new(success: false, errors: 'Something went wrong') }
 
       it 'sets success to false' do
         expect(result.success?).to be false
       end
 
-      it 'sets error correctly' do
-        expect(result.error).to eq('Something went wrong')
+      it 'sets errors correctly' do
+        expect(result.errors).to eq('Something went wrong')
       end
 
       it 'sets failure to true' do
@@ -42,7 +42,7 @@ RSpec.describe ServiceResult, type: :service do
       it 'initializes with default values' do
         expect(result.success?).to be true
         expect(result.payload).to be_nil
-        expect(result.error).to be_nil
+        expect(result.errors).to be_nil
       end
     end
   end
@@ -73,15 +73,15 @@ RSpec.describe ServiceResult, type: :service do
 
   describe 'attribute readers' do
     let(:payload) { { key: 'value' } }
-    let(:error) { 'Error message' }
-    let(:result) { described_class.new(success: true, payload: payload, error: error) }
+    let(:errors) { 'Errors message' }
+    let(:result) { described_class.new(success: true, payload: payload, errors: errors) }
 
     it 'provides read access to payload' do
       expect(result.payload).to eq(payload)
     end
 
-    it 'provides read access to error' do
-      expect(result.error).to eq(error)
+    it 'provides read access to errors' do
+      expect(result.errors).to eq(errors)
     end
   end
 end
