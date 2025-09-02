@@ -8,3 +8,5 @@ es:
       forbidden: No tenés permisos para realizar esta acción 
       unauthorized: No estás autenticado o tu token expiró
       invalid_credentials: Credenciales inválidas
+      record_not_destroyed: No se pudo eliminar el registro
+      deletion_restricted: La eliminación está restringida debido a asociaciones dependientes
