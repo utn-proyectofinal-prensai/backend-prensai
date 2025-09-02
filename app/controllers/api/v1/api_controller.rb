@@ -20,6 +20,8 @@ module API
       rescue_from Warden::JWTAuth::Errors::RevokedToken, with: :render_unauthorized
       rescue_from JWT::ExpiredSignature,               with: :render_unauthorized
       rescue_from JWT::DecodeError,                    with: :render_unauthorized
+      rescue_from ActiveRecord::RecordNotDestroyed,    with: :render_record_not_destroyed
+      rescue_from ActiveRecord::DeleteRestrictionError, with: :render_restriction_error
 
       private
 
@@ -46,6 +48,14 @@ module API
 
       def render_unauthorized(exception)
         render_error(exception, { message: I18n.t('api.errors.unauthorized') }, :unauthorized)
+      end
+
+      def render_record_not_destroyed(exception)
+        render_error(exception, { message: I18n.t('api.errors.record_not_destroyed') }, :conflict)
+      end
+
+      def render_restriction_error(exception)
+        render_error(exception, { message: I18n.t('api.errors.deletion_restricted') }, :conflict)
       end
     end
   end
