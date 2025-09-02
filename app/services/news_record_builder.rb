@@ -33,6 +33,7 @@ class NewsRecordBuilder
       author: news_data['AUTOR'],
       interviewee: news_data['ENTREVISTADO'],
       link: news_data['LINK'],
+      plain_text: news_data['TEXTO_PLANO'],
       audience_size: parse_audience_size(news_data['ALCANCE']),
       quotation: parse_quotation(news_data['COTIZACION']),
       valuation: map_valuation(news_data['VALORACION']), # puede venir "REVISAR MANUAL"
