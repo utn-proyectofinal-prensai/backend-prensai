@@ -145,7 +145,7 @@ Rails.application.routes.draw do
         resource :user, only: %i[update show]
       end
       resources :users, only: %i[index show create update destroy]
-      resources :topics, only: %i[index create update]
+      resources :topics, only: %i[index create update destroy]
       resources :news, only: %i[index] do
         post :batch_process, on: :collection
       end

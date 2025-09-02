@@ -3,7 +3,8 @@
 module API
   module V1
     class TopicsController < API::V1::APIController
-      before_action :set_topic, only: %i[update]
+      before_action :set_topic, only: %i[update destroy]
+
       def index
         @topics = policy_scope(Topic).ordered
       end
@@ -18,6 +19,12 @@ module API
         authorize @topic
         @topic.update!(topic_params)
         render :show, status: :ok
+      end
+
+      def destroy
+        authorize @topic
+        @topic.destroy!
+        head :no_content
       end
 
       private
