@@ -6,7 +6,7 @@ module API
       before_action :set_mention, only: %i[update destroy]
 
       def index
-        @mentions = policy_scope(Mention).ordered
+        @mentions = policy_scope(Mention).ordered.filter_by(filtering_params)
       end
 
       def create
@@ -35,6 +35,10 @@ module API
 
       def mention_params
         params.expect(mention: %i[name enabled])
+      end
+
+      def filtering_params
+        params.slice(*Mention.filter_scopes)
       end
     end
   end
