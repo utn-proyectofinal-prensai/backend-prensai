@@ -19,3 +19,13 @@ json.mentions news.mentions do |mention|
   json.id mention.id
   json.name mention.name
 end
+
+json.creator do
+  json.id news.creator.id
+  json.name news.creator.full_name
+end
+
+json.reviewer do
+  json.id news.reviewer.id
+  json.name news.reviewer.full_name
+end
