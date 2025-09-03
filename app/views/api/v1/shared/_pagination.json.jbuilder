@@ -2,6 +2,7 @@
 
 json.pagination do
   json.page @pagy.page
+  json.limit @pagy.limit
   json.count @pagy.count
   json.pages @pagy.pages
   json.prev @pagy.prev

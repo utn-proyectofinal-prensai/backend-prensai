@@ -4,7 +4,7 @@ describe 'GET api/v1/mentions' do
   subject { get api_v1_mentions_path, headers: auth_headers, as: :json }
 
   let!(:mention_zebra) { create(:mention, name: 'Zebra') }
-  let!(:mention_apple) { create(:mention, name: 'Apple') }
+  let!(:mention_apple) { create(:mention, name: 'Apple', enabled: false) }
   let!(:mention_mango) { create(:mention, name: 'Mango') }
 
   context 'when authenticated as admin user' do
@@ -80,6 +80,44 @@ describe 'GET api/v1/mentions' do
       subject
       mention_names = json[:mentions].pluck(:name)
       expect(mention_names).to eq(%w[Apple Mango Zebra])
+    end
+  end
+
+  context 'when sending filtering params' do
+    include_context 'with authenticated admin user via JWT'
+
+    context 'with enabled=true filter' do
+      subject { get api_v1_mentions_path(enabled: 'true'), headers: auth_headers, as: :json }
+
+      it 'returns only enabled mentions' do
+        subject
+        expect(json[:mentions].size).to eq(2)
+      end
+
+      it 'all returned mentions are enabled' do
+        subject
+        enabled_states = json[:mentions].pluck(:enabled)
+        expect(enabled_states).to all(be true)
+      end
+    end
+
+    context 'with enabled=false filter' do
+      subject { get api_v1_mentions_path(enabled: 'false'), headers: auth_headers, as: :json }
+
+      it 'returns only disabled mentions' do
+        subject
+        expect(json[:mentions].size).to eq(1)
+        expect(json[:mentions].first[:enabled]).to be false
+      end
+    end
+
+    context 'with invalid filter params' do
+      subject { get api_v1_mentions_path(invalid_param: 'value'), headers: auth_headers, as: :json }
+
+      it 'ignores invalid params and returns all mentions' do
+        subject
+        expect(json[:mentions].size).to eq(3)
+      end
     end
   end
 
