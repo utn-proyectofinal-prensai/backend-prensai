@@ -10,11 +10,13 @@ RSpec.describe NewsProcessingService, type: :service do
   let(:valid_urls) { ['https://example.com/news-1', 'https://example.com/news-2'] }
   let(:valid_topics) { ['Transport'] }
   let(:valid_mentions) { ['Mention1'] }
+  let(:creator) { create(:user) }
   let(:params) do
     {
       urls: valid_urls,
       topics: valid_topics,
-      mentions: valid_mentions
+      mentions: valid_mentions,
+      creator_id: creator.id
     }
   end
 
@@ -66,10 +68,16 @@ RSpec.describe NewsProcessingService, type: :service do
       it 'persists news with correct attributes and associations' do
         expect { result }.to change(News, :count).by(1)
       end
+
+      it 'persists news with correct creator_id' do
+        result
+        created_news = News.last
+        expect(created_news.creator_id).to eq(creator.id)
+      end
     end
 
     context 'with invalid URLs' do
-      let(:params) { { urls: ['invalid-url'], topics: [], mentions: [] } }
+      let(:params) { { urls: ['invalid-url'], topics: [], mentions: [], creator_id: creator.id } }
 
       it 'returns failure result' do
         expect(result).to be_failure
@@ -78,7 +86,7 @@ RSpec.describe NewsProcessingService, type: :service do
     end
 
     context 'with invalid topics' do
-      let(:params) { { urls: valid_urls, topics: ['NonexistentTopic'], mentions: [] } }
+      let(:params) { { urls: valid_urls, topics: ['NonexistentTopic'], mentions: [], creator_id: creator.id } }
 
       it 'returns failure result' do
         expect(result).to be_failure
@@ -87,7 +95,7 @@ RSpec.describe NewsProcessingService, type: :service do
     end
 
     context 'with invalid mentions' do
-      let(:params) { { urls: valid_urls, topics: [], mentions: ['NonexistentMention'] } }
+      let(:params) { { urls: valid_urls, topics: [], mentions: ['NonexistentMention'], creator_id: creator.id } }
 
       it 'returns failure result' do
         expect(result).to be_failure

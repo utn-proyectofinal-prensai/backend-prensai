@@ -3,10 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe NewsPersistenceService, type: :service do
-  subject(:service) { described_class.new(news_items) }
+  subject(:service) { described_class.new(news_items, creator_id) }
 
   let(:topic) { create(:topic, name: 'Transport') }
   let(:mention) { create(:mention, name: 'Mention1') }
+  let(:creator_id) { create(:user).id }
 
   let(:valid_news_item) do
     {
@@ -63,6 +64,12 @@ RSpec.describe NewsPersistenceService, type: :service do
         service.call
         news = News.last
         expect(news.mentions.pluck(:name)).to include('Mention1')
+      end
+
+      it 'sets creator_id correctly' do
+        service.call
+        news = News.last
+        expect(news.creator_id).to eq(creator_id)
       end
 
       it 'returns correct result structure' do

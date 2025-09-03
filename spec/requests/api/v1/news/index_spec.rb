@@ -4,8 +4,14 @@ describe 'GET api/v1/news' do
   subject { get api_v1_news_index_path, headers: auth_headers, as: :json }
 
   let!(:topic) { create(:topic) }
-  let!(:recent_news) { create(:news, title: 'Recent News', topic: topic, created_at: 1.day.ago) }
-  let!(:old_news) { create(:news, title: 'Old News', topic: topic, created_at: 1.week.ago) }
+  let!(:creator) { create(:user) }
+  let!(:reviewer) { create(:user) }
+  let!(:recent_news) do
+    create(:news, title: 'Recent News', topic: topic, creator: creator, reviewer: reviewer, created_at: 1.day.ago)
+  end
+  let!(:old_news) do
+    create(:news, title: 'Old News', topic: topic, creator: creator, reviewer: reviewer, created_at: 1.week.ago)
+  end
 
   context 'when authenticated as admin user' do
     include_context 'with authenticated admin user via JWT'
@@ -38,6 +44,21 @@ describe 'GET api/v1/news' do
       expect(news_item).to have_key(:valuation)
       expect(news_item).to have_key(:created_at)
       expect(news_item).to have_key(:updated_at)
+      expect(news_item).to have_key(:creator)
+      expect(news_item).to have_key(:reviewer)
+    end
+
+    it 'includes creator and reviewer as objects', :aggregate_failures do
+      subject
+      news_item = json[:news].first
+
+      expect(news_item[:creator]).to be_a(Hash)
+      expect(news_item[:creator][:id]).to eq(creator.id)
+      expect(news_item[:creator][:name]).to eq(creator.full_name)
+
+      expect(news_item[:reviewer]).to be_a(Hash)
+      expect(news_item[:reviewer][:id]).to eq(reviewer.id)
+      expect(news_item[:reviewer][:name]).to eq(reviewer.full_name)
     end
 
     it 'includes pagination metadata', :aggregate_failures do
@@ -52,7 +73,7 @@ describe 'GET api/v1/news' do
 
     context 'with many news items' do
       before do
-        create_list(:news, 10, topic: topic)
+        create_list(:news, 10, topic: topic, creator: creator, reviewer: reviewer)
       end
 
       it 'paginates results correctly' do
@@ -69,7 +90,7 @@ describe 'GET api/v1/news' do
 
     context 'with news from different topics' do
       let!(:another_topic) { create(:topic) }
-      let!(:news_from_another_topic) { create(:news, topic: another_topic) }
+      let!(:news_from_another_topic) { create(:news, topic: another_topic, creator: creator, reviewer: reviewer) }
 
       it 'returns news from all topics' do
         subject
@@ -80,9 +101,9 @@ describe 'GET api/v1/news' do
 
     context 'with news having different valuations' do
       before do
-        create(:news, valuation: 'positive', topic: topic)
-        create(:news, valuation: 'negative', topic: topic)
-        create(:news, valuation: 'neutral', topic: topic)
+        create(:news, valuation: 'positive', topic: topic, creator: creator, reviewer: reviewer)
+        create(:news, valuation: 'negative', topic: topic, creator: creator, reviewer: reviewer)
+        create(:news, valuation: 'neutral', topic: topic, creator: creator, reviewer: reviewer)
       end
 
       it 'returns news with all valuations' do

@@ -30,13 +30,61 @@ RSpec.describe 'POST /api/v1/news/batch_process' do
       it 'processes news successfully' do
         subject
         expect(response).to have_http_status(:ok)
-        expect(NewsProcessingService).to have_received(:call).with(params)
+        expect(NewsProcessingService).to have_received(:call).with(params.merge(creator_id: regular_user.id))
       end
 
       it 'returns service payload' do
         subject
         expect(response.parsed_body['received']).to eq(1)
         expect(response.parsed_body['processed_by_ai']).to eq(1)
+      end
+
+      it 'passes creator_id to the service' do
+        subject
+        expect(NewsProcessingService).to have_received(:call).with(hash_including(creator_id: regular_user.id))
+      end
+    end
+
+    context 'with real service processing' do
+      let(:external_ai_service_response) do
+        {
+          ok: true,
+          received: 1,
+          processed: 1,
+          news: [
+            {
+              'TITULO' => 'Test News',
+              'TIPO PUBLICACION' => 'nota',
+              'FECHA' => '2025-01-09',
+              'SOPORTE' => 'web',
+              'MEDIO' => 'Test Media',
+              'SECCION' => 'Politics',
+              'AUTOR' => 'Test Author',
+              'ENTREVISTADO' => nil,
+              'TEMA' => 'Transport',
+              'LINK' => 'https://example.com/news-1',
+              'ALCANCE' => '10.000',
+              'COTIZACION' => '$0.0',
+              'VALORACION' => 'neutral',
+              'FACTOR POLITICO' => 'medio',
+              'MENCIONES' => ['Mention1']
+            }
+          ],
+          errors: []
+        }
+      end
+
+      before do
+        allow(NewsProcessingService).to receive(:call).and_call_original
+        allow(ExternalAiService).to receive(:call).and_return(external_ai_service_response)
+      end
+
+      it 'persists news with correct creator_id' do
+        expect { subject }.to change(News, :count).by(1)
+
+        created_news = News.last
+        expect(created_news.creator_id).to eq(regular_user.id)
+        expect(created_news.title).to eq('Test News')
       end
     end
 
