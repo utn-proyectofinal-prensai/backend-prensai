@@ -167,4 +167,8 @@ Rails.application.routes.draw do
 
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'
+
+  # This route catches all requests that does not match with any other previous route declared
+  match '*a', to: 'errors#routing_error', via: :all
+  match '/', to: 'errors#routing_error', via: :all
 end
