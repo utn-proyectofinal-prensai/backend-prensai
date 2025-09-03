@@ -2,7 +2,7 @@
 
 describe Mention do
   describe 'associations' do
-    it { is_expected.to have_many(:mention_news).dependent(:destroy) }
+    it { is_expected.to have_many(:mention_news).dependent(:restrict_with_exception) }
     it { is_expected.to have_many(:news).through(:mention_news) }
   end
 

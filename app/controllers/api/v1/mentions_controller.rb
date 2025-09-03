@@ -3,7 +3,8 @@
 module API
   module V1
     class MentionsController < API::V1::APIController
-      before_action :set_mention, only: %i[update]
+      before_action :set_mention, only: %i[update destroy]
+
       def index
         @mentions = policy_scope(Mention).ordered
       end
@@ -18,6 +19,12 @@ module API
         authorize @mention
         @mention.update!(mention_params)
         render :show, status: :ok
+      end
+
+      def destroy
+        authorize @mention
+        @mention.destroy!
+        head :no_content
       end
 
       private

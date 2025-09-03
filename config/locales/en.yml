@@ -13,3 +13,5 @@ en:
       forbidden: You are not allowed to perform this action
       unauthorized: You are not authenticated or your token has expired
       invalid_credentials: Invalid credentials
+      record_not_destroyed: Couldn't destroy the record
+      deletion_restricted: Deletion is restricted due to dependent associations

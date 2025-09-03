@@ -2,7 +2,6 @@
 
 describe 'DELETE api/v1/users/:id' do
   let!(:target_user) { create(:user, :with_name) }
-  let!(:other_user) { create(:user, :with_name) }
 
   context 'when user is admin' do
     include_context 'with authenticated admin user via JWT'

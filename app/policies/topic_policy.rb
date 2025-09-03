@@ -6,4 +6,6 @@ class TopicPolicy < ApplicationPolicy
   def create? = true
 
   def update? = true
+
+  def destroy? = true
 end

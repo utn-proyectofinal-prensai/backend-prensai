@@ -16,7 +16,7 @@
 #
 
 class Mention < ApplicationRecord
-  has_many :mention_news, dependent: :destroy
+  has_many :mention_news, dependent: :restrict_with_exception
   has_many :news, through: :mention_news
 
   validates :name, presence: true, uniqueness: true

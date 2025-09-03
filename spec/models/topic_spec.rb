@@ -4,7 +4,7 @@
 
 describe Topic do
   describe 'associations' do
-    it { is_expected.to have_many(:news).dependent(:restrict_with_error) }
+    it { is_expected.to have_many(:news).dependent(:restrict_with_exception) }
   end
 
   describe 'validations' do
