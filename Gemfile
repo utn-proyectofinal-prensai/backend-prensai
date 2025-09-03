@@ -35,7 +35,6 @@ gem 'rswag-api', '~> 2.16.0'
 gem 'rswag-ui', '~> 2.16.0'
 gem 'sendgrid', '~> 1.2.4'
 gem 'sprockets-rails', '~> 3.5', '>= 3.5.2'
-gem 'strong_migrations', '~> 2.4'
 gem 'yaaf', '~> 3.0'
 
 # Gems para compatibilidad con Ruby 3.5.0+

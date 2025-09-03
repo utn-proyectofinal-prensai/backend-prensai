@@ -108,6 +108,9 @@ RSpec/VerifiedDoubles:
     - spec/policies/admin/page_policy_spec.rb
     - spec/policies/application_policy_spec.rb
 
+RSpec/MultipleMemoizedHelpers:
+  Max: 7
+  
 Style/ArrayCoercion:
   Enabled: true
 
@@ -164,3 +167,6 @@ RSpec/Dialect:
 
 Layout/EndOfLine:
   EnforcedStyle: lf
+
+Style/FrozenStringLiteralComment:
+  Enabled: false

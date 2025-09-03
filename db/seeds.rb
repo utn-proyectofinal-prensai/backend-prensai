@@ -26,7 +26,7 @@ if Rails.env.development?
   5.times do
     topics << FactoryBot.create(:topic)
   end
-  
+
   mentions = []
   5.times do
     mentions << FactoryBot.create(:mention)

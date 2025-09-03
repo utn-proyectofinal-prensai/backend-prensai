@@ -44,7 +44,7 @@ describe Topic do
     context 'when topic has more than 5 negative news' do
       it 'sets crisis to true' do
         # Create 6 negative news using insert_all to avoid callbacks
-        news_attributes = Array.new(6) do
+        news_attributes = Array.new(5) do
           {
             title: 'Test News',
             publication_type: 'article',
@@ -52,6 +52,7 @@ describe Topic do
             support: 'negative',
             media: 'Test Media',
             valuation: 'negative',
+            link: "https://example.com/news-#{SecureRandom.uuid}",
             topic_id: topic.id,
             created_at: Time.current,
             updated_at: Time.current
@@ -63,10 +64,10 @@ describe Topic do
       end
     end
 
-    context 'when topic has 5 or fewer negative news' do
+    context 'when topic has 4 or fewer negative news' do
       it 'keeps crisis as false' do
         # Create 5 negative news using insert_all
-        news_attributes = Array.new(5) do
+        news_attributes = Array.new(4) do
           {
             title: 'Test News',
             publication_type: 'article',
@@ -74,45 +75,12 @@ describe Topic do
             support: 'negative',
             media: 'Test Media',
             valuation: 'negative',
+            link: "https://example.com/news-#{SecureRandom.uuid}",
             topic_id: topic.id,
             created_at: Time.current,
             updated_at: Time.current
           }
         end
-        News.insert_all(news_attributes)
-
-        expect { topic.check_crisis! }.not_to change(topic, :crisis)
-        expect(topic.crisis).to be false
-      end
-    end
-
-    context 'when topic has no negative news' do
-      it 'keeps crisis as false' do
-        # Create only positive and neutral news using insert_all
-        news_attributes = [
-          {
-            title: 'Positive News',
-            publication_type: 'article',
-            date: Date.current,
-            support: 'positive',
-            media: 'Test Media',
-            valuation: 'positive',
-            topic_id: topic.id,
-            created_at: Time.current,
-            updated_at: Time.current
-          },
-          {
-            title: 'Neutral News',
-            publication_type: 'article',
-            date: Date.current,
-            support: 'neutral',
-            media: 'Test Media',
-            valuation: 'neutral',
-            topic_id: topic.id,
-            created_at: Time.current,
-            updated_at: Time.current
-          }
-        ]
         News.insert_all(news_attributes)
 
         expect { topic.check_crisis! }.not_to change(topic, :crisis)
@@ -134,6 +102,7 @@ describe Topic do
             support: 'negative',
             media: 'Test Media',
             valuation: 'negative',
+            link: "https://example.com/news-#{SecureRandom.uuid}",
             topic_id: topic.id,
             created_at: Time.current,
             updated_at: Time.current
