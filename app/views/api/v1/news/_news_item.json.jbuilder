@@ -20,12 +20,20 @@ json.mentions news.mentions do |mention|
   json.name mention.name
 end
 
-json.creator do
-  json.id news.creator.id
-  json.name news.creator.full_name
+if news.creator.present?
+  json.creator do
+    json.id news.creator.id
+    json.name news.creator.full_name
+  end
+else
+  json.creator nil
 end
 
-json.reviewer do
-  json.id news.reviewer.id
-  json.name news.reviewer.full_name
+if news.reviewer.present?
+  json.reviewer do
+    json.id news.reviewer.id
+    json.name news.reviewer.full_name
+  end
+else
+  json.reviewer nil
 end

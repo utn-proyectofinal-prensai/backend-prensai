@@ -3,14 +3,15 @@
 class NewsRecordBuilder
   include ActiveModel::Model
 
-  attr_accessor :news_data
+  attr_accessor :news_data, :creator_id
 
-  def self.call(news_data)
-    new(news_data).build
+  def self.call(news_data, creator_id = nil)
+    new(news_data, creator_id).build
   end
 
-  def initialize(news_data)
+  def initialize(news_data, creator_id = nil)
     @news_data = news_data
+    @creator_id = creator_id
   end
 
   def build
@@ -38,7 +39,8 @@ class NewsRecordBuilder
       quotation: parse_quotation(news_data['COTIZACION']),
       valuation: map_valuation(news_data['VALORACION']), # puede venir "REVISAR MANUAL"
       political_factor: news_data['FACTOR POLITICO'], # puede venir "REVISAR MANUAL"
-      topic: find_topic(news_data['TEMA'])
+      topic: find_topic(news_data['TEMA']),
+      creator_id: creator_id
     }
   end
   # rubocop:enable Metrics/AbcSize

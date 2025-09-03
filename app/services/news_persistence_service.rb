@@ -3,14 +3,15 @@
 class NewsPersistenceService
   include ActiveModel::Model
 
-  attr_accessor :news_items
+  attr_accessor :news_items, :creator_id
 
-  def self.call(news_items)
-    new(news_items).call
+  def self.call(news_items, creator_id = nil)
+    new(news_items, creator_id).call
   end
 
-  def initialize(news_items)
+  def initialize(news_items, creator_id = nil)
     @news_items = news_items
+    @creator_id = creator_id
   end
 
   def call
@@ -27,7 +28,7 @@ class NewsPersistenceService
   private
 
   def persist_single_news(news_data)
-    news_record = NewsRecordBuilder.call(news_data)
+    news_record = NewsRecordBuilder.call(news_data, creator_id)
 
     if news_record.persisted?
       {

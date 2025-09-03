@@ -3,7 +3,7 @@
 class NewsProcessingService
   include ActiveModel::Model
 
-  attr_accessor :urls, :topics, :mentions
+  attr_accessor :urls, :topics, :mentions, :creator_id
 
   validate :urls_format
   validate :topics_exist
@@ -72,7 +72,7 @@ class NewsProcessingService
   end
 
   def persist_news_items(news_items)
-    NewsPersistenceService.call(news_items)
+    NewsPersistenceService.call(news_items, creator_id)
   end
 
   def build_request_payload

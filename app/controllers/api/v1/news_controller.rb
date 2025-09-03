@@ -10,7 +10,7 @@ module API
       def batch_process
         authorize News, :batch_process?
 
-        result = NewsProcessingService.call(batch_process_params)
+        result = NewsProcessingService.call(batch_process_params.merge(creator_id: current_user.id))
 
         if result.success?
           @result = result.payload
