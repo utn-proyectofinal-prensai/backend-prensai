@@ -50,12 +50,13 @@ RSpec.describe 'POST /api/v1/news/batch_process' do
     end
 
     context 'when service fails' do
-      let(:service_result) { ServiceResult.new(success: false, error: 'Service error') }
+      let(:error_object) { { message: 'Service error' } }
+      let(:service_result) { ServiceResult.new(success: false, errors: [error_object]) }
 
       it 'returns error response' do
         subject
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.parsed_body['error']).to eq('Service error')
+        expect(response.parsed_body['errors']).to match([error_object.deep_stringify_keys])
       end
     end
   end
