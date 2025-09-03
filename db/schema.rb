@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_224450) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_27_031705) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -195,26 +195,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_224450) do
 
   create_table "news", force: :cascade do |t|
     t.string "title", null: false
-    t.string "publication_type", null: false
+    t.string "publication_type"
     t.date "date", null: false
     t.string "support", null: false
     t.string "media", null: false
     t.string "section"
     t.string "author"
     t.string "interviewee"
-    t.string "link"
+    t.string "link", null: false
     t.integer "audience_size"
     t.decimal "quotation", precision: 10, scale: 2, default: "0.0"
     t.string "valuation"
     t.string "political_factor"
-    t.string "management"
     t.text "plain_text"
     t.bigint "topic_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "creator_id"
+    t.bigint "reviewer_id"
+    t.index ["creator_id"], name: "index_news_on_creator_id"
     t.index ["date"], name: "index_news_on_date"
+    t.index ["link"], name: "index_news_on_link", unique: true
     t.index ["media"], name: "index_news_on_media"
     t.index ["publication_type"], name: "index_news_on_publication_type"
+    t.index ["reviewer_id"], name: "index_news_on_reviewer_id"
     t.index ["topic_id"], name: "index_news_on_topic_id"
     t.index ["valuation"], name: "index_news_on_valuation"
   end
@@ -262,4 +266,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_224450) do
   add_foreign_key "mention_news", "mentions"
   add_foreign_key "mention_news", "news"
   add_foreign_key "news", "topics"
+  add_foreign_key "news", "users", column: "creator_id"
+  add_foreign_key "news", "users", column: "reviewer_id"
 end

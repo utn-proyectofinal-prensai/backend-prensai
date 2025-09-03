@@ -30,7 +30,7 @@ class Topic < ApplicationRecord
   private
 
   def should_be_crisis?
-    news.valuation_negative.count > 5
+    news.valuation_negative.count >= 5
   end
 end
 

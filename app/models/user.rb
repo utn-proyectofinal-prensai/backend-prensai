@@ -34,6 +34,9 @@ class User < ApplicationRecord
          :recoverable, :trackable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
 
+  has_many :news, foreign_key: :creator_id, dependent: :nullify, inverse_of: :creator
+  has_many :reviewed_news, class_name: 'News', foreign_key: :reviewer_id, dependent: :nullify, inverse_of: :reviewer
+
   validates :role, presence: true, inclusion: { in: %w[admin user] }
 
   enum :role, { user: 'user', admin: 'admin' }, default: 'user'
