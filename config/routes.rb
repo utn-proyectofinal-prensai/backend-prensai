@@ -3,33 +3,38 @@
 # == Route Map
 #
 #                                   Prefix Verb       URI Pattern                                                                                       Controller#Action
-#                         new_user_session GET        /api/v1/users/sign_in(.:format)                                                                   api/v1/sessions#new
-#                             user_session POST       /api/v1/users/sign_in(.:format)                                                                   api/v1/sessions#create
-#                     destroy_user_session DELETE     /api/v1/users/sign_out(.:format)                                                                  api/v1/sessions#destroy
-#                        new_user_password GET        /api/v1/users/password/new(.:format)                                                              api/v1/passwords#new
-#                       edit_user_password GET        /api/v1/users/password/edit(.:format)                                                             api/v1/passwords#edit
-#                            user_password PATCH      /api/v1/users/password(.:format)                                                                  api/v1/passwords#update
-#                                          PUT        /api/v1/users/password(.:format)                                                                  api/v1/passwords#update
-#                                          POST       /api/v1/users/password(.:format)                                                                  api/v1/passwords#create
-#                 cancel_user_registration GET        /api/v1/users/cancel(.:format)                                                                    api/v1/registrations#cancel
-#                    new_user_registration GET        /api/v1/users/sign_up(.:format)                                                                   api/v1/registrations#new
-#                   edit_user_registration GET        /api/v1/users/edit(.:format)                                                                      api/v1/registrations#edit
-#                        user_registration PATCH      /api/v1/users(.:format)                                                                           api/v1/registrations#update
-#                                          PUT        /api/v1/users(.:format)                                                                           api/v1/registrations#update
-#                                          DELETE     /api/v1/users(.:format)                                                                           api/v1/registrations#destroy
-#                                          POST       /api/v1/users(.:format)                                                                           api/v1/registrations#create
-#              api_v1_users_validate_token GET        /api/v1/users/validate_token(.:format)                                                            devise_token_auth/token_validations#validate_token
+#                         new_user_session GET        /api/v1/users/sign_in(.:format)                                                                   api/v1/sessions#new {format: :json}
+#                             user_session POST       /api/v1/users/sign_in(.:format)                                                                   api/v1/sessions#create {format: :json}
+#                     destroy_user_session DELETE     /api/v1/users/sign_out(.:format)                                                                  api/v1/sessions#destroy {format: :json}
+#                        new_user_password GET        /api/v1/users/password/new(.:format)                                                              api/v1/passwords#new {format: :json}
+#                       edit_user_password GET        /api/v1/users/password/edit(.:format)                                                             api/v1/passwords#edit {format: :json}
+#                            user_password PATCH      /api/v1/users/password(.:format)                                                                  api/v1/passwords#update {format: :json}
+#                                          PUT        /api/v1/users/password(.:format)                                                                  api/v1/passwords#update {format: :json}
+#                                          POST       /api/v1/users/password(.:format)                                                                  api/v1/passwords#create {format: :json}
 #                            api_v1_status GET        /api/v1/status(.:format)                                                                          api/v1/health#status {format: :json}
-#                    api_v1_impersonations POST       /api/v1/impersonations(.:format)                                                                  api/v1/impersonations#create {format: :json}
+#              change_password_api_v1_user PATCH      /api/v1/user/change_password(.:format)                                                            api/v1/users#change_password {format: :json}
 #                              api_v1_user GET        /api/v1/user(.:format)                                                                            api/v1/users#show {format: :json}
 #                                          PATCH      /api/v1/user(.:format)                                                                            api/v1/users#update {format: :json}
 #                                          PUT        /api/v1/user(.:format)                                                                            api/v1/users#update {format: :json}
+#                                          PATCH      /api/v1/users/:id/change_password(.:format)                                                       api/v1/users#change_password {format: :json}
 #                             api_v1_users GET        /api/v1/users(.:format)                                                                           api/v1/users#index {format: :json}
 #                                          POST       /api/v1/users(.:format)                                                                           api/v1/users#create {format: :json}
 #                                          GET        /api/v1/users/:id(.:format)                                                                       api/v1/users#show {format: :json}
 #                                          PATCH      /api/v1/users/:id(.:format)                                                                       api/v1/users#update {format: :json}
 #                                          PUT        /api/v1/users/:id(.:format)                                                                       api/v1/users#update {format: :json}
 #                                          DELETE     /api/v1/users/:id(.:format)                                                                       api/v1/users#destroy {format: :json}
+#                            api_v1_topics GET        /api/v1/topics(.:format)                                                                          api/v1/topics#index {format: :json}
+#                                          POST       /api/v1/topics(.:format)                                                                          api/v1/topics#create {format: :json}
+#                             api_v1_topic PATCH      /api/v1/topics/:id(.:format)                                                                      api/v1/topics#update {format: :json}
+#                                          PUT        /api/v1/topics/:id(.:format)                                                                      api/v1/topics#update {format: :json}
+#                                          DELETE     /api/v1/topics/:id(.:format)                                                                      api/v1/topics#destroy {format: :json}
+#          batch_process_api_v1_news_index POST       /api/v1/news/batch_process(.:format)                                                              api/v1/news#batch_process {format: :json}
+#                        api_v1_news_index GET        /api/v1/news(.:format)                                                                            api/v1/news#index {format: :json}
+#                          api_v1_mentions GET        /api/v1/mentions(.:format)                                                                        api/v1/mentions#index {format: :json}
+#                                          POST       /api/v1/mentions(.:format)                                                                        api/v1/mentions#create {format: :json}
+#                           api_v1_mention PATCH      /api/v1/mentions/:id(.:format)                                                                    api/v1/mentions#update {format: :json}
+#                                          PUT        /api/v1/mentions/:id(.:format)                                                                    api/v1/mentions#update {format: :json}
+#                                          DELETE     /api/v1/mentions/:id(.:format)                                                                    api/v1/mentions#destroy {format: :json}
 #              must_update_api_v1_settings GET        /api/v1/settings/must_update(.:format)                                                            api/v1/settings#must_update {format: :json}
 #                   new_admin_user_session GET        /admin/login(.:format)                                                                            active_admin/devise/sessions#new
 #                       admin_user_session POST       /admin/login(.:format)                                                                            active_admin/devise/sessions#create
@@ -142,9 +147,13 @@ Rails.application.routes.draw do
     namespace :v1, defaults: { format: :json } do
       get :status, to: 'health#status'
       devise_scope :user do
-        resource :user, only: %i[update show]
+        resource :user, only: %i[update show] do
+          patch :change_password
+        end
       end
-      resources :users, only: %i[index show create update destroy]
+      resources :users, only: %i[index show create update destroy] do
+        patch :change_password, on: :member
+      end
       resources :topics, only: %i[index create update destroy]
       resources :news, only: %i[index] do
         post :batch_process, on: :collection
