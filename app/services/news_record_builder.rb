@@ -79,50 +79,11 @@ class NewsRecordBuilder
     end
   end
 
-  # "3.500" -> 3500, "3,500" -> 3500, 3500 -> 3500
   def parse_audience_size(value)
-    return if value.nil? || (value.is_a?(String) && value.strip.empty?)
-    return value if value.is_a?(Integer)
-
-    digits = value.to_s.gsub(/[^\d]/, '')
-    return if digits.empty?
-
-    digits.to_i
+    NumberParser.parse_audience_size(value)
   end
 
-  # Normaliza formatos de moneda comunes en ES/AR/LA:
-  # - "$75.000" -> 75000.00
-  # - "1.234,56" -> 1234.56
-  # - "100,50" -> 100.50
-  # - "100.50" -> 100.50
   def parse_quotation(value)
-    return if value.nil? || (value.is_a?(String) && value.strip.empty?)
-    return value if value.is_a?(Numeric)
-
-    str = value.to_s.strip
-    # Quita símbolos de moneda y espacios pero conserva separadores y signo
-    str = str.gsub(/[^\d\.,-]/, '')
-
-    if str.include?('.') && str.include?(',')
-      # Supone formato "1.234,56": punto miles, coma decimales
-      str = str.delete('.')
-      str = str.sub(',', '.')
-    elsif str.include?(',')
-      # Solo coma: tratar como separador decimal
-      str = str.tr(',', '.')
-    elsif str.include?('.')
-      # Solo punto: decidir si es miles o decimal
-      parts = str.split('.')
-      if parts.length > 1 && parts.last.length == 3 && parts[0..-2].all? { |p| p.length.between?(1, 3) }
-        # Parece separador de miles
-        str = parts.join('')
-      end
-    end
-
-    return if str.empty? || str == '-' || str == '.'
-
-    BigDecimal(str)
-  rescue ArgumentError
-    nil
+    NumberParser.parse_currency(value)
   end
 end
