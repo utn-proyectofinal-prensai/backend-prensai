@@ -26,19 +26,6 @@ class AiConfiguration < ApplicationRecord
 
   RANSACK_ATTRIBUTES = %w[id key display_name enabled created_at updated_at].freeze
 
-  def self.editable_configurations
-    enabled.ordered.map do |config|
-      {
-        key: config.key,
-        display_name: config.display_name,
-        description: config.description,
-        value_type: config.value_type,
-        current_value: config.value,
-        enabled: config.enabled
-      }
-    end
-  end
-
   def self.get_value(key)
     find_by(key: key)&.value
   end
