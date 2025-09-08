@@ -120,6 +120,48 @@ describe 'GET api/v1/topics' do
     end
   end
 
+  context 'when sending filtering params' do
+    include_context 'with authenticated admin user via JWT'
+
+    context 'with enabled=true filter' do
+      subject { get api_v1_topics_path(enabled: 'true'), headers: auth_headers, as: :json }
+
+      it 'returns only enabled topics' do
+        subject
+        expect(json[:topics].size).to eq(2)
+        topic_names = json[:topics].pluck(:name)
+        expect(topic_names).to include('Mango Topic', 'Zebra Topic')
+        expect(topic_names).not_to include('Apple Topic')
+      end
+
+      it 'all returned topics are enabled' do
+        subject
+        enabled_states = json[:topics].pluck(:enabled)
+        expect(enabled_states).to all(be true)
+      end
+    end
+
+    context 'with enabled=false filter' do
+      subject { get api_v1_topics_path(enabled: 'false'), headers: auth_headers, as: :json }
+
+      it 'returns only disabled topics' do
+        subject
+        expect(json[:topics].size).to eq(1)
+        expect(json[:topics].first[:name]).to eq('Apple Topic')
+        expect(json[:topics].first[:enabled]).to be false
+      end
+    end
+
+    context 'with invalid filter params' do
+      subject { get api_v1_topics_path(invalid_param: 'value'), headers: auth_headers, as: :json }
+
+      it 'ignores invalid params and returns all topics' do
+        subject
+        expect(json[:topics].size).to eq(3)
+      end
+    end
+  end
+
   context 'when not authenticated' do
     let(:auth_headers) { {} }
 
