@@ -39,11 +39,11 @@ class AiConfiguration < ApplicationRecord
   def value_type_matches_value
     return if value.nil?
 
-    case value_type
-    when 'array' then value.is_a?(Array)
-    when 'string' then value.is_a?(String)
-    when 'reference' then value.is_a?(Integer)
-    end
+    errors.add(:value, 'is not valid') unless case value_type
+                                              when 'array' then value.is_a?(Array)
+                                              when 'string' then value.is_a?(String)
+                                              when 'reference' then value.is_a?(Integer)
+                                              end
   end
 
   def valid_reference_type

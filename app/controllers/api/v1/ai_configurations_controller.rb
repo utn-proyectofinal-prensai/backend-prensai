@@ -6,6 +6,7 @@ module API
       before_action :set_ai_configuration, only: [:update]
 
       def index
+        authorize AiConfiguration
         @ai_configurations = policy_scope(AiConfiguration).enabled.ordered
       end
 
