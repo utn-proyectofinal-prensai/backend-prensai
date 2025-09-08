@@ -1,6 +1,6 @@
-class ErrorsController < ApplicationController
-  # Uncomment this if your API implements authentication
-  # skip_before_action :authenticate_request
+class ErrorsController < ActionController::API
+  # This controller handles not found routes and does not require CSRF protection
+  # as it is intended to return clean 404 responses for API requests
 
   def routing_error
     head :not_found
