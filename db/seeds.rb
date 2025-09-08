@@ -42,3 +42,33 @@ if Rails.env.development?
 end
 
 Setting.create_or_find_by!(key: 'min_version', value: '0.0')
+
+default_ai_configs = [
+  {
+    key: 'ministries_keywords',
+    display_name: 'Palabras clave de Ministerios',
+    description: 'Lista de palabras para identificar ministerios en las noticias',
+    value_type: 'array',
+    value: ['Ministerio de Cultura', 'Ministerio de Cultura de Buenos Aires']
+  },
+  {
+    key: 'ministers_keywords',
+    display_name: 'Palabras clave de Ministros',
+    description: 'Lista de palabras para identificar ministros en las noticias',
+    value_type: 'array',
+    value: ['Ricardes', 'Gabriela Ricardes', 'Ministro', 'Ministra']
+  },
+  {
+    key: 'schedule_topic',
+    display_name: 'Tópico de Agenda',
+    description: 'Tópico que representa la agenda/schedule de noticias',
+    value_type: 'reference',
+    reference_type: 'Topic'
+  }
+]
+
+default_ai_configs.each do |config_data|
+  AiConfiguration.find_or_create_by(key: config_data[:key]) do |config|
+    config.assign_attributes(config_data)
+  end
+end
