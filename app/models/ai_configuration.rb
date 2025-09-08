@@ -2,15 +2,16 @@
 #
 # Table name: ai_configurations
 #
-#  id           :bigint           not null, primary key
-#  description  :text
-#  display_name :string           not null
-#  enabled      :boolean          default(TRUE), not null
-#  key          :string           not null
-#  value        :jsonb
-#  value_type   :string           not null
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
+#  id             :bigint           not null, primary key
+#  description    :text
+#  display_name   :string           not null
+#  enabled        :boolean          default(TRUE), not null
+#  key            :string           not null
+#  reference_type :string
+#  value          :jsonb
+#  value_type     :string           not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
 #
 # Indexes
 #
@@ -24,37 +25,30 @@ class AiConfiguration < ApplicationRecord
   scope :enabled, -> { where(enabled: true) }
   scope :ordered, -> { order(:display_name) }
 
-  RANSACK_ATTRIBUTES = %w[id key display_name enabled created_at updated_at].freeze
+  validates :value_type, inclusion: { in: %w[array string reference] }
+
+  validate :value_type_matches_value
+  validate :valid_reference_type
 
   def self.get_value(key)
     find_by(key: key)&.value
   end
 
-  def value
-    cast_value_by_type
-  end
-
-  def value=(new_value)
-    super(cast_input_value(new_value))
-  end
-
   private
 
-  def cast_value_by_type
+  def value_type_matches_value
+    return if value.nil?
+
     case value_type
-    when 'array' then super || []
-    when 'string' then super || ''
-    when 'object' then super || {}
-    else super
+    when 'array' then value.is_a?(Array)
+    when 'string' then value.is_a?(String)
+    when 'reference' then value.is_a?(Integer)
     end
   end
 
-  def cast_input_value(new_value)
-    case value_type
-    when 'array' then new_value.is_a?(Array) ? new_value : []
-    when 'string' then new_value.to_s
-    when 'object' then new_value.is_a?(Hash) ? new_value : {}
-    else new_value
-    end
+  def valid_reference_type
+    return if reference_type.nil?
+
+    errors.add(:reference_type, 'is not valid') unless reference_type.in?(%w[Topic Mention])
   end
 end

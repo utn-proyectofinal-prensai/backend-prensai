@@ -7,6 +7,7 @@ class CreateAiConfigurations < ActiveRecord::Migration[8.0]
       t.string :display_name, null: false
       t.text :description
       t.boolean :enabled, default: true, null: false
+      t.string :reference_type
 
       t.timestamps
     end

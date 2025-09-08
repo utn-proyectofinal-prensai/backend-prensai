@@ -1,1 +1,1 @@
-json.extract! @ai_configuration, :key, :value
+json.extract! @ai_configuration, :key, :value, :enabled

@@ -68,6 +68,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002936) do
     t.string "display_name", null: false
     t.text "description"
     t.boolean "enabled", default: true, null: false
+    t.string "reference_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["enabled"], name: "index_ai_configurations_on_enabled"
