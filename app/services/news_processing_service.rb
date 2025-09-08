@@ -36,7 +36,6 @@ class NewsProcessingService
   end
 
   def call_external_service
-    byebug
     ExternalAiService.call(build_request_payload)
   rescue StandardError => e
     Rails.logger.error "External service error: #{e.message}"
