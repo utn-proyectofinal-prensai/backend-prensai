@@ -10,3 +10,8 @@ es:
       invalid_credentials: Credenciales inválidas
       record_not_destroyed: No se pudo eliminar el registro
       deletion_restricted: La eliminación está restringida debido a asociaciones dependientes
+      news:
+        duplicate_link: Esta noticia ya existe en el sistema
+        validation_failed: Error de validación en los datos de la noticia
+        save_failed: Error al guardar la noticia
+        internal_error: Error interno del servidor
