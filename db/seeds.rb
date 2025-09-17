@@ -60,8 +60,8 @@ default_ai_configs = [
   },
   {
     key: 'default_topic',
-    display_name: 'Tópico de Agenda',
-    description: 'Tópico que representa la agenda/schedule de noticias',
+    display_name: 'Tópico default',
+    description: 'Tópico default para las noticias',
     value_type: 'reference',
     reference_type: 'Topic'
   }
