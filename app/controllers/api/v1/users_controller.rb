@@ -3,7 +3,7 @@
 module API
   module V1
     class UsersController < API::V1::APIController
-      before_action :set_user, only: %i[show update destroy]
+      before_action :set_user, only: %i[show update destroy change_password]
 
       def index
         @users = policy_scope(User)
@@ -33,6 +33,12 @@ module API
         head :no_content
       end
 
+      def change_password
+        authorize @user, :change_password?
+        @user.update!(change_password_params)
+        render :show
+      end
+
       private
 
       def set_user
@@ -45,6 +51,10 @@ module API
 
       def update_user_params
         params.expect(user: %i[username first_name last_name email role])
+      end
+
+      def change_password_params
+        params.expect(user: %i[password password_confirmation])
       end
     end
   end

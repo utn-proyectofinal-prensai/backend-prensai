@@ -11,6 +11,8 @@ class UserPolicy < ApplicationPolicy
 
   def destroy? = user.admin? && user.id != record.id
 
+  def change_password? = user.admin? || user.id == record.id
+
   class Scope < Scope
     def resolve
       user.admin? ? scope.all : scope.where(id: user.id)
