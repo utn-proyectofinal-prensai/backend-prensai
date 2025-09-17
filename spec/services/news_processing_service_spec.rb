@@ -56,11 +56,11 @@ RSpec.describe NewsProcessingService, type: :service do
   end
 
   describe '.call' do
-    before do
-      allow(service).to receive(:call_external_service).and_return(external_ai_service_response)
-    end
-
     context 'with valid parameters' do
+      before do
+        allow(service).to receive(:call_external_service).and_return(external_ai_service_response)
+      end
+
       it 'returns success result' do
         expect(result).to be_success
       end
@@ -111,6 +111,89 @@ RSpec.describe NewsProcessingService, type: :service do
       it 'handles errors gracefully' do
         expect(result).to be_failure
         expect(result.errors).to include('Processing failed')
+      end
+    end
+
+    context 'when all urls were already processed' do
+      let(:valid_urls) { ['https://example.com/news-1'] }
+
+      before do
+        create(:news, link: valid_urls.first)
+        allow(ExternalAiService).to receive(:call)
+      end
+
+      it 'skips the external AI service' do
+        result
+        expect(ExternalAiService).not_to have_received(:call)
+      end
+
+      it 'returns a successful result with duplicate error information' do
+        payload = result.payload
+
+        expect(result).to be_success
+        expect(payload[:received]).to eq(0)
+        expect(payload[:processed_by_ai]).to eq(0)
+        expect(payload[:persisted]).to eq(0)
+        expect(payload[:errors]).to eq([
+                                         {
+                                           url: 'https://example.com/news-1',
+                                           reason: I18n.t('api.errors.news.duplicate_link')
+                                         }
+                                       ])
+      end
+    end
+
+    context 'when some urls were already processed' do
+      let(:valid_urls) { ['https://example.com/news-1', 'https://example.com/news-3'] }
+      let(:external_ai_service_response) do
+        {
+          ok: true,
+          received: 1,
+          processed: 1,
+          news: [
+            {
+              'TITULO' => 'Test News 3',
+              'TIPO PUBLICACION' => 'nota',
+              'FECHA' => '2025-01-10',
+              'SOPORTE' => 'web',
+              'MEDIO' => 'Test Media 3',
+              'SECCION' => 'Politics',
+              'AUTOR' => 'Test Author 3',
+              'ENTREVISTADO' => nil,
+              'TEMA' => 'Transport',
+              'LINK' => 'https://example.com/news-3',
+              'ALCANCE' => '12.000',
+              'COTIZACION' => '$0.0',
+              'VALORACION' => 'neutral',
+              'FACTOR POLITICO' => 'medio',
+              'MENCIONES' => ['Mention1']
+            }
+          ],
+          errors: []
+        }
+      end
+
+      before do
+        create(:news, link: 'https://example.com/news-1')
+        allow(ExternalAiService).to receive(:call).and_return(external_ai_service_response)
+      end
+
+      it 'calls the external AI service only with fresh urls' do
+        result
+        expect(ExternalAiService).to have_received(:call).with(hash_including(urls: ['https://example.com/news-3']))
+      end
+
+      it 'returns duplicate errors alongside processed results' do
+        payload = result.payload
+
+        expect(result).to be_success
+        expect(payload[:received]).to eq(1)
+        expect(payload[:processed_by_ai]).to eq(1)
+        expect(payload[:persisted]).to eq(1)
+        expect(payload[:errors]).to include(
+          url: 'https://example.com/news-1',
+          reason: I18n.t('api.errors.news.duplicate_link')
+        )
       end
     end
   end
