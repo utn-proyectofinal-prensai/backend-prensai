@@ -69,8 +69,8 @@ class NewsProcessingService
     AiConfiguration.get_value('ministers_keywords') || []
   end
 
-  def schedule_topic
-    topic_id = AiConfiguration.get_value('schedule_topic')
+  def default_topic
+    topic_id = AiConfiguration.get_value('default_topic')
     return if topic_id.blank?
 
     Topic.find(topic_id)&.name
@@ -83,7 +83,7 @@ class NewsProcessingService
       menciones: mentions,
       ministerios_key_words: ministries_keywords,
       ministro_key_words: ministers_keywords,
-      tema_agenda: schedule_topic
+      tema_default: default_topic
     }
   end
 

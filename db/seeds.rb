@@ -59,7 +59,7 @@ default_ai_configs = [
     value: ['Ricardes', 'Gabriela Ricardes', 'Ministro', 'Ministra']
   },
   {
-    key: 'schedule_topic',
+    key: 'default_topic',
     display_name: 'Tópico de Agenda',
     description: 'Tópico que representa la agenda/schedule de noticias',
     value_type: 'reference',
