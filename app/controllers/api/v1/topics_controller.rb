@@ -6,7 +6,7 @@ module API
       before_action :set_topic, only: %i[update destroy]
 
       def index
-        @topics = policy_scope(Topic).ordered
+        @topics = policy_scope(Topic).ordered.filter_by(filtering_params)
       end
 
       def create
@@ -35,6 +35,10 @@ module API
 
       def topic_params
         params.expect(topic: %i[name description enabled])
+      end
+
+      def filtering_params
+        params.slice(*Topic.filter_scopes)
       end
     end
   end

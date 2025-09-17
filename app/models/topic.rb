@@ -17,11 +17,14 @@
 #  index_topics_on_name  (name) UNIQUE
 #
 class Topic < ApplicationRecord
+  include Filterable
+
   has_many :news, dependent: :restrict_with_exception
 
   validates :name, presence: true, uniqueness: true
 
   scope :ordered, -> { order(:name) }
+  filter_scope :enabled, ->(enabled) { where(enabled: enabled) }
 
   def check_crisis!
     update!(crisis: should_be_crisis?)

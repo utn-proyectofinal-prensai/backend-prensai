@@ -122,7 +122,7 @@ describe Topic do
       before { create(:news, topic: topic) }
 
       it 'prevents deletion and raises error' do
-        expect { topic.destroy! }.to raise_error(ActiveRecord::RecordNotDestroyed)
+        expect { topic.destroy! }.to raise_error(ActiveRecord::DeleteRestrictionError)
         expect(described_class.exists?(topic.id)).to be true
       end
     end

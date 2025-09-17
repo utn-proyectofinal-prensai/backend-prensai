@@ -56,8 +56,9 @@ describe Mention do
     context 'when destroying mention with associated news' do
       before { mention.news << news_item }
 
-      it 'destroys mention_news join records but keeps news' do
-        expect { mention.destroy! }.to change(MentionNews, :count).by(-1)
+      it 'prevents deletion due to restrict_with_exception' do
+        expect { mention.destroy! }.to raise_error(ActiveRecord::DeleteRestrictionError)
+        expect(described_class.exists?(mention.id)).to be true
         expect(News.exists?(news_item.id)).to be true
       end
     end

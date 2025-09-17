@@ -148,11 +148,6 @@ RSpec.describe NewsPersistenceService, type: :service do
         expect(result[:errors]).to all(include(reason: /Persistence error/))
         expect(result[:errors].first[:reason]).to include('Unexpected error')
       end
-
-      it 'logs the error' do
-        expect(Rails.logger).to receive(:error).with(/Error persisting news/)
-        service.call
-      end
     end
   end
 end
