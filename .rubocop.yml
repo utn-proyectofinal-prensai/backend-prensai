@@ -170,3 +170,6 @@ Layout/EndOfLine:
 
 Style/FrozenStringLiteralComment:
   Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
