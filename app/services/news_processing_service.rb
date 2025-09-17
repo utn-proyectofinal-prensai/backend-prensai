@@ -9,20 +9,6 @@ class NewsProcessingService
   validate :topics_exist
   validate :mentions_exist
 
-  MINISTRIES = [
-    'Ministerio de Cultura',
-    'Ministerio de Cultura de Buenos Aires'
-  ].freeze
-
-  MINISTERS = [
-    'Ricardes',
-    'Gabriela Ricardes',
-    'Ministro',
-    'Ministra',
-    'Ministra de cultura',
-    'Ministro de cultura'
-  ].freeze
-
   def self.call(params)
     new(params).call
   end
@@ -75,13 +61,29 @@ class NewsProcessingService
     NewsPersistenceService.call(news_items, creator_id)
   end
 
+  def ministries_keywords
+    AiConfiguration.get_value('ministries_keywords') || []
+  end
+
+  def ministers_keywords
+    AiConfiguration.get_value('ministers_keywords') || []
+  end
+
+  def schedule_topic
+    topic_id = AiConfiguration.get_value('schedule_topic')
+    return if topic_id.blank?
+
+    Topic.find(topic_id)&.name
+  end
+
   def build_request_payload
     {
       urls:,
       temas: topics,
       menciones: mentions,
-      ministerios_key_words: MINISTRIES,
-      ministro_key_words: MINISTERS
+      ministerios_key_words: ministries_keywords,
+      ministro_key_words: ministers_keywords,
+      tema_agenda: schedule_topic
     }
   end
 

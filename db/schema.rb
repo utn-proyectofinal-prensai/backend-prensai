@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_27_031705) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_08_002936) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -59,6 +59,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_27_031705) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "ai_configurations", force: :cascade do |t|
+    t.string "key", null: false
+    t.jsonb "value"
+    t.string "value_type", null: false
+    t.string "display_name", null: false
+    t.text "description"
+    t.boolean "enabled", default: true, null: false
+    t.string "reference_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["enabled"], name: "index_ai_configurations_on_enabled"
+    t.index ["key"], name: "index_ai_configurations_on_key", unique: true
   end
 
   create_table "flipper_features", force: :cascade do |t|

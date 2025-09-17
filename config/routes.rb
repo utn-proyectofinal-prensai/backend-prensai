@@ -145,6 +145,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1, defaults: { format: :json } do
+      resources :ai_configurations, param: :key, only: %i[index update]
       get :status, to: 'health#status'
       devise_scope :user do
         resource :user, only: %i[update show] do
