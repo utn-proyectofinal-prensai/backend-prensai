@@ -104,4 +104,31 @@ describe News do
       end
     end
   end
+
+  describe '#requires_manual_review?' do
+    let(:topic) { create(:topic) }
+    let(:valid_attributes) do
+      {
+        publication_type: 'Nota',
+        political_factor: 'SI',
+        interviewee: 'Juan Pérez',
+        valuation: 'positive',
+        topic: topic
+      }
+    end
+
+    it 'returns false when all fields are valid' do
+      expect(build(:news, valid_attributes).requires_manual_review?).to be false
+    end
+
+    it 'returns true when a manual review string field is set' do
+      field = %i[publication_type political_factor interviewee].sample
+      expect(build(:news, valid_attributes.merge(field => 'REVISAR MANUAL')).requires_manual_review?).to be true
+    end
+
+    it 'returns true when a required field is nil' do
+      field = %i[valuation topic].sample
+      expect(build(:news, valid_attributes.merge(field => nil)).requires_manual_review?).to be true
+    end
+  end
 end
