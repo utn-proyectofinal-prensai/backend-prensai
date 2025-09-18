@@ -4,7 +4,9 @@ module API
   module V1
     class NewsController < API::V1::APIController
       def index
-        @pagy, @news = pagy(policy_scope(News).ordered)
+        @pagy, @news = pagy(policy_scope(News)
+                               .includes(:topic, :creator, :mentions, latest_review: :reviewer)
+                               .ordered)
       end
 
       def batch_process
@@ -20,6 +22,13 @@ module API
         end
       rescue ActionController::ParameterMissing => e
         render json: { error: 'Missing required parameters', details: e.message }, status: :bad_request
+      end
+
+      def show
+        @news = policy_scope(News)
+                  .includes(:topic, :creator, :mentions, reviews: :reviewer)
+                  .find(params[:id])
+        authorize @news
       end
 
       private

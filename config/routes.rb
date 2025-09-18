@@ -11,6 +11,9 @@
 #                            user_password PATCH      /api/v1/users/password(.:format)                                                                  api/v1/passwords#update {format: :json}
 #                                          PUT        /api/v1/users/password(.:format)                                                                  api/v1/passwords#update {format: :json}
 #                                          POST       /api/v1/users/password(.:format)                                                                  api/v1/passwords#create {format: :json}
+#                 api_v1_ai_configurations GET        /api/v1/ai_configurations(.:format)                                                               api/v1/ai_configurations#index {format: :json}
+#                  api_v1_ai_configuration PATCH      /api/v1/ai_configurations/:key(.:format)                                                          api/v1/ai_configurations#update {format: :json}
+#                                          PUT        /api/v1/ai_configurations/:key(.:format)                                                          api/v1/ai_configurations#update {format: :json}
 #                            api_v1_status GET        /api/v1/status(.:format)                                                                          api/v1/health#status {format: :json}
 #              change_password_api_v1_user PATCH      /api/v1/user/change_password(.:format)                                                            api/v1/users#change_password {format: :json}
 #                              api_v1_user GET        /api/v1/user(.:format)                                                                            api/v1/users#show {format: :json}
@@ -29,6 +32,7 @@
 #                                          PUT        /api/v1/topics/:id(.:format)                                                                      api/v1/topics#update {format: :json}
 #                                          DELETE     /api/v1/topics/:id(.:format)                                                                      api/v1/topics#destroy {format: :json}
 #          batch_process_api_v1_news_index POST       /api/v1/news/batch_process(.:format)                                                              api/v1/news#batch_process {format: :json}
+#                      api_v1_news_reviews POST       /api/v1/news/:news_id/reviews(.:format)                                                           api/v1/news/reviews#create {format: :json}
 #                        api_v1_news_index GET        /api/v1/news(.:format)                                                                            api/v1/news#index {format: :json}
 #                          api_v1_mentions GET        /api/v1/mentions(.:format)                                                                        api/v1/mentions#index {format: :json}
 #                                          POST       /api/v1/mentions(.:format)                                                                        api/v1/mentions#create {format: :json}
@@ -72,6 +76,8 @@
 #                           admin_good_job            /admin/background-jobs                                                                            GoodJob::Engine
 #                                 rswag_ui            /api-docs                                                                                         Rswag::Ui::Engine
 #                                rswag_api            /api-docs                                                                                         Rswag::Api::Engine
+#                                                     /*a(.:format)                                                                                     errors#routing_error
+#                                                     /                                                                                                 errors#routing_error
 #            rails_postmark_inbound_emails POST       /rails/action_mailbox/postmark/inbound_emails(.:format)                                           action_mailbox/ingresses/postmark/inbound_emails#create
 #               rails_relay_inbound_emails POST       /rails/action_mailbox/relay/inbound_emails(.:format)                                              action_mailbox/ingresses/relay/inbound_emails#create
 #            rails_sendgrid_inbound_emails POST       /rails/action_mailbox/sendgrid/inbound_emails(.:format)                                           action_mailbox/ingresses/sendgrid/inbound_emails#create
@@ -124,8 +130,8 @@
 #                     DELETE /pauses(.:format)                         good_job/pauses#destroy
 #                     GET    /pauses(.:format)                         good_job/pauses#index
 #       cleaner_index GET    /cleaner(.:format)                        good_job/cleaner#index
-#     frontend_module GET    /frontend/modules/:version/:id(.:format)  good_job/frontends#module {version: "4-11-1", format: "js"}
-#     frontend_static GET    /frontend/static/:version/:id(.:format)   good_job/frontends#static {version: "4-11-1"}
+#     frontend_module GET    /frontend/modules/:version/:id(.:format)  good_job/frontends#module {version: "4-11-2", format: "js"}
+#     frontend_static GET    /frontend/static/:version/:id(.:format)   good_job/frontends#static {version: "4-11-2"}
 #
 # Routes for Rswag::Ui::Engine:
 #
@@ -156,8 +162,9 @@ Rails.application.routes.draw do
         patch :change_password, on: :member
       end
       resources :topics, only: %i[index create update destroy]
-      resources :news, only: %i[index] do
+      resources :news, only: %i[index show] do
         post :batch_process, on: :collection
+        resources :reviews, only: :create, module: :news
       end
       resources :mentions, only: %i[index create update destroy]
       resources :settings, only: [] do

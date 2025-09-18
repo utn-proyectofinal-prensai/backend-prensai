@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+include_reviews = local_assigns.fetch(:include_reviews, false)
+latest_review = if include_reviews && news.association(:reviews).loaded?
+                  news.reviews.first
+                else
+                  news.latest_review
+                end
+
 json.extract! news, :id, :title, :publication_type, :date, :support, :media, :section, :author, :interviewee, :link,
               :audience_size, :quotation, :valuation, :political_factor, :plain_text, :created_at,
               :updated_at
@@ -29,11 +36,26 @@ else
   json.creator nil
 end
 
-if news.reviewer.present?
+if latest_review.present?
   json.reviewer do
-    json.id news.reviewer.id
-    json.name news.reviewer.full_name
+    json.id latest_review.reviewer.id
+    json.name latest_review.reviewer.full_name
+    json.reviewed_at latest_review.reviewed_at
   end
 else
   json.reviewer nil
+end
+
+if include_reviews
+  json.reviews news.reviews do |review|
+    json.id review.id
+    json.reviewed_at review.reviewed_at
+    json.notes review.notes
+    json.changeset review.changeset
+
+    json.reviewer do
+      json.id review.reviewer.id
+      json.name review.reviewer.full_name
+    end
+  end
 end

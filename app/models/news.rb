@@ -22,7 +22,6 @@
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  creator_id       :bigint
-#  reviewer_id      :bigint
 #  topic_id         :bigint
 #
 # Indexes
@@ -32,23 +31,22 @@
 #  index_news_on_link              (link) UNIQUE
 #  index_news_on_media             (media)
 #  index_news_on_publication_type  (publication_type)
-#  index_news_on_reviewer_id       (reviewer_id)
 #  index_news_on_topic_id          (topic_id)
 #  index_news_on_valuation         (valuation)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (creator_id => users.id)
-#  fk_rails_...  (reviewer_id => users.id)
 #  fk_rails_...  (topic_id => topics.id)
 #
 class News < ApplicationRecord
   belongs_to :topic, optional: true
   belongs_to :creator, class_name: 'User', optional: true
-  belongs_to :reviewer, class_name: 'User', optional: true
 
   has_many :mention_news, dependent: :destroy
   has_many :mentions, through: :mention_news
+  has_many :reviews, -> { recent_first }, class_name: 'NewsReview', dependent: :destroy, inverse_of: :news
+  has_one :latest_review, -> { recent_first }, class_name: 'NewsReview'
 
   validates :title, :date, :support, :media, :link, presence: true
 

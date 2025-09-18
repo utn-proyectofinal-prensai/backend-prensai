@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_08_002936) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_10_001000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -226,15 +226,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002936) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "creator_id"
-    t.bigint "reviewer_id"
     t.index ["creator_id"], name: "index_news_on_creator_id"
     t.index ["date"], name: "index_news_on_date"
     t.index ["link"], name: "index_news_on_link", unique: true
     t.index ["media"], name: "index_news_on_media"
     t.index ["publication_type"], name: "index_news_on_publication_type"
-    t.index ["reviewer_id"], name: "index_news_on_reviewer_id"
     t.index ["topic_id"], name: "index_news_on_topic_id"
     t.index ["valuation"], name: "index_news_on_valuation"
+  end
+
+  create_table "news_reviews", force: :cascade do |t|
+    t.bigint "news_id", null: false
+    t.bigint "reviewer_id", null: false
+    t.jsonb "changeset", default: {}, null: false
+    t.jsonb "news_snapshot", default: {}, null: false
+    t.text "notes"
+    t.datetime "reviewed_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["news_id"], name: "index_news_reviews_on_news_id"
+    t.index ["reviewed_at"], name: "index_news_reviews_on_reviewed_at"
+    t.index ["reviewer_id"], name: "index_news_reviews_on_reviewer_id"
   end
 
   create_table "settings", force: :cascade do |t|
@@ -281,5 +293,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002936) do
   add_foreign_key "mention_news", "news"
   add_foreign_key "news", "topics"
   add_foreign_key "news", "users", column: "creator_id"
-  add_foreign_key "news", "users", column: "reviewer_id"
+  add_foreign_key "news_reviews", "news"
+  add_foreign_key "news_reviews", "users", column: "reviewer_id"
 end

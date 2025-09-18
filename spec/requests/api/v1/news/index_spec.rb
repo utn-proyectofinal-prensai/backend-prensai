@@ -7,10 +7,12 @@ describe 'GET api/v1/news' do
   let!(:creator) { create(:user) }
   let!(:reviewer) { create(:user) }
   let!(:recent_news) do
-    create(:news, title: 'Recent News', topic: topic, creator: creator, reviewer: reviewer, created_at: 1.day.ago)
+    create(:news, :with_reviewer, title: 'Recent News', topic: topic, creator: creator, reviewer: reviewer,
+                                  reviewed_at: 1.day.ago, created_at: 1.day.ago)
   end
   let!(:old_news) do
-    create(:news, title: 'Old News', topic: topic, creator: creator, reviewer: reviewer, created_at: 1.week.ago)
+    create(:news, :with_reviewer, title: 'Old News', topic: topic, creator: creator, reviewer: reviewer,
+                                  reviewed_at: 1.week.ago, created_at: 1.week.ago)
   end
 
   context 'when authenticated as admin user' do
@@ -46,6 +48,7 @@ describe 'GET api/v1/news' do
       expect(news_item).to have_key(:updated_at)
       expect(news_item).to have_key(:creator)
       expect(news_item).to have_key(:reviewer)
+      expect(news_item).not_to have_key(:reviews)
     end
 
     it 'includes creator and reviewer as objects', :aggregate_failures do
@@ -59,6 +62,18 @@ describe 'GET api/v1/news' do
       expect(news_item[:reviewer]).to be_a(Hash)
       expect(news_item[:reviewer][:id]).to eq(reviewer.id)
       expect(news_item[:reviewer][:name]).to eq(reviewer.full_name)
+      expect(news_item[:reviewer][:reviewed_at]).to be_present
+    end
+
+    it 'exposes metadata of the most recent review' do
+      older_review = create(:news_review, news: recent_news, reviewer: reviewer, reviewed_at: 2.days.ago)
+      latest_review = create(:news_review, news: recent_news, reviewer: reviewer, reviewed_at: Time.current)
+
+      subject
+      reviewer_data = json[:news].first[:reviewer]
+
+      expect(Time.zone.parse(reviewer_data[:reviewed_at])).to be_within(1.second).of(latest_review.reviewed_at)
+      expect(Time.zone.parse(reviewer_data[:reviewed_at])).to be > Time.zone.parse(older_review.reviewed_at.to_s)
     end
 
     it 'includes pagination metadata', :aggregate_failures do
@@ -73,7 +88,7 @@ describe 'GET api/v1/news' do
 
     context 'with many news items' do
       before do
-        create_list(:news, 10, topic: topic, creator: creator, reviewer: reviewer)
+        create_list(:news, 10, :with_reviewer, topic: topic, creator: creator, reviewer: reviewer)
       end
 
       it 'paginates results correctly' do
@@ -90,7 +105,9 @@ describe 'GET api/v1/news' do
 
     context 'with news from different topics' do
       let!(:another_topic) { create(:topic) }
-      let!(:news_from_another_topic) { create(:news, topic: another_topic, creator: creator, reviewer: reviewer) }
+      let!(:news_from_another_topic) do
+        create(:news, :with_reviewer, topic: another_topic, creator: creator, reviewer: reviewer)
+      end
 
       it 'returns news from all topics' do
         subject
@@ -101,9 +118,9 @@ describe 'GET api/v1/news' do
 
     context 'with news having different valuations' do
       before do
-        create(:news, valuation: 'positive', topic: topic, creator: creator, reviewer: reviewer)
-        create(:news, valuation: 'negative', topic: topic, creator: creator, reviewer: reviewer)
-        create(:news, valuation: 'neutral', topic: topic, creator: creator, reviewer: reviewer)
+        create(:news, :with_reviewer, valuation: 'positive', topic: topic, creator: creator, reviewer: reviewer)
+        create(:news, :with_reviewer, valuation: 'negative', topic: topic, creator: creator, reviewer: reviewer)
+        create(:news, :with_reviewer, valuation: 'neutral', topic: topic, creator: creator, reviewer: reviewer)
       end
 
       it 'returns news with all valuations' do

@@ -30,7 +30,21 @@ FactoryBot.define do
     end
 
     trait :with_reviewer do
-      reviewer { association :user }
+      transient do
+        reviewer { association :user }
+        reviewed_at { Time.current }
+        notes { nil }
+      end
+
+      after(:create) do |news_item, evaluator|
+        create(
+          :news_review,
+          news: news_item,
+          reviewer: evaluator.reviewer,
+          reviewed_at: evaluator.reviewed_at,
+          notes: evaluator.notes
+        )
+      end
     end
   end
 end
