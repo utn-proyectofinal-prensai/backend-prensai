@@ -3,6 +3,8 @@
 module API
   module V1
     class NewsController < API::V1::APIController
+      before_action :set_news, only: :update
+
       def index
         @pagy, @news = pagy(policy_scope(News).ordered)
       end
@@ -22,7 +24,41 @@ module API
         render json: { error: 'Missing required parameters', details: e.message }, status: :bad_request
       end
 
+      def update
+        authorize @news
+
+        @news.assign_attributes(review_params)
+        @news.reviewer = current_user
+        @news.save!
+
+        render :show, status: :ok
+      end
+
       private
+
+      def set_news
+        @news = News.find(params[:id])
+      end
+
+      def review_params
+        params.expect(news: [
+          :title,
+          :publication_type,
+          :date,
+          :support,
+          :media,
+          :section,
+          :author,
+          :interviewee,
+          :plain_text,
+          :audience_size,
+          :quotation,
+          :valuation,
+          :political_factor,
+          :topic_id,
+          { mention_ids: [] }
+        ])
+      end
 
       def batch_process_params
         urls, topics, mentions = params.expect(
