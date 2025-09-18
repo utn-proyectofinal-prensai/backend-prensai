@@ -50,7 +50,6 @@ module API
           :section,
           :author,
           :interviewee,
-          :plain_text,
           :audience_size,
           :quotation,
           :valuation,
