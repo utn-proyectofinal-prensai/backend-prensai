@@ -38,29 +38,93 @@ describe Topic do
     end
   end
 
+  describe '#default?' do
+    let(:topic) { create(:topic) }
+
+    context 'when topic is not configured as default' do
+      it 'returns false' do
+        expect(topic.default?).to be false
+      end
+    end
+
+    context 'when topic is configured as default' do
+      before do
+        allow(AiConfiguration).to receive(:get_value).with('default_topic').and_return(topic.id)
+      end
+
+      it 'returns true' do
+        expect(topic.default?).to be true
+      end
+    end
+
+    context 'when no default topic is configured' do
+      before do
+        allow(AiConfiguration).to receive(:get_value).with('default_topic').and_return(nil)
+      end
+
+      it 'returns false' do
+        expect(topic.default?).to be false
+      end
+    end
+  end
+
   describe '#check_crisis!' do
     let(:topic) { create(:topic) }
 
     context 'when topic has more than 5 negative news' do
-      it 'sets crisis to true' do
-        # Create 6 negative news using insert_all to avoid callbacks
-        news_attributes = Array.new(5) do
-          {
-            title: 'Test News',
-            publication_type: 'article',
-            date: Date.current,
-            support: 'negative',
-            media: 'Test Media',
-            valuation: 'negative',
-            link: "https://example.com/news-#{SecureRandom.uuid}",
-            topic_id: topic.id,
-            created_at: Time.current,
-            updated_at: Time.current
-          }
+      context 'when topic is NOT default' do
+        before do
+          allow(topic).to receive(:default?).and_return(false)
         end
-        News.insert_all(news_attributes)
 
-        expect { topic.check_crisis! }.to change(topic, :crisis).from(false).to(true)
+        it 'sets crisis to true' do
+          # Create 5 negative news using insert_all to avoid callbacks
+          news_attributes = Array.new(5) do
+            {
+              title: 'Test News',
+              publication_type: 'article',
+              date: Date.current,
+              support: 'negative',
+              media: 'Test Media',
+              valuation: 'negative',
+              link: "https://example.com/news-#{SecureRandom.uuid}",
+              topic_id: topic.id,
+              created_at: Time.current,
+              updated_at: Time.current
+            }
+          end
+          News.insert_all(news_attributes)
+
+          expect { topic.check_crisis! }.to change(topic, :crisis).from(false).to(true)
+        end
+      end
+
+      context 'when topic is default' do
+        before do
+          allow(topic).to receive(:default?).and_return(true)
+        end
+
+        it 'keeps crisis as false' do
+          # Create 5 negative news using insert_all to avoid callbacks
+          news_attributes = Array.new(5) do
+            {
+              title: 'Test News',
+              publication_type: 'article',
+              date: Date.current,
+              support: 'negative',
+              media: 'Test Media',
+              valuation: 'negative',
+              link: "https://example.com/news-#{SecureRandom.uuid}",
+              topic_id: topic.id,
+              created_at: Time.current,
+              updated_at: Time.current
+            }
+          end
+          News.insert_all(news_attributes)
+
+          expect { topic.check_crisis! }.not_to change(topic, :crisis)
+          expect(topic.crisis).to be false
+        end
       end
     end
 

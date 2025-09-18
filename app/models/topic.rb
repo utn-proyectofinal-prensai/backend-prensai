@@ -37,6 +37,6 @@ class Topic < ApplicationRecord
   private
 
   def should_be_crisis?
-    news.valuation_negative.count >= 5 unless default?
+    default? ? false : news.valuation_negative.count >= 5
   end
 end
