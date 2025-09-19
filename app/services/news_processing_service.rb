@@ -16,6 +16,8 @@ class NewsProcessingService
   def call
     return failure_result(errors.full_messages) unless valid?
 
+    return success_result(empty_processing_payload) if filtered_urls.empty?
+
     handle_response(call_external_service)
   rescue StandardError => e
     Rails.logger.error "NewsProcessingService error: #{e.message}"
@@ -47,13 +49,14 @@ class NewsProcessingService
       response.values_at(:received, :processed, :news, :errors)
 
     persistence_result = persist_news_items(news_items) unless news_items.to_a.empty?
+    persistence_result ||= default_persistence_result
 
     {
       received: received_count,
       processed_by_ai: ai_processed_count,
       persisted: persistence_result[:success_count],
       news: persistence_result[:persisted_news],
-      errors: normalize_errors(external_errors, persistence_result[:errors])
+      errors: normalize_errors(external_errors, persistence_result[:errors]) + duplicate_errors
     }
   end
 
@@ -78,7 +81,7 @@ class NewsProcessingService
 
   def build_request_payload
     {
-      urls:,
+      urls: filtered_urls,
       temas: topics,
       menciones: mentions,
       ministerios_key_words: ministries_keywords,
@@ -126,5 +129,35 @@ class NewsProcessingService
 
   def normalize_errors(external_errors, persistence_errors = [])
     external_errors + persistence_errors
+  end
+
+  def filtered_urls
+    @filtered_urls ||= urls.reject { |url| News.exists?(link: url) }
+  end
+
+  def duplicate_urls
+    @duplicate_urls ||= urls - filtered_urls
+  end
+
+  def duplicate_errors
+    duplicate_urls.map { |url| { url:, reason: I18n.t('api.errors.news.duplicate_link') } }
+  end
+
+  def empty_processing_payload
+    {
+      received: 0,
+      processed_by_ai: 0,
+      persisted: 0,
+      news: [],
+      errors: duplicate_errors
+    }
+  end
+
+  def default_persistence_result
+    {
+      success_count: 0,
+      persisted_news: [],
+      errors: []
+    }
   end
 end
