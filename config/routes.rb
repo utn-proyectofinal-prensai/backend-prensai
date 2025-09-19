@@ -156,7 +156,7 @@ Rails.application.routes.draw do
         patch :change_password, on: :member
       end
       resources :topics, only: %i[index create update destroy]
-      resources :news, only: %i[index] do
+      resources :news, only: %i[index update] do
         post :batch_process, on: :collection
       end
       resources :mentions, only: %i[index create update destroy]
