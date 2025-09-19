@@ -94,7 +94,7 @@ RSpec.describe NewsPersistenceService, type: :service do
         expect(result[:success_count]).to eq(0)
         expect(result[:persisted_news]).to be_empty
         expect(result[:errors].size).to eq(1)
-        expect(result[:errors].first[:reason]).to include('Failed to save news')
+        expect(result[:errors].first[:reason]).to include(I18n.t('errors.messages.blank'))
       end
 
       it 'builds error messages with correct structure' do
@@ -103,7 +103,7 @@ RSpec.describe NewsPersistenceService, type: :service do
 
         expect(error).to have_key(:url)
         expect(error).to have_key(:reason)
-        expect(error[:reason]).to include('Failed to save news')
+        expect(error[:reason]).to include(I18n.t('errors.messages.blank'))
       end
     end
 
@@ -134,6 +134,46 @@ RSpec.describe NewsPersistenceService, type: :service do
   end
 
   describe 'error handling' do
+    context 'when a news item has a duplicate link' do
+      let!(:existing_news) { create(:news, link: valid_news_item['LINK']) }
+      let(:news_items) { [valid_news_item] }
+
+      it 'returns a duplicate link error' do
+        result = service.call
+
+        expect(result[:success_count]).to eq(0)
+        expect(result[:errors]).to contain_exactly(
+          include(
+            url: valid_news_item['LINK'],
+            reason: I18n.t('api.errors.news.duplicate_link')
+          )
+        )
+      end
+    end
+
+    context 'when the persistence layer raises a validation error' do
+      let(:news_items) { [valid_news_item] }
+
+      before do
+        invalid_record = News.new
+        invalid_record.errors.add(:base, :invalid)
+        allow(NewsRecordBuilder).to receive(:call)
+          .and_raise(ActiveRecord::RecordInvalid.new(invalid_record))
+      end
+
+      it 'returns a validation failed error' do
+        result = service.call
+
+        expect(result[:success_count]).to eq(0)
+        expect(result[:errors]).to contain_exactly(
+          include(
+            url: valid_news_item['LINK'],
+            reason: I18n.t('api.errors.news.validation_failed')
+          )
+        )
+      end
+    end
+
     context 'when NewsRecordBuilder raises an error' do
       let(:news_items) { [valid_news_item] }
 
@@ -145,8 +185,7 @@ RSpec.describe NewsPersistenceService, type: :service do
         result = service.call
 
         expect(result[:success_count]).to eq(0)
-        expect(result[:errors]).to all(include(reason: /Persistence error/))
-        expect(result[:errors].first[:reason]).to include('Unexpected error')
+        expect(result[:errors]).to all(include(reason: I18n.t('api.errors.news.internal_error')))
       end
     end
   end

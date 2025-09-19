@@ -30,9 +30,13 @@ class Topic < ApplicationRecord
     update!(crisis: should_be_crisis?)
   end
 
+  def default?
+    AiConfiguration.get_value('default_topic') == id
+  end
+
   private
 
   def should_be_crisis?
-    news.valuation_negative.count >= 5
+    default? ? false : news.valuation_negative.count >= 5
   end
 end

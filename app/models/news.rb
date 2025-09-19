@@ -61,7 +61,7 @@ class News < ApplicationRecord
   after_destroy :check_topic_crisis
 
   def requires_manual_review?
-    publication_type.nil? || valuation.nil? || topic.nil? || political_factor.nil?
+    manual_review_fields.include?('REVISAR MANUAL') || required_fields.any?(&:nil?)
   end
 
   def crisis?
@@ -69,6 +69,14 @@ class News < ApplicationRecord
   end
 
   private
+
+  def manual_review_fields
+    [publication_type, political_factor, interviewee]
+  end
+
+  def required_fields
+    [valuation, topic]
+  end
 
   def check_topic_crisis
     if topic_id_before_last_save.present? && topic_id_before_last_save != topic_id

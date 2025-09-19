@@ -38,14 +38,26 @@ class NewsPersistenceService
     else
       {
         success: false,
-        error: build_error(news_data['LINK'], "Failed to save news: #{news_record.errors.full_messages.join(', ')}")
+        error: build_error(news_data['LINK'], news_record.errors.full_messages.join(', '))
       }
     end
+  rescue ActiveRecord::RecordNotUnique => e
+    Rails.logger.error "Duplicate news: #{e.message}"
+    {
+      success: false,
+      error: build_error(news_data['LINK'], I18n.t('api.errors.news.duplicate_link'))
+    }
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error "Validation error: #{e.message}"
+    {
+      success: false,
+      error: build_error(news_data['LINK'], I18n.t('api.errors.news.validation_failed'))
+    }
   rescue StandardError => e
     Rails.logger.error "Error persisting news: #{e.message}"
     {
       success: false,
-      error: build_error(news_data['LINK'], "Persistence error: #{e.message}")
+      error: build_error(news_data['LINK'], I18n.t('api.errors.news.internal_error'))
     }
   end
 
