@@ -1,0 +1,755 @@
+FORMAT: 1A
+
+# PrensAI API
+
+## Group Aplicación
+
+## Status [/api/v1/status]
+
+### status [GET]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "online": true
+            }
+
+## Users [/api/v1/user]
+
+### show [GET]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "user": {
+                    "id": 15,
+                    "email": "juan.perez@example.com",
+                    "username": "juan.perez",
+                    "name": "Juan Perez",
+                    "first_name": "Juan",
+                    "last_name": "Perez",
+                    "uid": "vaughn@kovacek.example",
+                    "provider": "email",
+                    "created_at": "2024-04-26T20:34:58.626Z",
+                    "updated_at": "2024-04-26T20:34:58.689Z"
+                }
+            }
+
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "errors": [
+                    {
+                        "message": "Couldn't find the record"
+                    }
+                ]
+            }
+
+### create [POST]
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "user": {
+                    "email": "test@example.com",
+                    "password": "12345678",
+                    "password_confirmation": "12345678",
+                    "username": "test",
+                    "first_name": "Johnny",
+                    "last_name": "Perez"
+                }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "user": {
+                    "id": 5,
+                    "email": "test@example.com",
+                    "name": "Johnny Perez",
+                    "username": "test",
+                    "first_name": "Johnny",
+                    "last_name": "Perez",
+                    "uid": "test@example.com",
+                    "provider": "email",
+                    "created_at": "2024-04-26T20:34:57.901Z",
+                    "updated_at": "2024-04-26T20:34:57.979Z"
+                }
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "status": "error",
+                "data": {
+                    "id": null,
+                    "email": "test@example.com",
+                    "allow_password_change": false,
+                    "first_name": "Johnny",
+                    "last_name": "Perez",
+                    "username": "test",
+                    "created_at": null,
+                    "updated_at": null,
+                    "provider": "email",
+                    "uid": "test@example.com",
+                    "impersonated_by": null
+                },
+                "errors": {
+                    "password_confirmation": [
+                        "doesn't match Password"
+                    ],
+                    "full_messages": [
+                        "Password is too short (minimum is 8 characters)"
+                    ],
+                    "email": [
+                        "is not an email"
+                    ],
+                    "password": [
+                        "is too short (minimum is 8 characters)"
+                    ]
+                }
+            }
+
+### update [PUT]
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "user": {
+                    "username": "new username"
+                }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "user": {
+                    "id": 10,
+                    "email": "juan.perez@example.com",
+                    "name": "new username",
+                    "username": "new username",
+                    "first_name": "",
+                    "last_name": "",
+                    "uid": "juan.perez@example.com",
+                    "provider": "email",
+                    "created_at": "2024-04-26T20:34:58.540Z",
+                    "updated_at": "2024-04-26T20:34:58.674Z"
+                }
+            }
+
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "errors": [
+                    {
+                        "email": [
+                            "is not an email"
+                        ]
+                    }
+                ]
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": [
+                    {
+                        "message": "A required param is missing"
+                    }
+                ]
+            }
+
+## Contraseña [/api/v1/users/password]
+
+### Recuperar contraseña [POST]
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "email": "juan.perez@example.com"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "success": true,
+                "message": "An email has been sent to 'juan.perez@example.com' containing instructions for resetting your password."
+            }
+
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "errors": [
+                    {
+                        "message": "Unable to find user with email 'notvalid@example.com'."
+                    }
+                ]
+            }
+
+### Actualizar contraseña [PUT]
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "password": "123456789",
+                "password_confirmation": "123456789"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "success": true,
+                "data": {
+                    "email": "juan.perez@example.com",
+                    "provider": "email",
+                    "uid": "juan.perez@example.com",
+                    "id": 9,
+                    "allow_password_change": false,
+                    "first_name": "",
+                    "last_name": "",
+                    "username": "juan.perez",
+                    "created_at": "2024-04-26T20:34:58.309Z",
+                    "updated_at": "2024-04-26T20:34:58.630Z",
+                    "impersonated_by": null
+                },
+                "message": "Your password has been successfully updated."
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "success": false,
+                "errors": {
+                    "password_confirmation": [
+                        "doesn't match Password"
+                    ],
+                    "full_messages": [
+                        "Password confirmation doesn't match Password"
+                    ]
+                }
+            }
+
+## Login [/api/v1/users/sign_in]
+
+### Iniciar sesión [POST]
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "user": {
+                    "email": "juan.perez@example.com",
+                    "password": "password"
+                }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "user": {
+                    "id": 14,
+                    "email": "juan.perez@example.com",
+                    "name": "juan perez",
+                    "username": "juan.perez",
+                    "first_name": "",
+                    "last_name": "",
+                    "uid": "juan.perez@example.com",
+                    "provider": "email",
+                    "created_at": "2024-04-26T20:34:58.289Z",
+                    "updated_at": "2024-04-26T20:34:58.361Z"
+                }
+            }
+
++ Response 401 (application/json)
+
+    + Body
+
+            {
+                "errors": [
+                    {
+                        "message": "Invalid login credentials. Please try again."
+                    }
+                ]
+            }
+
+## Logout [/api/v1/users/sign_out]
+
+### Cerrar sesión [DELETE]
+
++ Request (application/json)
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "success": true
+            }
+
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "errors": [
+                    {
+                        "message": "User was not found or was not logged in."
+                    }
+                ]
+            }
+
+## News [/api/v1/news]
+
+### Listar Noticias [GET]
+
+Obtiene una lista paginada de todas las noticias en el sistema, ordenadas por fecha de creación descendente.
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 200 (application/json)
+
+    + Attributes
+        + news (array[NewsItem])
+        + pagination (Pagination)
+        
+    + Body
+    
+        {
+            "news": [
+                {
+                    "id": 1,
+                    "title": "Nueva política de transporte",
+                    "publication_type": "article",
+                    "date": "2025-01-09",
+                    "support": "web",
+                    "media": "Diario Nacional",
+                    "section": "Politics",
+                    "author": "María González",
+                    "interviewee": null,
+                    "link": "https://example.com/news-1",
+                    "audience_size": 50000,
+                    "quotation": 0.0,
+                    "valuation": "neutral",
+                    "political_factor": "national",
+                    "plain_text": "El gobierno anunció una nueva política...",
+                    "crisis": false,
+                    "created_at": "2025-01-09T10:30:00Z",
+                    "updated_at": "2025-01-09T10:30:00Z",
+                    "topic": {
+                        "id": 1,
+                        "name": "Transport"
+                    },
+                    "mentions": [
+                        {
+                            "id": 1,
+                            "name": "Ministerio de Transporte"
+                        }
+                    ],
+                    "creator": {
+                        "id": 1,
+                        "name": "Juan Pérez"
+                    },
+                    "reviewer": {
+                        "id": 2,
+                        "name": "Ana García"
+                    }
+                }
+            ],
+            "pagination": {
+                "page": 1,
+                "count": 1,
+                "pages": 1,
+                "prev": null,
+                "next": null
+            }
+        }      
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+    + Body
+    
+    {
+        "errors": [
+            {
+                "message": "You need to sign in or sign up before continuing."
+            }
+        ]
+    }
+
+### Procesar Noticias por Lotes [POST /api/v1/news/batch_process]
+
+Procesa múltiples URLs de noticias utilizando IA para extraer información estructurada y persistir las noticias en el sistema. El usuario autenticado se asigna como creador de las noticias procesadas.
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "urls": [
+                "https://example.com/news-1",
+                "https://example.com/news-2"
+            ],
+            "topics": [
+                "Transport",
+                "Politics"
+            ],
+            "mentions": [
+                "Mention1",
+                "Mention2"
+            ]
+        }
+
++ Response 200 (application/json)
+    + Attributes
+        + received: 2 (number) - Número de URLs recibidas
+        + processed_by_ai: 2 (number) - Número de URLs procesadas exitosamente por IA
+        + persisted: 2 (number) - Número de noticias persistidas en la base de datos
+        + news (array[NewsItem]) - Noticias creadas exitosamente
+        + errors (array[ProcessingError]) - Errores de procesamiento
+
+    + Body
+    
+        {
+            "received": 2,
+            "processed_by_ai": 2,
+            "persisted": 2,
+            "news": [
+                {
+                    "id": 1,
+                    "title": "Nueva política de transporte",
+                    "publication_type": "article",
+                    "date": "2025-01-09",
+                    "support": "web",
+                    "media": "Diario Nacional",
+                    "section": "Politics",
+                    "author": "María González",
+                    "interviewee": null,
+                    "link": "https://example.com/news-1",
+                    "audience_size": 50000,
+                    "quotation": 0.0,
+                    "valuation": "neutral",
+                    "political_factor": "national",
+                    "plain_text": "El gobierno anunció una nueva política...",
+                    "crisis": false,
+                    "created_at": "2025-01-09T10:30:00Z",
+                    "updated_at": "2025-01-09T10:30:00Z",
+                    "topic": {
+                        "id": 1,
+                        "name": "Transport"
+                    },
+                    "mentions": [
+                        {
+                            "id": 1,
+                            "name": "Ministerio de Transporte"
+                        }
+                    ],
+                    "creator": {
+                        "id": 1,
+                        "name": "Juan Pérez"
+                    },
+                    "reviewer": null
+                }
+            ],
+            "errors": []
+        }    
+
++ Response 400 (application/json)
+    + Attributes
+        + error: "Missing required parameters" (string)
+        + details (string) - Detalles del error
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+---
+
+## Group IA
+
+Módulo de IA. Para interactuar con esta API se requiere un Api Key.
+
+## Clasificación de noticias [/v1/procesar-noticias]
+
+### Enviar lote de noticias para clasificar [POST]
+
+Procesa un conjunto de hasta 10 URLs de noticias. Devuelve la información estructurada de cada noticia.
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer {token}
+
+    + Body
+
+            {
+              "urls": [
+                "https://ejemplo.com/noticia-1",
+                "https://ejemplo.com/noticia-2"
+              ],
+              "temas": [],
+              "menciones": [],
+              "ministerios_key_words": ["Ministerio de Cultura", "Ministerio de Cultura de Buenos Aires"],
+              "ministro_key_words": ["Pepe Pompin", "Ministro", "Ministro de cultura"],
+            }
+
++ Response 200 (application/json)
+
+    + Attributes
+        + recibidas: 2 (number) - Cantidad de URLs recibidas.
+        + procesadas: 2 (number) - Cantidad de URLs procesadas exitosamente.
+        + noticias (array[Noticia])
+        + errors (array[ErrorNoticia])
+
+    + Body
+
+            {
+              "recibidas": 2,
+              "procesadas": 2,
+              "data": [
+                {
+                  "TITULO": "Texto del título detectado",
+                  "TIPO PUBLICACION": "nota",
+                  "FECHA": "2025-07-09",
+                  "SOPORTE": "web",
+                  "MEDIO": "Diario Ejemplo",
+                  "SECCION": "Política",
+                  "AUTOR": "Nombre Apellido",
+                  "ENTREVISTADO": "",
+                  "TEMA": "Transporte",
+                  "LINK": "https://ejemplo.com/noticia-5",
+                  "ALCANCE": "12.000",
+                  "COTIZACION": "$35000.0",
+                  "VALORACION": "neutro",
+                  "FACTOR POLITICO": "medio",
+                  "MENCIONES": []
+                }
+              ],
+              "errores": [{"url": "1", "motivo": "error 1"},{"url": "2", "motivo": "error 2"}],
+              "tiempo_procesamiento": ""
+            }
+
+
++ Response 422 (application/json)
+
+    + Attributes
+        + recibidas: 2 (number) - Cantidad de URLs recibidas.
+        + procesadas: 2 (number) - Cantidad de URLs procesadas exitosamente.
+        + noticias (array[Noticia])
+        + errors (array[ErrorNoticia])
+
+    + Body
+
+            {
+                "data": [],
+                "errores": [
+                    {
+                        "url": "1",
+                        "motivo": "error 1"
+                    },
+                    {
+                        "url": "2",
+                        "motivo": "error 2"
+                    }
+                ]
+            }
+            
+
++ Response 400 (application/json)
+
+    + Attributes
+        + mensaje: (string). Mensaje de error
+
+    + Body
+
+            {
+              "mensaje": "urls must contain between 1 and 10 unique items.",
+            }
+
+## Reportes de clippings [/v1/generar-informe-clipping]
+
+### Generar reporte de clipping [POST]
+
+Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un informe de clipping con IA generativa.
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer {internal-token}
+
+    + Body
+
+            {
+              "noticias": [
+                {
+                  "titulo": "Texto del título detectado",
+                  "tipo_publicacion": "nota",
+                  "fecha": "2025-07-09",
+                  "soporte": "web",
+                  "medio": "Diario Ejemplo",
+                  "seccion": "Política",
+                  "autor": "Nombre Apellido",
+                  "entrevistado": null,
+                  "tema": "Transporte",
+                  "link": "https://ejemplo.com/noticia-1",
+                  "alcance": 120000,
+                  "cotizacion": 0.0,
+                  "valoracion": "neutro",
+                  "factor_politico": "medio",
+                  "gestion": "GCBA",
+                  "texto_plano": "Cuerpo completo extraído y limpiado...",
+                  "crisis": "no",
+                  "menciones": []
+                }
+              ],
+              "configuracion": {
+                "titulo": "Clipping semanal",
+                "formato": "markdown"
+              }
+            }
+
++ Response 200 (application/json)
+
+    + Attributes (ClippingReport)
+
+    + Body
+
+            {
+              "titulo": "Clipping semanal",
+              "formato": "markdown",
+              "contenido": "# Resumen del clipping\n\n## Noticias destacadas\n- Texto del título detectado...",
+              "resumen": [
+                "Cobertura de Transporte en medios nacionales.",
+                "Predomina valoración neutra."
+              ]
+            }
+
+
+## Data Structures
+
+### NewsItem (object)
++ id: 1 (number) - ID único de la noticia
++ title: "Título de la noticia" (string) - Título de la noticia
++ publication_type: "article" (string) - Tipo de publicación (article, interview, editorial, opinion, o "REVISAR MANUAL")
++ date: "2025-01-09" (string) - Fecha de la noticia (ISO 8601)
++ support: "web" (string) - Soporte de la noticia
++ media: "Nombre del Medio" (string) - Nombre del medio de comunicación
++ section: "Politics" (string) - Sección de la noticia
++ author: "Nombre del Autor" (string) - Autor de la noticia
++ interviewee: "Nombre del Entrevistado" (string, nullable) - Persona entrevistada
++ link: "https://example.com/news" (string) - URL de la noticia original
++ audience_size: 10000 (number, nullable) - Tamaño de la audiencia
++ quotation: 0.0 (number, nullable) - Cotización monetaria
++ valuation: "neutral" (string, nullable) - Valoración (positive, neutral, negative, o "REVISAR MANUAL")
++ political_factor: "medio" (string, nullable) - Factor político (local, regional, national, international, o "REVISAR MANUAL")
++ plain_text: "Texto plano de la noticia..." (string, nullable) - Contenido de texto plano
++ crisis: false (boolean) - Indica si la noticia está relacionada con una crisis
++ created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
++ updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
++ topic (Topic, nullable) - Tema asociado a la noticia
++ mentions (array[Mention]) - Menciones asociadas a la noticia
++ creator (User, nullable) - Usuario que procesó/creó la noticia
++ reviewer (User, nullable) - Usuario que revisó la noticia
+
+### Topic (object)
++ id: 1 (number) - ID único del tema
++ name: "Transport" (string) - Nombre del tema
+
+### Mention (object)
++ id: 1 (number) - ID único de la mención
++ name: "Mention1" (string) - Nombre de la mención
+
+### User (object)
++ id: 1 (number) - ID único del usuario
++ name: "Juan Pérez" (string) - Nombre completo del usuario
+
+### Pagination (object)
++ page: 1 (number) - Página actual
++ count: 25 (number) - Total de elementos
++ pages: 3 (number) - Total de páginas
++ prev: null (number, nullable) - Número de página anterior
++ next: 2 (number, nullable) - Número de página siguiente
+
+### Error (object)
++ message: "Error message" (string) - Mensaje de error
+
+### ProcessingError (object)
++ url: "https://example.com/news" (string) - URL que causó el error
++ reason: "Failed to save news: Validation failed" (string) - Razón del error
+
+### Noticia (object)
+- titulo: Texto del título detectado (string)
+- tipo_publicacion: Tipo de publicación, por ejemplo "nota" (string)
+- fecha: Fecha en formato ISO-8601 (string) - e.g. `2025-07-09`
+- soporte: Soporte, por ejemplo "web" (string)
+- medio: Medio de publicación (string)
+- seccion: Sección del medio (string, optional)
+- autor: Autor/a (string, optional)
+- entrevistado: Entrevistado/a (string, optional)
+- tema: Tema o categoría (string, optional)
+- link: URL de la noticia (string)
+- alcance: Alcance estimado (number, optional)
+- cotizacion: Cotización asociada (number, optional)
+- valoracion: Sentimiento: `positivo` | `negativo` | `neutro` (string)
+- factor_politico: Intensidad del factor político (string, optional)
+- gestion: Jurisdicción o gestión referida (string, optional)
+- texto_plano: Texto completo extraído (string, optional)
+- crisis: Indicador de crisis (string, optional)
+- menciones: Menciones de la noticia (array[string], optional)
+- usuario_creador: Alias usuario creador (string, optional)
+- usuario_revisor: Alias usuario revisor (string, optional)
+
+### ErrorNoticia (object)
+- url: URL que falló (string)
+- detail: Descripción del error (string)
+
+### ClippingReport (object)
+- report_id (string)
+- title (string)
+- format (string) - `markdown|html|plain_text`
+- content (string) - Informe generado
+- summary (array[string], optional) - Puntos clave
