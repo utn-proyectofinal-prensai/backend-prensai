@@ -1,0 +1,76 @@
+FORMAT: 1A
+
+# PrensAI API
+
+This document describes the AI Configuration endpoints. All requests must be authenticated using a valid token, and only
+administrator users are authorized to access these resources.
+
+## AI Configurations [/api/v1/ai_configurations]
+
+List and manage AI configuration records. Requests to this resource must include valid authentication headers for an
+administrator account.
+
+### List AI Configurations [GET]
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {JWT}
+
++ Response 200 (application/json)
+    + Attributes (AiConfigurationList)
+
+### Replace an AI Configuration [PUT /api/v1/ai_configurations/{key}]
++ Parameters
+    + key: `daily_summary` (required, string) - Unique identifier of the configuration to update.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {JWT}
+
+    + Attributes (AiConfigurationUpdatePayload)
+
++ Response 200 (application/json)
+    + Attributes (AiConfigurationUpdateResponse)
+
+### Update an AI Configuration [PATCH /api/v1/ai_configurations/{key}]
+Performs a partial update using the same payload schema as the PUT action.
+
++ Parameters
+    + key: `daily_summary` (required, string) - Unique identifier of the configuration to update.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {JWT}
+
+    + Attributes (AiConfigurationUpdatePayload)
+
++ Response 200 (application/json)
+    + Attributes (AiConfigurationUpdateResponse)
+
+# Data Structures
+
+## AiConfigurationList (object)
++ ai_configurations (array[AiConfiguration]) - Enabled AI configurations ordered by display name.
+
+## AiConfiguration (object)
++ key: `daily_summary` (string) - Unique identifier of the configuration.
++ value: `{"enabled":true}` (object) - JSON payload matching the `value_type`. May also be a primitive, array, or nested object depending on the configuration.
++ value_type: `array` (enum[string, array, reference]) - Data type expected in `value`.
++ display_name: `Daily Summary` (string) - Human readable label for the configuration.
++ description: `Determines the behaviour of the daily summary agent.` (nullable, string) - Optional description of the configuration.
++ enabled: true (boolean) - Indicates if the configuration is active.
++ reference_type: `Topic` (nullable, string) - Model referenced when `value_type` is `reference`.
++ created_at: `2024-01-01T12:00:00Z` (string) - Timestamp of creation.
++ updated_at: `2024-01-05T09:30:00Z` (string) - Timestamp of last update.
+
+## AiConfigurationUpdatePayload (object)
++ ai_configuration (object, required)
+    + enabled: true (optional, boolean) - Sets whether the configuration is active.
+    + value: `{"prompt":"Hello"}` (optional) - JSON payload to store. Provide a string, array, object, or identifier matching the configuration `value_type`.
+
+## AiConfigurationUpdateResponse (object)
++ key: `daily_summary` (string) - Unique identifier of the configuration.
++ value: `{"prompt":"Hello"}` (object) - The stored JSON payload.
++ enabled: true (boolean) - Indicates if the configuration is active.
