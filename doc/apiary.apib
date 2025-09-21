@@ -1028,13 +1028,13 @@ Obtiene una lista de todas las configuraciones de IA habilitadas en el sistema.
         {
             "ai_configurations": [
                 {
-                    "key": "openai_api_key",
-                    "value": "sk-xxx...",
-                    "value_type": "string",
-                    "display_name": "OpenAI API Key",
-                    "description": "Clave de API para OpenAI",
+                    "key": "default_topic",
+                    "value": "1",
+                    "value_type": "reference",
+                    "display_name": "Tema por defecto",
+                    "description": "Tema que se asigna por defecto a las noticias procesadas",
                     "enabled": true,
-                    "reference_type": "global",
+                    "reference_type": "Topic",
                     "created_at": "2025-01-09T10:30:00Z",
                     "updated_at": "2025-01-09T10:30:00Z"
                 }
@@ -1299,13 +1299,13 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 
 ### AiConfiguration (object)
-+ key: "openai_api_key" (string) - Clave única de la configuración
-+ value: "sk-xxx..." (string) - Valor de la configuración
-+ value_type: "string" (string) - Tipo de valor (string, number, boolean, object, array)
-+ display_name: "OpenAI API Key" (string) - Nombre para mostrar
-+ description: "Clave de API para OpenAI" (string) - Descripción de la configuración
++ key: "default_topic" (string) - Clave única de la configuración
++ value: "1" (string) - Valor de la configuración
++ value_type: "reference" (string) - Tipo de valor (string, array, reference)
++ display_name: "Tema por defecto" (string) - Nombre para mostrar
++ description: "Tema que se asigna por defecto a las noticias procesadas" (string) - Descripción de la configuración
 + enabled: true (boolean) - Indica si la configuración está habilitada
-+ reference_type: "global" (string) - Tipo de referencia
++ reference_type: "Topic" (string) - Tipo de referencia
 + created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 

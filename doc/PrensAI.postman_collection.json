@@ -1,0 +1,886 @@
+{
+	"info": {
+		"_postman_id": "ec0d286a-78d0-491d-9548-1e6ba2d76bbe",
+		"name": "PrensAI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34251416",
+		"_collection_link": "https://prensai.postman.co/workspace/PrensAI~034d7a81-e063-4e6b-b1ad-956e9ab89aa9/collection/34251416-ec0d286a-78d0-491d-9548-1e6ba2d76bbe?action=share&source=collection_link&creator=34251416"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Actualizar usuario",
+					"request": {
+						"description": "🔐 ADMIN: Actualiza la información de un usuario específico por ID. Permite modificar username, nombre, apellido, email y rol. Requiere token de administrador.",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"username\": \"nuevo_username\",\r\n        \"first_name\": \"Nuevo\",\r\n        \"last_name\": \"Nombre\",\r\n        \"email\": \"nuevo@example.com\",\r\n        \"role\": \"user\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/users/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detalle usuario actual",
+					"request": {
+						"description": "Obtiene la información completa del usuario autenticado actualmente en el sistema.",
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/user",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener usuario por ID",
+					"request": {
+						"description": "🔐 ADMIN/OWNER: Obtiene la información detallada de un usuario específico. Requiere token de administrador o ser el propietario del usuario.",
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/users/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar usuarios",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"description": "🔐 ADMIN: Obtiene una lista de todos los usuarios registrados en el sistema. Requiere token de administrador.",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user\": {\r\n    \"email\": \"test@example.com\",\r\n    \"password\": \"12345678\",\r\n    \"password_confirmation\": \"12345678\",\r\n    \"username\": \"test\",\r\n    \"first_name\": \"Johnny\",\r\n    \"last_name\": \"Perez\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/users",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear usuario",
+					"request": {
+						"description": "🔐 ADMIN: Crea un nuevo usuario en el sistema con email, contraseña, datos personales y rol asignado. Requiere token de administrador.",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user\": {\r\n    \"email\": \"test1@example.com\",\r\n    \"password\": \"12345678\",\r\n    \"password_confirmation\": \"12345678\",\r\n    \"username\": \"test\",\r\n    \"first_name\": \"Johnny\",\r\n    \"last_name\": \"Perez\",\r\n    \"role\": \"user\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/users",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar usuario",
+					"request": {
+						"description": "🔐 ADMIN: Elimina permanentemente un usuario del sistema mediante su ID único. Requiere token de administrador (no puede eliminar su propio usuario).",
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/users/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar contraseña de usuario",
+					"request": {
+						"description": "🔐 ADMIN/OWNER: Cambia la contraseña de un usuario específico. Requiere token de administrador o ser el propietario del usuario.",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"password\": \"nueva_contraseña\",\r\n        \"password_confirmation\": \"nueva_contraseña\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/users/:id/change_password",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								":id",
+								"change_password"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar contraseña usuario actual",
+					"request": {
+						"description": "Permite al usuario autenticado cambiar su propia contraseña proporcionando la nueva contraseña y confirmación.",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user\": {\r\n        \"password\": \"nueva_contraseña\",\r\n        \"password_confirmation\": \"nueva_contraseña\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/user/change_password",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"change_password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Noticias",
+			"item": [
+				{
+					"name": "Procesar noticias",
+					"request": {
+						"description": "Procesa múltiples URLs de noticias utilizando IA para extraer información estructurada y crear registros en el sistema.",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"urls\": [\"https://www.google.com/\"],\r\n    \"topics\": [\"Feria de Mataderos\", \"Juventus Lyrica\"],\r\n    \"mentions\": [\"Gabriela Ricardes\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/news/batch_process",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"news",
+								"batch_process"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar noticias",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"description": "Obtiene una lista paginada de todas las noticias del sistema ordenadas por fecha de creación descendente.",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"topics\": [\"Feria de Mataderos\", \"Juventus Lyrica\"],\r\n    \"mentions\": [\"Gabriela Ricardes\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/news?limit=4",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"news"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "4"
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar noticia",
+					"request": {
+						"description": "Actualiza los datos de una noticia existente incluyendo título, valoración, factor político y asignación de temas/menciones.",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"news\": {\r\n        \"title\": \"Título actualizado\",\r\n        \"publication_type\": \"article\",\r\n        \"date\": \"2025-01-09\",\r\n        \"support\": \"web\",\r\n        \"media\": \"Diario Nacional\",\r\n        \"section\": \"Politics\",\r\n        \"author\": \"María González\",\r\n        \"interviewee\": null,\r\n        \"audience_size\": 50000,\r\n        \"quotation\": 0.0,\r\n        \"valuation\": \"positive\",\r\n        \"political_factor\": \"national\",\r\n        \"topic_id\": 1,\r\n        \"mention_ids\": [1, 2]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/news/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"news",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Menciones",
+			"item": [
+				{
+					"name": "Listar menciones",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"description": "Obtiene una lista de todas las menciones disponibles en el sistema con opción de filtrar por estado habilitado.",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"topics\": [\"Feria de Mataderos\", \"Juventus Lyrica\"],\r\n    \"mentions\": [\"Gabriela Ricardes\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/mentions?enabled=true",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"mentions"
+							],
+							"query": [
+								{
+									"key": "enabled",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear menciones",
+					"request": {
+						"description": "Crea una nueva mención en el sistema con nombre y estado habilitado/deshabilitado.",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"mention\": {\r\n        \"name\": \"Jorge Macri\",\r\n        \"enabled\": true\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/mentions",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"mentions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar mención",
+					"request": {
+						"description": "Actualiza los datos de una mención existente permitiendo cambiar su nombre y estado habilitado/deshabilitado.",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"mention\": {\r\n        \"name\": \"Mención Actualizada\",\r\n        \"enabled\": false\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/mentions/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"mentions",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar mención",
+					"request": {
+						"description": "Elimina permanentemente una mención del sistema mediante su ID único.",
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/mentions/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"mentions",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Temas",
+			"item": [
+				{
+					"name": "Listar temas",
+					"request": {
+						"description": "Obtiene una lista de todos los temas disponibles en el sistema con opción de filtrar por estado habilitado.",
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/topics?enabled=true",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"topics"
+							],
+							"query": [
+								{
+									"key": "enabled",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear temas",
+					"request": {
+						"description": "Crea un nuevo tema en el sistema con nombre, descripción y estado habilitado/deshabilitado.",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"topic\": {\r\n        \"name\": \"Presentaciones\",\r\n        \"description\": \"Descripción del tema\",\r\n        \"enabled\": true\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/topics",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"topics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar tema",
+					"request": {
+						"description": "Actualiza los datos de un tema existente incluyendo nombre, descripción y estado habilitado/deshabilitado.",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"topic\": {\r\n        \"name\": \"Tema Actualizado\",\r\n        \"description\": \"Nueva descripción\",\r\n        \"enabled\": false\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/topics/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"topics",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar tema",
+					"request": {
+						"description": "Elimina permanentemente un tema del sistema mediante su ID único.",
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/topics/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"topics",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AiConfig",
+			"item": [
+				{
+					"name": "Listar configuración",
+					"request": {
+						"description": "🔐 ADMIN: Obtiene una lista de todas las configuraciones de IA habilitadas en el sistema como claves API y parámetros. Requiere token de administrador.",
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/ai_configurations",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"ai_configurations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar configuración",
+					"request": {
+						"description": "🔐 ADMIN: Actualiza una configuración específica de IA mediante su clave única, permitiendo cambiar valor y estado. Requiere token de administrador.",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"ai_configuration\": {\r\n        \"value\": \"nuevo_valor\",\r\n        \"enabled\": true\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/ai_configurations/:key",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"ai_configurations",
+								":key"
+							],
+							"variable": [
+								{
+									"key": "key",
+									"value": "default_topic"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sign in",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Store the token value in a collection variable\", function () {\r",
+							"    var responseJSON = pm.response.json();\r",
+							"    pm.collectionVariables.set(\"token\", responseJSON.token);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"description": "Autentica un usuario en el sistema con email y contraseña, retornando un token JWT para usar en siguientes peticiones.",
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"user\": {\r\n    \"email\": \"admin@prensai.com\",\r\n    \"password\": \"admin123456\"\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/api/v1/users/sign_in",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"sign_in"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign out",
+			"request": {
+				"description": "Cierra la sesión del usuario autenticado invalidando su token JWT actual en el sistema.",
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/api/v1/users/sign_out",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"sign_out"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}
