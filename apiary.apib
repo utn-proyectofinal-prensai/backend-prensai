@@ -505,6 +505,578 @@ Procesa múltiples URLs de noticias utilizando IA para extraer información estr
     + Attributes
         + errors (array[Error])
 
+### Actualizar Noticia [PUT /api/v1/news/{id}]
+
+Actualiza una noticia existente. Requiere autenticación y el usuario debe tener permisos para revisar noticias.
+
++ Parameters
+    + id: 1 (number, required) - ID de la noticia
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "news": {
+                "title": "Título actualizado",
+                "publication_type": "article",
+                "date": "2025-01-09",
+                "support": "web",
+                "media": "Diario Nacional",
+                "section": "Politics",
+                "author": "María González",
+                "interviewee": null,
+                "audience_size": 50000,
+                "quotation": 0.0,
+                "valuation": "positive",
+                "political_factor": "national",
+                "topic_id": 1,
+                "mention_ids": [1, 2]
+            }
+        }
+
++ Response 200 (application/json)
+    + Attributes (NewsItem)
+    + Body
+        {
+            "id": 1,
+            "title": "Título actualizado",
+            "publication_type": "article",
+            "date": "2025-01-09",
+            "support": "web",
+            "media": "Diario Nacional",
+            "section": "Politics",
+            "author": "María González",
+            "interviewee": null,
+            "link": "https://example.com/news-1",
+            "audience_size": 50000,
+            "quotation": 0.0,
+            "valuation": "positive",
+            "political_factor": "national",
+            "plain_text": "El gobierno anunció una nueva política...",
+            "crisis": false,
+            "created_at": "2025-01-09T10:30:00Z",
+            "updated_at": "2025-01-09T10:30:00Z",
+            "topic": {
+                "id": 1,
+                "name": "Transport"
+            },
+            "mentions": [
+                {
+                    "id": 1,
+                    "name": "Ministerio de Transporte"
+                }
+            ],
+            "creator": {
+                "id": 1,
+                "name": "Juan Pérez"
+            },
+            "reviewer": {
+                "id": 2,
+                "name": "Ana García"
+            }
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+## Topics [/api/v1/topics]
+
+### Listar Temas [GET]
+
+Obtiene una lista de todos los temas disponibles en el sistema.
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 200 (application/json)
+    + Attributes
+        + topics (array[Topic])
+        
+    + Body
+        {
+            "topics": [
+                {
+                    "id": 1,
+                    "name": "Transport",
+                    "description": "Noticias relacionadas con transporte",
+                    "enabled": true,
+                    "crisis": false,
+                    "created_at": "2025-01-09T10:30:00Z",
+                    "updated_at": "2025-01-09T10:30:00Z"
+                }
+            ]
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Crear Tema [POST]
+
+Crea un nuevo tema en el sistema.
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "topic": {
+                "name": "Nuevo Tema",
+                "description": "Descripción del tema",
+                "enabled": true
+            }
+        }
+
++ Response 201 (application/json)
+    + Attributes (Topic)
+    + Body
+        {
+            "id": 2,
+            "name": "Nuevo Tema",
+            "description": "Descripción del tema",
+            "enabled": true,
+            "crisis": false,
+            "created_at": "2025-01-09T10:30:00Z",
+            "updated_at": "2025-01-09T10:30:00Z"
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Actualizar Tema [PUT /api/v1/topics/{id}]
+
+Actualiza un tema existente.
+
++ Parameters
+    + id: 1 (number, required) - ID del tema
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "topic": {
+                "name": "Tema Actualizado",
+                "description": "Nueva descripción",
+                "enabled": false
+            }
+        }
+
++ Response 200 (application/json)
+    + Attributes (Topic)
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Eliminar Tema [DELETE /api/v1/topics/{id}]
+
+Elimina un tema del sistema.
+
++ Parameters
+    + id: 1 (number, required) - ID del tema
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 204
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+## Mentions [/api/v1/mentions]
+
+### Listar Menciones [GET]
+
+Obtiene una lista de todas las menciones disponibles en el sistema.
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 200 (application/json)
+    + Attributes
+        + mentions (array[Mention])
+        
+    + Body
+        {
+            "mentions": [
+                {
+                    "id": 1,
+                    "name": "Ministerio de Transporte",
+                    "enabled": true,
+                    "created_at": "2025-01-09T10:30:00Z",
+                    "updated_at": "2025-01-09T10:30:00Z"
+                }
+            ]
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Crear Mención [POST]
+
+Crea una nueva mención en el sistema.
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "mention": {
+                "name": "Nueva Mención",
+                "enabled": true
+            }
+        }
+
++ Response 201 (application/json)
+    + Attributes (Mention)
+    + Body
+        {
+            "id": 2,
+            "name": "Nueva Mención",
+            "enabled": true,
+            "created_at": "2025-01-09T10:30:00Z",
+            "updated_at": "2025-01-09T10:30:00Z"
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Actualizar Mención [PUT /api/v1/mentions/{id}]
+
+Actualiza una mención existente.
+
++ Parameters
+    + id: 1 (number, required) - ID de la mención
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "mention": {
+                "name": "Mención Actualizada",
+                "enabled": false
+            }
+        }
+
++ Response 200 (application/json)
+    + Attributes (Mention)
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Eliminar Mención [DELETE /api/v1/mentions/{id}]
+
+Elimina una mención del sistema.
+
++ Parameters
+    + id: 1 (number, required) - ID de la mención
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 204
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+## Administración de Usuarios [/api/v1/users]
+
+### Listar Usuarios [GET]
+
+Obtiene una lista de todos los usuarios del sistema. Requiere permisos de administrador.
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 200 (application/json)
+    + Attributes
+        + users (array[User])
+        
+    + Body
+        {
+            "users": [
+                {
+                    "id": 1,
+                    "email": "admin@example.com",
+                    "name": "Administrador",
+                    "username": "admin",
+                    "first_name": "Admin",
+                    "last_name": "User",
+                    "role": "admin",
+                    "created_at": "2025-01-09T10:30:00Z",
+                    "updated_at": "2025-01-09T10:30:00Z"
+                }
+            ]
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 403 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Obtener Usuario por ID [GET /api/v1/users/{id}]
+
+Obtiene la información de un usuario específico.
+
++ Parameters
+    + id: 1 (number, required) - ID del usuario
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 200 (application/json)
+    + Attributes (User)
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Actualizar Usuario por ID [PUT /api/v1/users/{id}]
+
+Actualiza la información de un usuario específico.
+
++ Parameters
+    + id: 1 (number, required) - ID del usuario
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "user": {
+                "username": "nuevo_username",
+                "first_name": "Nuevo",
+                "last_name": "Nombre",
+                "email": "nuevo@example.com",
+                "role": "user"
+            }
+        }
+
++ Response 200 (application/json)
+    + Attributes (User)
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Eliminar Usuario [DELETE /api/v1/users/{id}]
+
+Elimina un usuario del sistema.
+
++ Parameters
+    + id: 1 (number, required) - ID del usuario
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 204
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Cambiar Contraseña de Usuario [PATCH /api/v1/users/{id}/change_password]
+
+Cambia la contraseña de un usuario específico.
+
++ Parameters
+    + id: 1 (number, required) - ID del usuario
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "user": {
+                "password": "nueva_contraseña",
+                "password_confirmation": "nueva_contraseña"
+            }
+        }
+
++ Response 200 (application/json)
+    + Attributes (User)
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Cambiar Contraseña de Usuario Actual [PATCH /api/v1/user/change_password]
+
+Cambia la contraseña del usuario autenticado actual.
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "user": {
+                "password": "nueva_contraseña",
+                "password_confirmation": "nueva_contraseña"
+            }
+        }
+
++ Response 200 (application/json)
+    + Attributes (User)
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+## Configuraciones de IA [/api/v1/ai_configurations]
+
+### Listar Configuraciones de IA [GET]
+
+Obtiene una lista de todas las configuraciones de IA habilitadas en el sistema.
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 200 (application/json)
+    + Attributes
+        + ai_configurations (array[AiConfiguration])
+        
+    + Body
+        {
+            "ai_configurations": [
+                {
+                    "key": "openai_api_key",
+                    "value": "sk-xxx...",
+                    "value_type": "string",
+                    "display_name": "OpenAI API Key",
+                    "description": "Clave de API para OpenAI",
+                    "enabled": true,
+                    "reference_type": "global",
+                    "created_at": "2025-01-09T10:30:00Z",
+                    "updated_at": "2025-01-09T10:30:00Z"
+                }
+            ]
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Actualizar Configuración de IA [PUT /api/v1/ai_configurations/{key}]
+
+Actualiza una configuración de IA específica.
+
++ Parameters
+    + key: "openai_api_key" (string, required) - Clave de la configuración
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "ai_configuration": {
+                "value": "nuevo_valor",
+                "enabled": true
+            }
+        }
+
++ Response 200 (application/json)
+    + Attributes (AiConfiguration)
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
 ---
 
 ## Group IA
@@ -690,22 +1262,52 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + crisis: false (boolean) - Indica si la noticia está relacionada con una crisis
 + created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
-+ topic (Topic, nullable) - Tema asociado a la noticia
-+ mentions (array[Mention]) - Menciones asociadas a la noticia
-+ creator (User, nullable) - Usuario que procesó/creó la noticia
-+ reviewer (User, nullable) - Usuario que revisó la noticia
++ topic (EntityRef, nullable) - Tema asociado a la noticia
++ mentions (array[EntityRef]) - Menciones asociadas a la noticia
++ creator (EntityRef, nullable) - Usuario que procesó/creó la noticia
++ reviewer (EntityRef, nullable) - Usuario que revisó la noticia
+
+### EntityRef (object)
++ id: 1 (number) - Id único del registro
++ name: "Name" (string) - Nombre del registro
 
 ### Topic (object)
 + id: 1 (number) - ID único del tema
 + name: "Transport" (string) - Nombre del tema
++ description: "Noticias relacionadas con transporte" (string, nullable) - Descripción del tema
++ enabled: true (boolean) - Indica si el tema está habilitado
++ crisis: false (boolean) - Indica si el tema está relacionado con crisis
++ created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
++ updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 
 ### Mention (object)
 + id: 1 (number) - ID único de la mención
 + name: "Mention1" (string) - Nombre de la mención
++ enabled: true (boolean) - Indica si la mención está habilitada
++ created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
++ updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 
 ### User (object)
 + id: 1 (number) - ID único del usuario
++ email: "juan.perez@example.com" (string) - Email del usuario
 + name: "Juan Pérez" (string) - Nombre completo del usuario
++ username: "juan.perez" (string) - Nombre de usuario
++ first_name: "Juan" (string) - Nombre del usuario
++ last_name: "Pérez" (string) - Apellido del usuario
++ role: "user" (string) - Rol del usuario (user, admin)
++ created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
++ updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
+
+### AiConfiguration (object)
++ key: "openai_api_key" (string) - Clave única de la configuración
++ value: "sk-xxx..." (string) - Valor de la configuración
++ value_type: "string" (string) - Tipo de valor (string, number, boolean, object, array)
++ display_name: "OpenAI API Key" (string) - Nombre para mostrar
++ description: "Clave de API para OpenAI" (string) - Descripción de la configuración
++ enabled: true (boolean) - Indica si la configuración está habilitada
++ reference_type: "global" (string) - Tipo de referencia
++ created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
++ updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 
 ### Pagination (object)
 + page: 1 (number) - Página actual
