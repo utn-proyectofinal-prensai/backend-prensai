@@ -22,20 +22,20 @@ if Rails.env.development?
     role: 'user'
   )
 
-  topics = []
-  5.times do
-    topics << FactoryBot.create(:topic)
+  topics = ['BAFICI', 'Cultura', 'Actividades programadas', 'Tango BA', 'Presentaciones']
+  topics.each do |topic|
+    FactoryBot.create(:topic, name: topic, description: '')
   end
 
-  mentions = []
-  5.times do
-    mentions << FactoryBot.create(:mention)
+  mentions = ['Gabriela Ricardes', 'Jorge Macri']
+  mentions.each do |mention|
+    FactoryBot.create(:mention, name: mention)
   end
 
   news_items = []
   10.times do
-    news_item = FactoryBot.create(:news, topic: topics.sample)
-    selected_mentions = mentions.sample(rand(1..3))
+    news_item = FactoryBot.create(:news, topic: Topic.all.sample)
+    selected_mentions = Mention.all.sample(rand(0..2))
     news_item.mentions << selected_mentions
     news_items << news_item
   end
@@ -56,14 +56,15 @@ default_ai_configs = [
     display_name: 'Palabras clave de Ministros',
     description: 'Lista de palabras para identificar ministros en las noticias',
     value_type: 'array',
-    value: ['Ricardes', 'Gabriela Ricardes', 'Ministro', 'Ministra']
+    value: ['Gabriela Ricardes', 'Ministra de Cultura', 'Victoria Noorthoorn', 'Gerardo Grieco', 'Jorge Macri']
   },
   {
     key: 'default_topic',
     display_name: 'Tópico default',
     description: 'Tópico default para las noticias',
     value_type: 'reference',
-    reference_type: 'Topic'
+    reference_type: 'Topic',
+    value: Topic.find_by(name: 'Actividades programadas').id
   }
 ]
 
