@@ -34,6 +34,14 @@ class AiConfiguration < ApplicationRecord
     find_by(key: key)&.value
   end
 
+  def options
+    return unless value_type == 'reference' && reference_type.present?
+
+    reference_type.safe_constantize.enabled(true).ordered.pluck(:id, :name).map do |id, name|
+      { value: id, label: name }
+    end
+  end
+
   private
 
   def value_type_matches_value
