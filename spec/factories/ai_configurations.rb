@@ -14,24 +14,12 @@ FactoryBot.define do
 
     trait :reference_type do
       value_type { 'reference' }
-      value { Faker::Number.between(from: 1, to: 100) }
+      value { create(:topic, enabled: true).id }
       reference_type { 'Topic' }
     end
 
     trait :disabled do
       enabled { false }
-    end
-
-    trait :with_topic_reference do
-      value_type { 'reference' }
-      value { Faker::Number.between(from: 1, to: 100) }
-      reference_type { 'Topic' }
-    end
-
-    trait :with_mention_reference do
-      value_type { 'reference' }
-      value { Faker::Number.between(from: 1, to: 100) }
-      reference_type { 'Mention' }
     end
   end
 end

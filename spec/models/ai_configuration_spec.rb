@@ -100,6 +100,31 @@ describe AiConfiguration do
     end
   end
 
+  describe '#options' do
+    context 'when value_type is reference and reference_type is Topic' do
+      let(:config) { create(:ai_configuration, :reference_type) }
+
+      it 'returns an array of options with value and label structure' do
+        options = config.options
+        expect(options).to be_an(Array)
+        options.each do |option|
+          expect(option).to have_key(:value)
+          expect(option).to have_key(:label)
+          expect(option[:value]).to be_a(Integer)
+          expect(option[:label]).to be_a(String)
+        end
+      end
+    end
+
+    context 'when value_type is not reference' do
+      let(:config) { create(:ai_configuration, value_type: 'string') }
+
+      it 'returns nil' do
+        expect(config.options).to be_nil
+      end
+    end
+  end
+
   describe '.get_value' do
     before { create(:ai_configuration, key: 'test_key', value: 'test_value') }
 

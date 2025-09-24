@@ -53,6 +53,16 @@ describe 'GET api/v1/ai_configurations' do
       expect(config).to have_key(:created_at)
       expect(config).to have_key(:updated_at)
     end
+
+    context 'with reference type configuration' do
+      let!(:reference_config) { create(:ai_configuration, :reference_type, enabled: true) }
+
+      it 'includes options attribute' do
+        subject
+        ref = json[:ai_configurations].find { |c| c[:key] == reference_config.key }
+        expect(ref).to have_key(:options)
+      end
+    end
   end
 
   context 'when authenticated as regular user' do

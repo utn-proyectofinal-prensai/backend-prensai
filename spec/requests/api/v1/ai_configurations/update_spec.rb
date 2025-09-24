@@ -9,7 +9,7 @@ describe 'PATCH api/v1/ai_configurations/:key' do
   end
 
   let!(:config) { create(:ai_configuration, enabled: true, value: 'original_value') }
-  let(:update_params) { { enabled: false, value: 'updated_value' } }
+  let(:update_params) { { value: 'updated_value' } }
 
   context 'when authenticated as admin user' do
     include_context 'with authenticated admin user via JWT'
@@ -20,29 +20,17 @@ describe 'PATCH api/v1/ai_configurations/:key' do
         expect(response).to have_http_status(:success)
       end
 
-      it 'updates the configuration' do
+      it 'updates the configuration value only' do
         subject
         config.reload
-        expect(config.enabled).to be false
         expect(config.value).to eq('updated_value')
       end
 
-      it 'returns the updated configuration data' do
+      it 'returns the updated configuration data (enabled unchanged)' do
         subject
         expect(json[:key]).to eq(config.key)
-        expect(json[:enabled]).to be false
+        expect(json[:enabled]).to be true
         expect(json[:value]).to eq('updated_value')
-      end
-
-      context 'when updating only enabled status' do
-        let(:update_params) { { enabled: false } }
-
-        it 'updates only the enabled field' do
-          subject
-          config.reload
-          expect(config.enabled).to be false
-          expect(config.value).to eq('original_value')
-        end
       end
 
       context 'when updating only value' do
@@ -97,7 +85,7 @@ describe 'PATCH api/v1/ai_configurations/:key' do
       end
 
       context 'when value type does not match array value' do
-        let!(:config) { create(:ai_configuration, :array_type) }
+        let(:config) { create(:ai_configuration, :array_type) }
         let(:update_params) { { value: 'not an array' } }
 
         it 'returns unprocessable entity status' do
