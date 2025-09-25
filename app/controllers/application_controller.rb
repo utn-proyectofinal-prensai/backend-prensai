@@ -12,11 +12,17 @@ class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   protect_from_forgery with: :exception
 
+  around_action :use_active_admin_locale, if: :active_admin_controller?
+
   def active_admin_controller?
     is_a?(ActiveAdmin::BaseController)
   end
 
   def errors_controller?
     is_a?(ErrorsController)
+  end
+
+  def use_active_admin_locale(&)
+    I18n.with_locale(:en, &)
   end
 end
