@@ -10,7 +10,7 @@ describe AiConfiguration do
     it { is_expected.to validate_presence_of(:display_name) }
     it { is_expected.to validate_presence_of(:value_type) }
     it { is_expected.to validate_uniqueness_of(:key) }
-    it { is_expected.to validate_inclusion_of(:value_type).in_array(%w[array string reference]) }
+    it { is_expected.to validate_inclusion_of(:value_type).in_array(described_class::VALUE_TYPES) }
 
     describe 'value_type_matches_value' do
       context 'when value_type is array' do
@@ -64,37 +64,38 @@ describe AiConfiguration do
       end
     end
 
-    describe 'valid_reference_type' do
-      context 'when reference_type is nil' do
-        let(:config) { build(:ai_configuration, reference_type: nil) }
+    describe 'reference_type validations' do
+      context 'when value_type is reference' do
+        subject(:config) { build(:ai_configuration, :reference_type) }
 
-        it 'is valid' do
-          expect(config).to be_valid
-        end
-      end
+        it 'requires reference_type' do
+          config.reference_type = nil
 
-      context 'when reference_type is Topic' do
-        let(:config) { build(:ai_configuration, reference_type: 'Topic') }
-
-        it 'is valid' do
-          expect(config).to be_valid
-        end
-      end
-
-      context 'when reference_type is Mention' do
-        let(:config) { build(:ai_configuration, reference_type: 'Mention') }
-
-        it 'is valid' do
-          expect(config).to be_valid
-        end
-      end
-
-      context 'when reference_type is invalid' do
-        let(:config) { build(:ai_configuration, reference_type: 'InvalidType') }
-
-        it 'is invalid' do
           expect(config).not_to be_valid
-          expect(config.errors[:reference_type]).to include('is not valid')
+        end
+
+        it 'allows configured reference types' do
+          described_class::REFERENCE_TYPES.each do |type|
+            config.reference_type = type
+
+            expect(config).to be_valid
+          end
+        end
+
+        it 'rejects unknown reference types' do
+          config.reference_type = 'InvalidType'
+
+          expect(config).not_to be_valid
+        end
+      end
+
+      context 'when value_type is not reference' do
+        subject(:config) { build(:ai_configuration) }
+
+        it 'requires reference_type to be blank' do
+          config.reference_type = 'Topic'
+
+          expect(config).not_to be_valid
         end
       end
     end
