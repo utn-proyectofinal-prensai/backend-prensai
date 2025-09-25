@@ -11,6 +11,9 @@
 #                            user_password PATCH      /api/v1/users/password(.:format)                                                                  api/v1/passwords#update {format: :json}
 #                                          PUT        /api/v1/users/password(.:format)                                                                  api/v1/passwords#update {format: :json}
 #                                          POST       /api/v1/users/password(.:format)                                                                  api/v1/passwords#create {format: :json}
+#                 api_v1_ai_configurations GET        /api/v1/ai_configurations(.:format)                                                               api/v1/ai_configurations#index {format: :json}
+#                  api_v1_ai_configuration PATCH      /api/v1/ai_configurations/:key(.:format)                                                          api/v1/ai_configurations#update {format: :json}
+#                                          PUT        /api/v1/ai_configurations/:key(.:format)                                                          api/v1/ai_configurations#update {format: :json}
 #                            api_v1_status GET        /api/v1/status(.:format)                                                                          api/v1/health#status {format: :json}
 #              change_password_api_v1_user PATCH      /api/v1/user/change_password(.:format)                                                            api/v1/users#change_password {format: :json}
 #                              api_v1_user GET        /api/v1/user(.:format)                                                                            api/v1/users#show {format: :json}
@@ -30,11 +33,18 @@
 #                                          DELETE     /api/v1/topics/:id(.:format)                                                                      api/v1/topics#destroy {format: :json}
 #          batch_process_api_v1_news_index POST       /api/v1/news/batch_process(.:format)                                                              api/v1/news#batch_process {format: :json}
 #                        api_v1_news_index GET        /api/v1/news(.:format)                                                                            api/v1/news#index {format: :json}
+#                              api_v1_news PATCH      /api/v1/news/:id(.:format)                                                                        api/v1/news#update {format: :json}
+#                                          PUT        /api/v1/news/:id(.:format)                                                                        api/v1/news#update {format: :json}
 #                          api_v1_mentions GET        /api/v1/mentions(.:format)                                                                        api/v1/mentions#index {format: :json}
 #                                          POST       /api/v1/mentions(.:format)                                                                        api/v1/mentions#create {format: :json}
 #                           api_v1_mention PATCH      /api/v1/mentions/:id(.:format)                                                                    api/v1/mentions#update {format: :json}
 #                                          PUT        /api/v1/mentions/:id(.:format)                                                                    api/v1/mentions#update {format: :json}
 #                                          DELETE     /api/v1/mentions/:id(.:format)                                                                    api/v1/mentions#destroy {format: :json}
+#                         api_v1_clippings GET        /api/v1/clippings(.:format)                                                                       api/v1/clippings#index {format: :json}
+#                                          POST       /api/v1/clippings(.:format)                                                                       api/v1/clippings#create {format: :json}
+#                          api_v1_clipping GET        /api/v1/clippings/:id(.:format)                                                                   api/v1/clippings#show {format: :json}
+#                                          PATCH      /api/v1/clippings/:id(.:format)                                                                   api/v1/clippings#update {format: :json}
+#                                          PUT        /api/v1/clippings/:id(.:format)                                                                   api/v1/clippings#update {format: :json}
 #              must_update_api_v1_settings GET        /api/v1/settings/must_update(.:format)                                                            api/v1/settings#must_update {format: :json}
 #                   new_admin_user_session GET        /admin/login(.:format)                                                                            active_admin/devise/sessions#new
 #                       admin_user_session POST       /admin/login(.:format)                                                                            active_admin/devise/sessions#create
@@ -54,6 +64,15 @@
 #                                          PATCH      /admin/admin_users/:id(.:format)                                                                  admin/admin_users#update
 #                                          PUT        /admin/admin_users/:id(.:format)                                                                  admin/admin_users#update
 #                                          DELETE     /admin/admin_users/:id(.:format)                                                                  admin/admin_users#destroy
+#     batch_action_admin_ai_configurations POST       /admin/ai_configurations/batch_action(.:format)                                                   admin/ai_configurations#batch_action
+#                  admin_ai_configurations GET        /admin/ai_configurations(.:format)                                                                admin/ai_configurations#index
+#                                          POST       /admin/ai_configurations(.:format)                                                                admin/ai_configurations#create
+#               new_admin_ai_configuration GET        /admin/ai_configurations/new(.:format)                                                            admin/ai_configurations#new
+#              edit_admin_ai_configuration GET        /admin/ai_configurations/:id/edit(.:format)                                                       admin/ai_configurations#edit
+#                   admin_ai_configuration GET        /admin/ai_configurations/:id(.:format)                                                            admin/ai_configurations#show
+#                                          PATCH      /admin/ai_configurations/:id(.:format)                                                            admin/ai_configurations#update
+#                                          PUT        /admin/ai_configurations/:id(.:format)                                                            admin/ai_configurations#update
+#                                          DELETE     /admin/ai_configurations/:id(.:format)                                                            admin/ai_configurations#destroy
 #                          admin_dashboard GET        /admin/dashboard(.:format)                                                                        admin/dashboard#index
 #                 batch_action_admin_users POST       /admin/users/batch_action(.:format)                                                               admin/users#batch_action
 #                              admin_users GET        /admin/users(.:format)                                                                            admin/users#index
@@ -72,6 +91,8 @@
 #                           admin_good_job            /admin/background-jobs                                                                            GoodJob::Engine
 #                                 rswag_ui            /api-docs                                                                                         Rswag::Ui::Engine
 #                                rswag_api            /api-docs                                                                                         Rswag::Api::Engine
+#                                                     /*a(.:format)                                                                                     errors#routing_error
+#                                                     /                                                                                                 errors#routing_error
 #            rails_postmark_inbound_emails POST       /rails/action_mailbox/postmark/inbound_emails(.:format)                                           action_mailbox/ingresses/postmark/inbound_emails#create
 #               rails_relay_inbound_emails POST       /rails/action_mailbox/relay/inbound_emails(.:format)                                              action_mailbox/ingresses/relay/inbound_emails#create
 #            rails_sendgrid_inbound_emails POST       /rails/action_mailbox/sendgrid/inbound_emails(.:format)                                           action_mailbox/ingresses/sendgrid/inbound_emails#create
