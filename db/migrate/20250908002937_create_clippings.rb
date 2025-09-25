@@ -7,7 +7,7 @@ class CreateClippings < ActiveRecord::Migration[8.0]
       t.date :period_start, null: false
       t.date :period_end, null: false
       t.jsonb :filters, null: false, default: {}
-      t.jsonb :news_ids, null: false, default: [], array: true
+      t.jsonb :news_ids, null: false, default: []
       t.references :creator, null: false, foreign_key: { to_table: :users }
 
       t.timestamps
@@ -15,5 +15,7 @@ class CreateClippings < ActiveRecord::Migration[8.0]
 
     add_index :clippings, :period_start
     add_index :clippings, :period_end
+    add_index :clippings, :filters, using: :gin
+    add_index :clippings, :news_ids, using: :gin
   end
 end
