@@ -23,7 +23,7 @@ module API
       end
 
       def ai_configuration_params
-        params.expect(ai_configuration: [:enabled, :value, { value: {} }, { value: [] }])
+        params.expect(ai_configuration: [:value, { value: {} }, { value: [] }])
       end
     end
   end

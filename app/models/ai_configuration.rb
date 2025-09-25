@@ -19,19 +19,36 @@
 #  index_ai_configurations_on_key      (key) UNIQUE
 #
 class AiConfiguration < ApplicationRecord
+  RANSACK_ATTRIBUTES = %w[id key display_name value_type reference_type enabled created_at updated_at].freeze
+
   validates :key, presence: true, uniqueness: true
   validates :display_name, :value_type, presence: true
 
   scope :enabled, -> { where(enabled: true) }
   scope :ordered, -> { order(:display_name) }
 
-  validates :value_type, inclusion: { in: %w[array string reference] }
+  VALUE_TYPES = %w[array string reference].freeze
+  REFERENCE_TYPES = %w[Topic Mention].freeze
+
+  validates :value_type, inclusion: { in: VALUE_TYPES }
+
+  with_options if: :reference_value_type? do
+    validates :reference_type, presence: true, inclusion: { in: REFERENCE_TYPES }
+  end
+  validates :reference_type, absence: true, unless: :reference_value_type?
 
   validate :value_type_matches_value
-  validate :valid_reference_type
 
   def self.get_value(key)
     find_by(key: key)&.value
+  end
+
+  def options
+    return unless value_type == 'reference' && reference_type.present?
+
+    reference_type.safe_constantize.enabled(true).ordered.pluck(:id, :name).map do |id, name|
+      { value: id, label: name }
+    end
   end
 
   private
@@ -46,9 +63,7 @@ class AiConfiguration < ApplicationRecord
                                               end
   end
 
-  def valid_reference_type
-    return if reference_type.nil?
-
-    errors.add(:reference_type, 'is not valid') unless reference_type.in?(%w[Topic Mention])
+  def reference_value_type?
+    value_type == 'reference'
   end
 end
