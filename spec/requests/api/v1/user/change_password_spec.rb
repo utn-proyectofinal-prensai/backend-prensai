@@ -33,7 +33,7 @@ describe 'PATCH api/v1/user/change_password' do
         login_params = { user: { email: regular_user.email, password: new_password } }
         post new_user_session_path, params: login_params, as: :json
         expect(response).to have_http_status(:success)
-        expect(JSON.parse(response.body)['token']).to be_present
+        expect(response.parsed_body['token']).to be_present
       end
 
       it 'prevents login with old password' do
@@ -147,7 +147,7 @@ describe 'PATCH api/v1/user/change_password' do
         login_params = { user: { email: admin_user.email, password: new_password } }
         post new_user_session_path, params: login_params, as: :json
         expect(response).to have_http_status(:success)
-        expect(JSON.parse(response.body)['token']).to be_present
+        expect(response.parsed_body['token']).to be_present
       end
     end
   end
