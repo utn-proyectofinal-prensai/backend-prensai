@@ -65,12 +65,19 @@ ActiveAdmin.register AiConfiguration do
                         rows: 8,
                         value: begin
                           existing_value = f.object.value
-                          existing_value.is_a?(Array) || existing_value.is_a?(Hash) ? JSON.pretty_generate(existing_value) : existing_value
+                          if existing_value.is_a?(Array) || existing_value.is_a?(Hash)
+                            JSON.pretty_generate(existing_value)
+                          else
+                            existing_value
+                          end
                         rescue StandardError
                           f.object.value
                         end
                       },
-                      hint: 'For arrays provide valid JSON (e.g. ["foo", "bar"]). For references provide the numeric ID.'
+                      hint: [
+                        'For arrays provide valid JSON (e.g. ["foo", "bar"]).',
+                        'For references provide the numeric ID.'
+                      ].join(' ')
     end
 
     f.actions
@@ -92,19 +99,23 @@ ActiveAdmin.register AiConfiguration do
     end
 
     def parse_value(raw_value, value_type)
-      return if raw_value.nil? || raw_value == ''
+      return if raw_value.blank?
 
-      case value_type
-      when 'array'
-        parsed = JSON.parse(raw_value)
-        parsed.is_a?(Array) ? parsed : raw_value
-      when 'reference'
-        raw_value.to_s.match?(/\A\d+\z/) ? raw_value.to_i : raw_value
-      else
-        raw_value
-      end
+      return parse_array_value(raw_value) if value_type == 'array'
+      return parse_reference_value(raw_value) if value_type == 'reference'
+
+      raw_value
     rescue JSON::ParserError
       raw_value
+    end
+
+    def parse_array_value(raw_value)
+      parsed = JSON.parse(raw_value)
+      parsed.is_a?(Array) ? parsed : raw_value
+    end
+
+    def parse_reference_value(raw_value)
+      raw_value.to_s.match?(/\A\d+\z/) ? raw_value.to_i : raw_value
     end
   end
 end

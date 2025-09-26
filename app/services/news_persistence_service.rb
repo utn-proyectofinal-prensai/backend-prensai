@@ -28,40 +28,47 @@ class NewsPersistenceService
   private
 
   def persist_single_news(news_data)
-    news_record = NewsRecordBuilder.call(news_data, creator_id)
+    with_error_handling(news_data) do
+      news_record = NewsRecordBuilder.call(news_data, creator_id)
 
-    if news_record.persisted?
-      {
-        success: true,
-        news: news_record
-      }
-    else
-      {
-        success: false,
-        error: build_error(news_data['LINK'], news_record.errors.full_messages.join(', '))
-      }
+      return success_result(news_record) if news_record.persisted?
+
+      failure_result(news_data, news_record.errors.full_messages.join(', '))
     end
-  rescue ActiveRecord::RecordNotUnique => e
-    Rails.logger.error "Duplicate news: #{e.message}"
-    {
-      success: false,
-      error: build_error(news_data['LINK'], I18n.t('api.errors.news.duplicate_link'))
-    }
-  rescue ActiveRecord::RecordInvalid => e
-    Rails.logger.error "Validation error: #{e.message}"
-    {
-      success: false,
-      error: build_error(news_data['LINK'], I18n.t('api.errors.news.validation_failed'))
-    }
-  rescue StandardError => e
-    Rails.logger.error "Error persisting news: #{e.message}"
-    {
-      success: false,
-      error: build_error(news_data['LINK'], I18n.t('api.errors.news.internal_error'))
-    }
   end
 
   def build_error(url, reason)
     { url:, reason: }
+  end
+
+  def success_result(news_record)
+    { success: true, news: news_record }
+  end
+
+  def failure_result(news_data, reason)
+    { success: false, error: build_error(news_link(news_data), reason) }
+  end
+
+  def news_link(news_data)
+    news_data['LINK']
+  end
+
+  def log_error(prefix, error)
+    Rails.logger.error "#{prefix}: #{error.message}"
+  end
+
+  def with_error_handling(news_data)
+    yield
+  rescue ActiveRecord::RecordNotUnique => error
+    handle_failure(news_data, error, 'Duplicate news', 'api.errors.news.duplicate_link')
+  rescue ActiveRecord::RecordInvalid => error
+    handle_failure(news_data, error, 'Validation error', 'api.errors.news.validation_failed')
+  rescue StandardError => error
+    handle_failure(news_data, error, 'Error persisting news', 'api.errors.news.internal_error')
+  end
+
+  def handle_failure(news_data, error, log_prefix, translation_key)
+    log_error(log_prefix, error)
+    failure_result(news_data, I18n.t(translation_key))
   end
 end

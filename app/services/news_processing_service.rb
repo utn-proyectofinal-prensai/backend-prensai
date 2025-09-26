@@ -14,14 +14,12 @@ class NewsProcessingService
   end
 
   def call
-    return failure_result(errors.full_messages) unless valid?
+    return validation_failure unless valid?
+    return success_for_empty_urls if filtered_urls.empty?
 
-    return success_result(empty_processing_payload) if filtered_urls.empty?
-
-    handle_response(call_external_service)
-  rescue StandardError => e
-    Rails.logger.error "NewsProcessingService error: #{e.message}"
-    failure_result("Processing failed: #{e.message}")
+    process_external_call
+  rescue StandardError => error
+    handle_service_failure(error)
   end
 
   private
@@ -159,5 +157,22 @@ class NewsProcessingService
       persisted_news: [],
       errors: []
     }
+  end
+
+  def validation_failure
+    failure_result(errors.full_messages)
+  end
+
+  def success_for_empty_urls
+    success_result(empty_processing_payload)
+  end
+
+  def process_external_call
+    handle_response(call_external_service)
+  end
+
+  def handle_service_failure(error)
+    Rails.logger.error "NewsProcessingService error: #{error.message}"
+    failure_result("Processing failed: #{error.message}")
   end
 end
