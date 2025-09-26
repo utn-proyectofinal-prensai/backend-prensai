@@ -14,17 +14,13 @@ class ExternalAiService
   end
 
   def call
-    response = http_client.post(ai_service_url, payload)
+    response = perform_request
 
-    unless response.success?
-      Rails.logger.error "AI service failed with status #{response.status}: #{response.body}"
-      return { ok: false, errors: response.body['errores'] }
-    end
+    return handle_unsuccessful_response(response) unless response.success?
 
-    transform_response(response.body).merge({ ok: true })
-  rescue Faraday::Error => e
-    Rails.logger.error "AI service connection error: #{e.message}"
-    nil
+    build_success_payload(response.body)
+  rescue Faraday::Error => error
+    handle_connection_error(error)
   end
 
   private
@@ -53,11 +49,11 @@ class ExternalAiService
       received: ai_data['recibidas'],
       processed: ai_data['procesadas'],
       news: ai_data['data'],
-      errors: tranform_errors(ai_data['errores'])
+      errors: transform_errors(ai_data['errores'])
     }
   end
 
-  def tranform_errors(errors)
+  def transform_errors(errors)
     return [] unless errors.is_a?(Array)
 
     errors.map do |error|
@@ -77,5 +73,23 @@ class ExternalAiService
     error_msg = "AI service response missing required fields: #{missing_fields.join(', ')}"
     Rails.logger.error error_msg
     raise StandardError, error_msg
+  end
+
+  def perform_request
+    http_client.post(ai_service_url, payload)
+  end
+
+  def handle_unsuccessful_response(response)
+    Rails.logger.error "AI service failed with status #{response.status}: #{response.body}"
+    { ok: false, errors: response.body['errores'] }
+  end
+
+  def build_success_payload(body)
+    transform_response(body).merge(ok: true)
+  end
+
+  def handle_connection_error(error)
+    Rails.logger.error "AI service connection error: #{error.message}"
+    nil
   end
 end

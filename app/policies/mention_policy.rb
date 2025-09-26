@@ -1,11 +1,17 @@
 # frozen_string_literal: true
 
 class MentionPolicy < ApplicationPolicy
-  def index? = true
+  def index? = user_present?
 
-  def create? = true
+  def create? = user_present?
 
-  def update? = true
+  def update? = user_present?
 
-  def destroy? = true
+  def destroy? = user_present?
+
+  private
+
+  def user_present?
+    user.present?
+  end
 end

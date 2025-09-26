@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :topic do
-    name        { Faker::Lorem.unique.word.capitalize }
+    sequence(:name) { |n| "Topic#{n}" }
     description { Faker::Lorem.paragraph }
     enabled     { true }
     crisis      { false }
