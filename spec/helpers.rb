@@ -8,7 +8,16 @@ module Helpers
     JSON.parse(response.body).with_indifferent_access
   end
 
+  def auth_headers_for(token_user)
+    raise ArgumentError, 'A user instance is required to build auth headers' unless token_user
+
+    token, _payload = Warden::JWTAuth::UserEncoder.new.call(token_user, :user, nil)
+    { 'Authorization' => "Bearer #{token}" }
+  end
+
   def auth_headers
-    user.create_new_auth_token
+    raise ArgumentError, 'Define a user with let(:user) to build auth headers' unless respond_to?(:user)
+
+    auth_headers_for(user)
   end
 end

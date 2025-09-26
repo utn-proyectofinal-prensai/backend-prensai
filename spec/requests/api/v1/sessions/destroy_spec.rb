@@ -2,25 +2,28 @@
 
 describe 'DELETE api/v1/users/sign_out' do
   let(:user) { create(:user) }
+  let(:auth_headers) { auth_headers_for(user) }
 
   context 'with a valid token' do
-    it 'returns a successful response' do
+    it 'returns a no content response' do
       delete destroy_user_session_path, headers: auth_headers, as: :json
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:no_content)
     end
 
-    it 'decrements the amount of user tokens' do
-      headers = auth_headers
-      expect {
-        delete destroy_user_session_path, headers:, as: :json
-      }.to change { user.reload.tokens.size }.by(-1)
+    it 'revokes the JWT token' do
+      expect do
+        delete destroy_user_session_path, headers: auth_headers, as: :json
+      end.to change(JwtDenylist, :count).by(1)
     end
   end
 
   context 'without a valid token' do
-    it 'returns not found response' do
-      delete destroy_user_session_path, headers: {}, as: :json
-      expect(response).to have_http_status(:not_found)
+    it 'still returns no content' do
+      expect do
+        delete destroy_user_session_path, headers: {}, as: :json
+      end.not_to change(JwtDenylist, :count)
+
+      expect(response).to have_http_status(:no_content)
     end
   end
 end
