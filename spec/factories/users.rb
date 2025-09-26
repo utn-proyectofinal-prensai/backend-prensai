@@ -2,9 +2,9 @@
 
 FactoryBot.define do
   factory :user do
-    email    { Faker::Internet.unique.email }
+    sequence(:email) { |n| "user#{n}@example.com" }
     password { Faker::Internet.password(min_length: 8) }
-    username { Faker::Internet.unique.user_name }
+    sequence(:username) { |n| "user#{n}" }
     role     { 'user' }
 
     trait :admin do
