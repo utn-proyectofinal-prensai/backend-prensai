@@ -6,7 +6,7 @@ module API
       before_action :set_clipping, only: %i[show update]
 
       def index
-        @clippings = policy_scope(Clipping).ordered
+        @clippings = policy_scope(Clipping).ordered.filter_by(filtering_params)
       end
 
       def show
@@ -41,6 +41,10 @@ module API
             { news_ids: [] }
           ]
         )
+      end
+
+      def filtering_params
+        params.slice(*Clipping.filter_scopes)
       end
     end
   end
