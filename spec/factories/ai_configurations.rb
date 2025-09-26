@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :ai_configuration do
-    key { Faker::Lorem.unique.word }
+    sequence(:key) { |n| "ai_config_#{n}" }
     display_name { Faker::Lorem.sentence }
     value_type { 'string' }
     value { Faker::Lorem.sentence }

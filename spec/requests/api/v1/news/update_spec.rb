@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 describe 'PUT api/v1/news/:id' do
-  let(:news) { create(:news) }
-
   subject(:perform_request) do
-    put api_v1_news_path(news), params: params, headers: auth_headers, as: :json
+    put api_v1_news_path(target_news_id), params: params, headers: auth_headers, as: :json
   end
+
+  let(:news) { create(:news) }
+  let(:target_news_id) { news.id }
 
   context 'when authenticated as admin user' do
     include_context 'with authenticated admin user via JWT'
@@ -79,6 +80,7 @@ describe 'PUT api/v1/news/:id' do
 
   context 'when the news does not exist' do
     include_context 'with authenticated admin user via JWT'
+    let(:target_news_id) { -1 }
 
     let(:params) do
       {
@@ -86,10 +88,6 @@ describe 'PUT api/v1/news/:id' do
           valuation: 'neutral'
         }
       }
-    end
-
-    subject(:perform_request) do
-      put api_v1_news_path(-1), params: params, headers: auth_headers, as: :json
     end
 
     it 'returns not found status' do

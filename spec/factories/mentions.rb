@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :mention do
-    name { Faker::Lorem.unique.word.capitalize }
+    sequence(:name) { |n| "Mention#{n}" }
     enabled { true }
 
     trait :with_news do

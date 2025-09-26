@@ -135,7 +135,8 @@ RSpec.describe NewsPersistenceService, type: :service do
 
   describe 'error handling' do
     context 'when a news item has a duplicate link' do
-      let!(:existing_news) { create(:news, link: valid_news_item['LINK']) }
+      before { create(:news, link: valid_news_item['LINK']) }
+
       let(:news_items) { [valid_news_item] }
 
       it 'returns a duplicate link error' do

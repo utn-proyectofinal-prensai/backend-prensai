@@ -6,7 +6,7 @@ module API
       before_action :set_news, only: :update
 
       def index
-        @pagy, @news = pagy(policy_scope(News).ordered)
+        @pagy, @news = pagy(news.ordered)
       end
 
       def batch_process
@@ -36,27 +36,31 @@ module API
 
       private
 
+      def news
+        policy_scope(News).includes(:topic, :mentions)
+      end
+
       def set_news
         @news = News.find(params[:id])
       end
 
       def review_params
         params.expect(news: [
-          :title,
-          :publication_type,
-          :date,
-          :support,
-          :media,
-          :section,
-          :author,
-          :interviewee,
-          :audience_size,
-          :quotation,
-          :valuation,
-          :political_factor,
-          :topic_id,
-          { mention_ids: [] }
-        ])
+                        :title,
+                        :publication_type,
+                        :date,
+                        :support,
+                        :media,
+                        :section,
+                        :author,
+                        :interviewee,
+                        :audience_size,
+                        :quotation,
+                        :valuation,
+                        :political_factor,
+                        :topic_id,
+                        { mention_ids: [] }
+                      ])
       end
 
       def batch_process_params
