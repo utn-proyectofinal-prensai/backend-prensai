@@ -15,29 +15,20 @@ describe UserPolicy do
   end
 
   permissions :destroy? do
-    it 'allows admins to destroy other users' do
+    it 'allows admins to destroy other users and not themselves' do
       expect(policy).to permit(admin, other_user)
+      expect(policy).not_to permit(admin, admin)
     end
 
     it 'denies regular users' do
       expect(policy).not_to permit(user, other_user)
     end
-
-    it 'prevents admins from destroying themselves' do
-      expect(policy).not_to permit(admin, admin)
-    end
   end
 
   permissions :show?, :change_password? do
-    it 'allows admins' do
+    it 'allows admins or self-access and denies others' do
       expect(policy).to permit(admin, other_user)
-    end
-
-    it 'allows users accessing their own record' do
       expect(policy).to permit(user, user)
-    end
-
-    it 'denies users accessing other records' do
       expect(policy).not_to permit(user, other_user)
     end
   end

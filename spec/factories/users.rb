@@ -5,7 +5,7 @@ FactoryBot.define do
     sequence(:email) { |n| "user#{n}@example.com" }
     password { Faker::Internet.password(min_length: 8) }
     sequence(:username) { |n| "user#{n}" }
-    role     { 'user' }
+    role { 'user' }
 
     trait :admin do
       role { 'admin' }

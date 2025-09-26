@@ -11,17 +11,17 @@ describe 'DELETE api/v1/users/sign_out' do
     end
 
     it 'revokes the JWT token' do
-      expect do
+      expect {
         delete destroy_user_session_path, headers: auth_headers, as: :json
-      end.to change(JwtDenylist, :count).by(1)
+      }.to change(JwtDenylist, :count).by(1)
     end
   end
 
   context 'without a valid token' do
     it 'still returns no content' do
-      expect do
+      expect {
         delete destroy_user_session_path, headers: {}, as: :json
-      end.not_to change(JwtDenylist, :count)
+      }.not_to change(JwtDenylist, :count)
 
       expect(response).to have_http_status(:no_content)
     end
