@@ -44,7 +44,7 @@ class Clipping < ApplicationRecord
 
   scope :ordered, -> { order(created_at: :desc) }
   filter_scope :topic_id, ->(id) { where(topic_id: id) }
-  filter_scope :news_ids, ->(ids) { where("#{table_name}.news_ids @> ?", ids.to_json) }
+  filter_scope :news_ids, ->(ids) { where("#{table_name}.news_ids && ?", ids.to_json) }
   filter_scope :period_start, ->(date) { where(arel_table[:period_start].gteq(date)) }
   filter_scope :period_end, ->(date) { where(arel_table[:period_end].lteq(date)) }
 

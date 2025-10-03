@@ -12,7 +12,9 @@ describe 'GET /api/v1/clippings' do
       :clipping,
       name: 'Recent Clipping',
       created_at: 1.day.ago,
-      topic_ids: topics.map(&:id),
+      period_start: Date.current,
+      period_end: Date.current,
+      topic: topics.first,
       news_ids: news_items.map(&:id)
     )
   end
@@ -21,7 +23,9 @@ describe 'GET /api/v1/clippings' do
       :clipping,
       name: 'Older Clipping',
       created_at: 5.days.ago,
-      topic_ids: [topics.first.id],
+      period_start: 5.days.ago.to_date,
+      period_end: 4.days.ago.to_date,
+      topic: topics.last,
       news_ids: [news_items.first.id]
     )
   end
@@ -36,13 +40,13 @@ describe 'GET /api/v1/clippings' do
     expect(json[:clippings].pluck(:id)).to eq([clipping_recent.id, clipping_old.id])
   end
 
-  it 'includes topics and news ids in each clipping', :aggregate_failures do
+  it 'includes topic and news ids in each clipping', :aggregate_failures do
     request_index
     payload = json[:clippings].first
 
-    expect(payload[:topic_ids]).to match_array(topics.map(&:id))
+    expect(payload[:topic_id]).to eq(topics.first.id)
     expect(payload[:news_ids]).to match_array(news_items.map(&:id))
-    expect(payload[:created_by]).to include(:id, :name)
+    expect(payload[:creator]).to include(:id, :name)
   end
 
   it 'returns pagination metadata' do
@@ -51,12 +55,92 @@ describe 'GET /api/v1/clippings' do
   end
 
   context 'with pagination params' do
-    subject(:request_index) { get api_v1_clippings_path(page: { number: 2, size: 1 }), headers: auth_headers, as: :json }
+    subject(:request_index) do
+      get api_v1_clippings_path(page: 2, limit: 1), headers: auth_headers, as: :json
+    end
 
     it 'respects pagy parameters' do
       request_index
       expect(json[:clippings].size).to eq(1)
       expect(json[:pagination][:page]).to eq 2
+    end
+  end
+
+  context 'with filtering params' do
+    context 'with topic_id filter' do
+      subject(:request_index) do
+        get api_v1_clippings_path(topic_id: topics.first.id), headers: auth_headers, as: :json
+      end
+
+      it 'returns only clippings for the specified topic' do
+        request_index
+        expect(json[:clippings].size).to eq(1)
+        expect(json[:clippings].first[:id]).to eq(clipping_recent.id)
+        expect(json[:clippings].first[:topic_id]).to eq(topics.first.id)
+      end
+    end
+
+    context 'with news_ids filter' do
+      subject(:request_index) do
+        get api_v1_clippings_path(news_ids: [news_items.first.id]), headers: auth_headers, as: :json
+      end
+
+      it 'returns clippings containing the specified news ids' do
+        request_index
+        expect(json[:clippings].size).to eq(2)
+        clipping_ids = json[:clippings].pluck(:id)
+        expect(clipping_ids).to include(clipping_recent.id, clipping_old.id)
+      end
+    end
+
+    context 'with period_start filter' do
+      subject(:request_index) do
+        get api_v1_clippings_path(period_start: 3.days.ago.to_date), headers: auth_headers, as: :json
+      end
+
+      it 'returns clippings with period_start >= specified date' do
+        request_index
+        expect(json[:clippings].size).to eq(1)
+        expect(json[:clippings].first[:id]).to eq(clipping_recent.id)
+      end
+    end
+
+    context 'with period_end filter' do
+      subject(:request_index) do
+        get api_v1_clippings_path(period_end: 2.days.ago.to_date), headers: auth_headers, as: :json
+      end
+
+      it 'returns clippings with period_end <= specified date' do
+        request_index
+        expect(json[:clippings].size).to eq(1)
+        expect(json[:clippings].first[:id]).to eq(clipping_old.id)
+      end
+    end
+
+    context 'with multiple filters combined' do
+      subject(:request_index) do
+        get api_v1_clippings_path(
+          topic_id: topics.first.id,
+          news_ids: [news_items.first.id]
+        ), headers: auth_headers, as: :json
+      end
+
+      it 'applies all filters together' do
+        request_index
+        expect(json[:clippings].size).to eq(1)
+        expect(json[:clippings].first[:id]).to eq(clipping_recent.id)
+      end
+    end
+
+    context 'with invalid filter params' do
+      subject(:request_index) do
+        get api_v1_clippings_path(invalid_param: 'value'), headers: auth_headers, as: :json
+      end
+
+      it 'ignores invalid params and returns all clippings' do
+        request_index
+        expect(json[:clippings].size).to eq(2)
+      end
     end
   end
 end
