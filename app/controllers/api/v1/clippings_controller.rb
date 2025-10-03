@@ -3,23 +3,10 @@
 module API
   module V1
     class ClippingsController < API::V1::APIController
-      include HasScope
-
       before_action :set_clipping, only: %i[show update]
 
-      has_scope :period_between, as: :period_range, type: :hash do |_controller, scope, value|
-        start_value = value[:start] || value['start'] || value[:from] || value['from']
-        end_value = value[:end] || value['end'] || value[:to] || value['to']
-
-        start_value.present? && end_value.present? ? scope.period_between(start_value, end_value) : scope
-      end
-
-      has_scope :with_news_ids, type: :array
-
-      has_scope :with_topic_id, as: :topic_id, type: :integer
-
       def index
-        scoped = apply_scopes(policy_scope(Clipping).ordered)
+        scoped = policy_scope(Clipping).ordered.filter_by(filtering_params)
         @pagy, @clippings = pagy(scoped)
       end
 
@@ -55,6 +42,10 @@ module API
             { news_ids: [] }
           ]
         )
+      end
+
+      def filtering_params
+        params.permit(:topic_id, :period_start, :period_end, news_ids: [])
       end
     end
   end

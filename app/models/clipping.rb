@@ -28,6 +28,8 @@
 #  fk_rails_...  (topic_id => topics.id)
 #
 class Clipping < ApplicationRecord
+  include Filterable
+
   belongs_to :creator, class_name: 'User'
   belongs_to :topic
 
@@ -41,12 +43,10 @@ class Clipping < ApplicationRecord
   validate :news_ids_must_exist
 
   scope :ordered, -> { order(created_at: :desc) }
-  scope :with_news_ids, ->(ids) { where("#{table_name}.news_ids @> ?", ids.to_json) }
-  scope :with_topic_id, ->(id) { where(topic_id: id) }
-  scope :period_between, lambda { |start_date, end_date|
-    where(arel_table[:period_start].gteq(start_date))
-      .where(arel_table[:period_end].lteq(end_date))
-  }
+  filter_scope :topic_id, ->(id) { where(topic_id: id) }
+  filter_scope :news_ids, ->(ids) { where("#{table_name}.news_ids @> ?", ids.to_json) }
+  filter_scope :period_start, ->(date) { where(arel_table[:period_start].gteq(date)) }
+  filter_scope :period_end, ->(date) { where(arel_table[:period_end].lteq(date)) }
 
   def news_count
     news_ids.size
@@ -76,7 +76,7 @@ class Clipping < ApplicationRecord
   def news_ids_must_be_positive_integers
     return if invalid_news_ids.blank?
 
-    errors.add(:news_ids, :invalid, message: 'must contain positive integer IDs')
+    errors.add(:news_ids, 'must contain positive integer IDs')
   end
 
   def news_ids_must_exist
@@ -86,7 +86,7 @@ class Clipping < ApplicationRecord
     missing_ids = news_ids - existing_ids
     return if missing_ids.empty?
 
-    errors.add(:news_ids, :unknown, message: 'must reference existing news')
+    errors.add(:news_ids, 'must reference existing news')
   end
 
   def cast_positive_integer(value)
