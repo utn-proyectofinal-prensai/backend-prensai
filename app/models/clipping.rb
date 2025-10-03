@@ -44,7 +44,17 @@ class Clipping < ApplicationRecord
 
   scope :ordered, -> { order(created_at: :desc) }
   filter_scope :topic_id, ->(id) { where(topic_id: id) }
-  filter_scope :news_ids, ->(ids) { where("#{table_name}.news_ids && ?", ids.to_json) }
+  filter_scope :news_ids, lambda { |ids|
+    # Use @> operator with OR to leverage GIN index on JSONB array
+    # Each condition checks if news_ids contains at least one specific ID
+    return all if ids.blank?
+
+    sanitized_ids = ids.map(&:to_i)
+    conditions = sanitized_ids.map { "#{table_name}.news_ids @> ?" }
+    values = sanitized_ids.map { |id| [id].to_json }
+
+    where(conditions.join(' OR '), *values)
+  }
   filter_scope :period_start, ->(date) { where(arel_table[:period_start].gteq(date)) }
   filter_scope :period_end, ->(date) { where(arel_table[:period_end].lteq(date)) }
 
