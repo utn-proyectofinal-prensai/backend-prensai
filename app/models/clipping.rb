@@ -4,63 +4,49 @@
 #
 # Table name: clippings
 #
-#  id             :bigint           not null, primary key
-#  filters        :jsonb            not null
-#  name           :string           not null
-#  news_ids       :jsonb            not null
-#  period_end     :date             not null
-#  period_start   :date             not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  created_by_id  :bigint           not null
+#  id           :bigint           not null, primary key
+#  name         :string           not null
+#  news_ids     :jsonb            not null
+#  period_end   :date             not null
+#  period_start :date             not null
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  creator_id   :bigint           not null
+#  topic_id     :bigint           not null
 #
 # Indexes
 #
-#  index_clippings_on_created_by_id  (created_by_id)
-#  index_clippings_on_filters       (filters) USING gin
+#  index_clippings_on_creator_id    (creator_id)
 #  index_clippings_on_news_ids      (news_ids) USING gin
 #  index_clippings_on_period_end    (period_end)
 #  index_clippings_on_period_start  (period_start)
+#  index_clippings_on_topic_id      (topic_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (creator_id => users.id)
+#  fk_rails_...  (topic_id => topics.id)
 #
 class Clipping < ApplicationRecord
-  include Filterable
+  belongs_to :creator, class_name: 'User'
+  belongs_to :topic
 
-  belongs_to :creator, class_name: 'User', foreign_key: :created_by_id
-
-  before_validation :normalize_news_ids!
+  before_validation :normalize_news_ids
 
   attr_reader :invalid_news_ids
 
-  filter_scope :created_by_id, lambda { |value|
-    ids = normalize_id_values(value)
-    ids.present? ? where(created_by_id: ids) : all
-  }
-  filter_scope :period_start_from, lambda { |value|
-    date = parse_date(value)
-    date.present? ? where(arel_table[:period_start].gteq(date)) : all
-  }
-  filter_scope :period_end_to, lambda { |value|
-    date = parse_date(value)
-    date.present? ? where(arel_table[:period_end].lteq(date)) : all
-  }
-  filter_scope :filters_contains, lambda { |value|
-    value_hash = normalize_jsonb_filter(value)
-    value_hash.present? ? where("#{table_name}.filters @> ?", value_hash.to_json) : all
-  }
-  filter_scope :with_news_ids, lambda { |value|
-    ids = normalize_news_ids(value)
-    ids.present? ? where("#{table_name}.news_ids @> ?", ids.to_json) : all
-  }
-
   validates :name, :period_start, :period_end, presence: true
-  validate :period_end_cannot_be_before_period_start
+  validate :period_end_not_before_start
   validate :news_ids_must_be_positive_integers
+  validate :news_ids_must_exist
 
   scope :ordered, -> { order(created_at: :desc) }
+  scope :with_news_ids, ->(ids) { where("#{table_name}.news_ids @> ?", ids.to_json) }
+  scope :with_topic_id, ->(id) { where(topic_id: id) }
+  scope :period_between, lambda { |start_date, end_date|
+    where(arel_table[:period_start].gteq(start_date))
+      .where(arel_table[:period_end].lteq(end_date))
+  }
 
   def news_count
     news_ids.size
@@ -68,39 +54,19 @@ class Clipping < ApplicationRecord
 
   private
 
-  def normalize_news_ids!
-    normalized_ids = []
+  def normalize_news_ids
+    normalized = []
     @invalid_news_ids = []
 
-    Array(news_ids).each do |value|
-      id = extract_id(value)
-
-      if id.is_a?(Integer) && id.positive?
-        normalized_ids << id
-      else
-        @invalid_news_ids << value unless value.nil?
-      end
+    Array.wrap(news_ids).each do |value|
+      int = cast_positive_integer(value)
+      int ? normalized << int : @invalid_news_ids << value
     end
 
-    self.news_ids = normalized_ids
+    self.news_ids = normalized
   end
 
-  def extract_id(value)
-    case value
-    when Hash
-      extract_id(value['id'] || value[:id])
-    when String
-      Integer(value, exception: false)
-    when Integer
-      value
-    when Float
-      value.to_i if value.positive?
-    else
-      nil
-    end
-  end
-
-  def period_end_cannot_be_before_period_start
+  def period_end_not_before_start
     return if period_start.blank? || period_end.blank?
     return unless period_end < period_start
 
@@ -113,94 +79,20 @@ class Clipping < ApplicationRecord
     errors.add(:news_ids, :invalid, message: 'must contain positive integer IDs')
   end
 
-  class << self
-    private
+  def news_ids_must_exist
+    return if news_ids.blank?
 
-    def normalize_jsonb_filter(value)
-      data = if defined?(ActionController::Parameters) && value.is_a?(ActionController::Parameters)
-                value.to_unsafe_h
-              elsif value.is_a?(Hash)
-                value
-              elsif value.is_a?(String)
-                begin
-                  JSON.parse(value)
-                rescue JSON::ParserError
-                  {}
-                end
-              else
-                {}
-              end
+    existing_ids = News.where(id: news_ids).pluck(:id)
+    missing_ids = news_ids - existing_ids
+    return if missing_ids.empty?
 
-      data.each_with_object({}) do |(key, val), memo|
-        memo[key.to_s] = val unless val.blank?
-      end
-    end
+    errors.add(:news_ids, :unknown, message: 'must reference existing news')
+  end
 
-    def normalize_id_values(value)
-      raw_values = if defined?(ActionController::Parameters) && value.is_a?(ActionController::Parameters)
-                     value.to_unsafe_h.values
-                   elsif value.is_a?(Hash)
-                     value.values
-                   else
-                     Array(value)
-                   end
-
-      raw_values.filter_map do |raw|
-        case raw
-        when Integer
-          raw if raw.positive?
-        when String
-          parsed = Integer(raw, exception: false)
-          parsed.positive? ? parsed : nil
-        when Float
-          int = raw.to_i
-          int.positive? ? int : nil
-        else
-          nil
-        end
-      end
-    end
-
-    def normalize_news_ids(value)
-      normalize_id_values(value)
-    end
-
-    def parse_date(value)
-      raw = extract_first_scalar(value)
-      case raw
-      when Date
-        raw
-      when Time, DateTime
-        raw.to_date
-      when String
-        begin
-          Date.parse(raw)
-        rescue ArgumentError
-          nil
-        end
-      else
-        nil
-      end
-    end
-
-    def extract_first_scalar(value)
-      return value if scalar?(value)
-
-      collection = if defined?(ActionController::Parameters) && value.is_a?(ActionController::Parameters)
-                     value.to_unsafe_h.values
-                   elsif value.is_a?(Hash)
-                     value.values
-                   elsif value.is_a?(Array)
-                     value
-                   else
-                     Array(value)
-                   end
-
-      collection.find { |item| scalar?(item) }
-    end
-
-    def scalar?(value)
-      value.is_a?(String) || value.is_a?(Numeric) || value.is_a?(Date) || value.is_a?(Time)
-    end
+  def cast_positive_integer(value)
+    int = Integer(value, exception: false)
+    int&.positive? ? int : nil
+  rescue TypeError
+    nil
   end
 end

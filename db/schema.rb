@@ -79,16 +79,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002937) do
     t.string "name", null: false
     t.date "period_start", null: false
     t.date "period_end", null: false
-    t.jsonb "filters", default: {}, null: false
     t.jsonb "news_ids", default: [], null: false
     t.bigint "creator_id", null: false
+    t.bigint "topic_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["creator_id"], name: "index_clippings_on_creator_id"
-    t.index ["filters"], name: "index_clippings_on_filters", using: :gin
     t.index ["news_ids"], name: "index_clippings_on_news_ids", using: :gin
     t.index ["period_end"], name: "index_clippings_on_period_end"
     t.index ["period_start"], name: "index_clippings_on_period_start"
+    t.index ["topic_id"], name: "index_clippings_on_topic_id"
   end
 
   create_table "flipper_features", force: :cascade do |t|
@@ -293,6 +293,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002937) do
   end
 
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "clippings", "topics"
   add_foreign_key "clippings", "users", column: "creator_id"
   add_foreign_key "mention_news", "mentions"
   add_foreign_key "mention_news", "news"
