@@ -902,7 +902,7 @@
 				{
 					"name": "Actualizar clipping",
 					"request": {
-						"description": "Actualiza un clipping existente permitiendo modificar nombre, fechas, tema y lista de noticias incluidas.",
+						"description": "🔐 CREATOR/ADMIN: Actualiza un clipping existente permitiendo modificar nombre, fechas, tema y lista de noticias incluidas. Solo el creador del clipping o un administrador pueden actualizarlo.",
 						"method": "PUT",
 						"header": [
 							{
@@ -919,6 +919,34 @@
 								}
 							}
 						},
+						"url": {
+							"raw": "localhost:3000/api/v1/clippings/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"clippings",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar clipping",
+					"request": {
+						"description": "🔐 CREATOR/ADMIN: Elimina permanentemente un clipping del sistema. Solo el creador del clipping o un administrador pueden eliminarlo.",
+						"method": "DELETE",
+						"header": [],
 						"url": {
 							"raw": "localhost:3000/api/v1/clippings/:id",
 							"host": [

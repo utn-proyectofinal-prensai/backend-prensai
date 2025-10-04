@@ -725,7 +725,7 @@ Obtiene los detalles de un clipping específico.
 
 ### Actualizar Clipping [PUT /api/v1/clippings/{id}]
 
-Actualiza un clipping existente.
+Actualiza un clipping existente. **Permisos:** Solo el creador del clipping o un administrador pueden actualizarlo.
 
 + Parameters
     + id: 1 (number, required) - ID del clipping
@@ -751,11 +751,40 @@ Actualiza un clipping existente.
     + Attributes
         + errors (array[Error])
 
++ Response 403 (application/json)
+    + Attributes
+        + errors (array[Error])
+
 + Response 404 (application/json)
     + Attributes
         + errors (array[Error])
 
 + Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Eliminar Clipping [DELETE /api/v1/clippings/{id}]
+
+Elimina permanentemente un clipping del sistema. **Permisos:** Solo el creador del clipping o un administrador pueden eliminarlo.
+
++ Parameters
+    + id: 1 (number, required) - ID del clipping
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 204
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 403 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
     + Attributes
         + errors (array[Error])
 
