@@ -181,7 +181,7 @@ Rails.application.routes.draw do
         post :batch_process, on: :collection
       end
       resources :mentions, only: %i[index create update destroy]
-      resources :clippings, only: %i[index show create update]
+      resources :clippings, only: %i[index show create update destroy]
       resources :settings, only: [] do
         get :must_update, on: :collection
       end
