@@ -7,10 +7,26 @@ describe 'GET api/v1/news' do
   let!(:creator) { create(:user) }
   let!(:reviewer) { create(:user) }
   let!(:recent_news) do
-    create(:news, title: 'Recent News', topic: topic, creator: creator, reviewer: reviewer, created_at: 1.day.ago)
+    create(
+      :news,
+      title: 'Recent News',
+      topic: topic,
+      creator: creator,
+      reviewer: reviewer,
+      created_at: 1.day.ago,
+      date: Date.current
+    )
   end
   let!(:old_news) do
-    create(:news, title: 'Old News', topic: topic, creator: creator, reviewer: reviewer, created_at: 1.week.ago)
+    create(
+      :news,
+      title: 'Old News',
+      topic: topic,
+      creator: creator,
+      reviewer: reviewer,
+      created_at: 1.week.ago,
+      date: 10.days.ago
+    )
   end
 
   context 'when authenticated as admin user' do
@@ -99,6 +115,62 @@ describe 'GET api/v1/news' do
       end
     end
 
+    context 'with topic_id filter' do
+      let!(:another_topic) { create(:topic) }
+      let!(:news_from_another_topic) { create(:news, topic: another_topic, creator: creator, reviewer: reviewer) }
+
+      it 'returns only news matching the topic' do
+        get api_v1_news_index_path, params: { topic_id: topic.id }, headers: auth_headers, as: :json
+
+        expect(json[:news].pluck(:topic).pluck(:id).uniq).to eq([topic.id])
+        expect(json[:news].pluck(:id)).not_to include(news_from_another_topic.id)
+      end
+    end
+
+    context 'with start_date filter' do
+      let!(:very_old_news) do
+        create(:news, topic: topic, creator: creator, reviewer: reviewer, date: 30.days.ago)
+      end
+
+      it 'returns news published on or after the start_date' do
+        get api_v1_news_index_path,
+            params: { start_date: 7.days.ago.to_date },
+            headers: auth_headers,
+            as: :json
+
+        expect(json[:news].pluck(:id)).to contain_exactly(recent_news.id)
+        expect(json[:news].pluck(:id)).not_to include(old_news.id, very_old_news.id)
+      end
+    end
+
+    context 'with end_date filter' do
+      it 'returns news published on or before the end_date' do
+        get api_v1_news_index_path,
+            params: { end_date: 7.days.ago.to_date },
+            headers: auth_headers,
+            as: :json
+
+        expect(json[:news].pluck(:id)).to contain_exactly(old_news.id)
+        expect(json[:news].pluck(:id)).not_to include(recent_news.id)
+      end
+    end
+
+    context 'with start_date and end_date filters' do
+      let!(:news_outside_range) do
+        create(:news, topic: topic, creator: creator, reviewer: reviewer, date: 40.days.ago)
+      end
+
+      it 'returns news within the date range' do
+        get api_v1_news_index_path,
+            params: { start_date: 12.days.ago.to_date, end_date: 2.days.ago.to_date },
+            headers: auth_headers,
+            as: :json
+
+        expect(json[:news].pluck(:id)).to contain_exactly(old_news.id)
+        expect(json[:news].pluck(:id)).not_to include(recent_news.id, news_outside_range.id)
+      end
+    end
+
     context 'with news having different valuations' do
       before do
         create(:news, valuation: 'positive', topic: topic, creator: creator, reviewer: reviewer)
@@ -110,6 +182,92 @@ describe 'GET api/v1/news' do
         subject
         valuations = json[:news].pluck(:valuation)
         expect(valuations).to include('positive', 'negative', 'neutral')
+      end
+    end
+
+    context 'with media filter' do
+      let!(:news_from_tv) { create(:news, media: 'TV', topic: topic, creator: creator, reviewer: reviewer) }
+      let!(:news_from_radio) { create(:news, media: 'Radio', topic: topic, creator: creator, reviewer: reviewer) }
+
+      it 'returns only news from the specified media' do
+        get api_v1_news_index_path, params: { media: 'TV' }, headers: auth_headers, as: :json
+
+        expect(json[:news].pluck(:media).uniq).to eq(['TV'])
+        expect(json[:news].pluck(:id)).to include(news_from_tv.id)
+        expect(json[:news].pluck(:id)).not_to include(news_from_radio.id)
+      end
+    end
+
+    context 'with publication_type filter' do
+      let!(:news_article) do
+        create(:news, publication_type: 'Article', topic: topic, creator: creator, reviewer: reviewer)
+      end
+      let!(:news_interview) do
+        create(:news, publication_type: 'Interview', topic: topic, creator: creator, reviewer: reviewer)
+      end
+
+      it 'returns only news with the specified publication type' do
+        get api_v1_news_index_path, params: { publication_type: 'Article' }, headers: auth_headers, as: :json
+
+        expect(json[:news].pluck(:publication_type).uniq).to eq(['Article'])
+        expect(json[:news].pluck(:id)).to include(news_article.id)
+        expect(json[:news].pluck(:id)).not_to include(news_interview.id)
+      end
+    end
+
+    context 'with valuation filter' do
+      let!(:positive_news) { create(:news, valuation: 'positive', topic: topic, creator: creator, reviewer: reviewer) }
+      let!(:negative_news) { create(:news, valuation: 'negative', topic: topic, creator: creator, reviewer: reviewer) }
+
+      it 'returns only news with the specified valuation' do
+        get api_v1_news_index_path, params: { valuation: 'positive' }, headers: auth_headers, as: :json
+
+        expect(json[:news].pluck(:valuation).uniq).to eq(['positive'])
+        expect(json[:news].pluck(:id)).to include(positive_news.id)
+        expect(json[:news].pluck(:id)).not_to include(negative_news.id)
+      end
+    end
+
+    context 'with multiple filters combined' do
+      let!(:target_news) do
+        create(
+          :news,
+          media: 'TV',
+          publication_type: 'Article',
+          valuation: 'positive',
+          topic: topic,
+          creator: creator,
+          reviewer: reviewer,
+          date: 5.days.ago
+        )
+      end
+      let!(:other_news) do
+        create(
+          :news,
+          media: 'Radio',
+          publication_type: 'Interview',
+          valuation: 'negative',
+          topic: topic,
+          creator: creator,
+          reviewer: reviewer,
+          date: 3.days.ago
+        )
+      end
+
+      it 'returns news matching all specified filters' do
+        get api_v1_news_index_path,
+            params: {
+              media: 'TV',
+              publication_type: 'Article',
+              valuation: 'positive',
+              start_date: 7.days.ago.to_date,
+              end_date: 1.day.ago.to_date
+            },
+            headers: auth_headers,
+            as: :json
+
+        expect(json[:news].pluck(:id)).to contain_exactly(target_news.id)
+        expect(json[:news].pluck(:id)).not_to include(other_news.id)
       end
     end
   end

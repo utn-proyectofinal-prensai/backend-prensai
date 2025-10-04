@@ -339,6 +339,19 @@ FORMAT: 1A
 
 Obtiene una lista paginada de todas las noticias en el sistema, ordenadas por fecha de creación descendente.
 
+**Parámetros de filtrado disponibles:**
+- `topic_id`: Filtrar por tema específico
+- `start_date`: Filtrar noticias desde una fecha (formato: YYYY-MM-DD)
+- `end_date`: Filtrar noticias hasta una fecha (formato: YYYY-MM-DD)
+- `media`: Filtrar por medio de comunicación
+- `publication_type`: Filtrar por tipo de publicación
+- `valuation`: Filtrar por valoración (positive, neutral, negative)
+
+**Ejemplos de uso:**
+- `GET /api/v1/news?topic_id=1`
+- `GET /api/v1/news?media=TV&valuation=positive`
+- `GET /api/v1/news?start_date=2025-01-01&end_date=2025-01-31`
+
 + Request (application/json)
     + Headers
         Authorization: Bearer {jwt_token}
@@ -586,6 +599,192 @@ Actualiza una noticia existente. Requiere autenticación y el usuario debe tener
         + errors (array[Error])
 
 + Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+## Clippings [/api/v1/clippings]
+
+### Listar Clippings [GET]
+
+Obtiene una lista paginada de todos los clippings en el sistema, ordenados por fecha de creación descendente.
+
+**Parámetros de filtrado disponibles:**
+- `topic_id`: Filtrar por tema específico
+- `start_date`: Filtrar clippings desde una fecha (formato: YYYY-MM-DD)
+- `end_date`: Filtrar clippings hasta una fecha (formato: YYYY-MM-DD)
+- `news_ids[]`: Filtrar clippings que contengan noticias específicas
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 200 (application/json)
+    + Attributes
+        + clippings (array[Clipping])
+        + pagination (Pagination)
+        
+    + Body
+    
+        {
+            "clippings": [
+                {
+                    "id": 1,
+                    "name": "Clipping Semanal Transporte",
+                    "start_date": "2025-01-01",
+                    "end_date": "2025-01-07",
+                    "topic_id": 1,
+                    "news_ids": [1, 2, 3],
+                    "news_count": 3,
+                    "created_at": "2025-01-09T10:30:00Z",
+                    "updated_at": "2025-01-09T10:30:00Z",
+                    "creator": {
+                        "id": 1,
+                        "name": "Juan Pérez"
+                    }
+                }
+            ],
+            "pagination": {
+                "page": 1,
+                "count": 1,
+                "pages": 1,
+                "prev": null,
+                "next": null
+            }
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Crear Clipping [POST]
+
+Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas específicas.
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "clipping": {
+                "name": "Clipping Semanal Transporte",
+                "start_date": "2025-01-01",
+                "end_date": "2025-01-07",
+                "topic_id": 1,
+                "news_ids": [1, 2, 3]
+            }
+        }
+
++ Response 201 (application/json)
+    + Attributes (Clipping)
+    + Body
+        {
+            "id": 1,
+            "name": "Clipping Semanal Transporte",
+            "start_date": "2025-01-01",
+            "end_date": "2025-01-07",
+            "topic_id": 1,
+            "news_ids": [1, 2, 3],
+            "news_count": 3,
+            "created_at": "2025-01-09T10:30:00Z",
+            "updated_at": "2025-01-09T10:30:00Z",
+            "creator": {
+                "id": 1,
+                "name": "Juan Pérez"
+            }
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Obtener Clipping [GET /api/v1/clippings/{id}]
+
+Obtiene los detalles de un clipping específico.
+
++ Parameters
+    + id: 1 (number, required) - ID del clipping
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 200 (application/json)
+    + Attributes (Clipping)
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Actualizar Clipping [PUT /api/v1/clippings/{id}]
+
+Actualiza un clipping existente. **Permisos:** Solo el creador del clipping o un administrador pueden actualizarlo.
+
++ Parameters
+    + id: 1 (number, required) - ID del clipping
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "clipping": {
+                "name": "Clipping Actualizado",
+                "start_date": "2025-01-01",
+                "end_date": "2025-01-07",
+                "topic_id": 1,
+                "news_ids": [1, 2, 3, 4]
+            }
+        }
+
++ Response 200 (application/json)
+    + Attributes (Clipping)
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 403 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+### Eliminar Clipping [DELETE /api/v1/clippings/{id}]
+
+Elimina permanentemente un clipping del sistema. **Permisos:** Solo el creador del clipping o un administrador pueden eliminarlo.
+
++ Parameters
+    + id: 1 (number, required) - ID del clipping
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 204
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 403 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
     + Attributes
         + errors (array[Error])
 
@@ -1308,6 +1507,18 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + reference_type: "Topic" (string) - Tipo de referencia
 + created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
+
+### Clipping (object)
++ id: 1 (number) - ID único del clipping
++ name: "Clipping Semanal Transporte" (string) - Nombre del clipping
++ start_date: "2025-01-01" (string) - Fecha de inicio del período (ISO 8601)
++ end_date: "2025-01-07" (string) - Fecha de fin del período (ISO 8601)
++ topic_id: 1 (number) - ID del tema asociado
++ news_ids: [1, 2, 3] (array[number]) - Array de IDs de noticias incluidas
++ news_count: 3 (number) - Cantidad de noticias en el clipping
++ created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
++ updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
++ creator (EntityRef) - Usuario que creó el clipping
 
 ### Pagination (object)
 + page: 1 (number) - Página actual

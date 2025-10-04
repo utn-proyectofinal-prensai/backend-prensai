@@ -6,7 +6,8 @@ module API
       before_action :set_news, only: :update
 
       def index
-        @pagy, @news = pagy(news.ordered)
+        scoped = news.filter_by(filtering_params).ordered
+        @pagy, @news = pagy(scoped)
       end
 
       def batch_process
@@ -70,6 +71,10 @@ module API
           mentions: []
         )
         { urls: urls, topics: topics, mentions: mentions }
+      end
+
+      def filtering_params
+        params.slice(*News.filter_scopes)
       end
     end
   end
