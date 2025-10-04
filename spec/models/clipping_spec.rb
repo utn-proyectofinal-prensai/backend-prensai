@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 describe Clipping do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:creator) { create(:user) }
   let(:base_attributes) do
     {
@@ -43,6 +45,42 @@ describe Clipping do
 
         expect(clipping).not_to be_valid
         expect(clipping.errors[:news_ids]).to include('must reference existing news')
+      end
+    end
+  end
+
+  describe 'callbacks' do
+    it 'builds and refreshes metrics when news ids change' do
+      positive_news = create(:news, valuation: 'positive')
+      negative_news = create(:news, valuation: 'negative')
+
+      clipping = nil
+
+      travel_to Time.zone.local(2025, 1, 1, 10, 0) do
+        clipping = described_class.create!(
+          base_attributes.merge(
+            news_ids: [positive_news.id, negative_news.id],
+            topic_id: topic.id
+          )
+        )
+
+        metrics = clipping.metrics.deep_symbolize_keys
+        expect(metrics[:news_count]).to eq(2)
+        expect(metrics[:generated_at]).to eq(Time.current.iso8601)
+        expect(metrics[:valuation][:positive][:count]).to eq(1)
+        expect(metrics[:valuation][:negative][:count]).to eq(1)
+      end
+
+      neutral_news = create(:news, valuation: 'neutral')
+
+      travel_to Time.zone.local(2025, 1, 2, 12, 0) do
+        clipping.update!(news_ids: [positive_news.id, neutral_news.id])
+        refreshed_metrics = clipping.reload.metrics.deep_symbolize_keys
+
+        expect(refreshed_metrics[:news_count]).to eq(2)
+        expect(refreshed_metrics[:generated_at]).to eq(Time.current.iso8601)
+        expect(refreshed_metrics[:valuation][:negative][:count]).to eq(0)
+        expect(refreshed_metrics[:valuation][:neutral][:count]).to eq(1)
       end
     end
   end

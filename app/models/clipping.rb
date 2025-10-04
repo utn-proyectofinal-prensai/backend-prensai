@@ -34,6 +34,7 @@ class Clipping < ApplicationRecord
   belongs_to :topic
 
   before_validation :normalize_news_ids
+  before_save :refresh_metrics, if: :should_refresh_metrics?
 
   attr_reader :invalid_news_ids
 
@@ -63,6 +64,14 @@ class Clipping < ApplicationRecord
   end
 
   private
+
+  def should_refresh_metrics?
+    new_record? || will_save_change_to_news_ids?
+  end
+
+  def refresh_metrics
+    self.metrics = Clippings::MetricsBuilder.call(self)
+  end
 
   def normalize_news_ids
     normalized = []
