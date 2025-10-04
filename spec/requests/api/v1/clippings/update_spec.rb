@@ -3,11 +3,8 @@
 describe 'PUT /api/v1/clippings/:id' do
   subject(:request_update) { put api_v1_clipping_path(clipping.id), params:, headers: auth_headers, as: :json }
 
-  include_context 'with authenticated admin user via JWT'
-
   let(:topic) { create(:topic) }
   let(:news) { create_list(:news, 2) }
-  let!(:clipping) { create(:clipping, topic:, news_ids: [news.first.id]) }
 
   let(:valid_params) do
     {
@@ -32,7 +29,10 @@ describe 'PUT /api/v1/clippings/:id' do
     }
   end
 
-  context 'with valid parameters' do
+  context 'when authenticated as admin user' do
+    include_context 'with authenticated admin user via JWT'
+
+    let(:clipping) { create(:clipping, topic:, news_ids: [news.first.id]) }
     let(:params) { valid_params }
 
     it 'returns ok status' do
@@ -46,17 +46,48 @@ describe 'PUT /api/v1/clippings/:id' do
       expect(json[:topic_id]).to eq(topic.id)
       expect(json[:news_ids]).to match_array(news.map(&:id))
     end
+
+    context 'with invalid parameters' do
+      let(:params) { invalid_params }
+
+      it 'returns unprocessable entity' do
+        request_update
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'does not change the clipping' do
+        original_name = clipping.name
+        request_update
+        expect(clipping.reload.name).to eq(original_name)
+      end
+    end
   end
 
-  context 'with invalid parameters' do
-    let(:params) { invalid_params }
+  context 'when authenticated as the creator' do
+    include_context 'with authenticated regular user via JWT'
 
-    it 'returns unprocessable entity' do
+    let(:clipping) { create(:clipping, creator: regular_user, topic:, news_ids: [news.first.id]) }
+    let(:params) { valid_params }
+
+    it 'updates the clipping', :aggregate_failures do
       request_update
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:ok)
+      expect(json[:name]).to eq('Updated Summary')
+    end
+  end
+
+  context 'when authenticated as a different regular user' do
+    include_context 'with authenticated regular user via JWT'
+
+    let(:clipping) { create(:clipping) }
+    let(:params) { valid_params }
+
+    it 'returns forbidden status' do
+      request_update
+      expect(response).to have_http_status(:forbidden)
     end
 
-    it 'does not change the clipping' do
+    it 'does not update the clipping' do
       original_name = clipping.name
       request_update
       expect(clipping.reload.name).to eq(original_name)
