@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 json.extract! news, :id, :title, :publication_type, :date, :support, :media, :section, :author, :interviewee, :link,
-              :audience_size, :quotation, :valuation, :political_factor, :plain_text, :created_at,
-              :updated_at
+              :audience_size, :quotation, :valuation, :political_factor, :created_at, :updated_at
 
 json.crisis news.crisis?
+
+json.requires_manual_review news.requires_manual_review?
 
 if news.topic.present?
   json.topic do
