@@ -3,7 +3,7 @@
 module API
   module V1
     class ClippingsController < API::V1::APIController
-      before_action :set_clipping, only: %i[show update]
+      before_action :set_clipping, only: %i[show update destroy]
 
       def index
         scoped = policy_scope(Clipping).ordered.filter_by(filtering_params)
@@ -24,6 +24,12 @@ module API
         authorize @clipping
         @clipping.update!(clipping_params)
         render :show, status: :ok
+      end
+
+      def destroy
+        authorize @clipping
+        @clipping.destroy!
+        head :no_content
       end
 
       private
