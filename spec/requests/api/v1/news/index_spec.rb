@@ -184,6 +184,92 @@ describe 'GET api/v1/news' do
         expect(valuations).to include('positive', 'negative', 'neutral')
       end
     end
+
+    context 'with media filter' do
+      let!(:news_from_tv) { create(:news, media: 'TV', topic: topic, creator: creator, reviewer: reviewer) }
+      let!(:news_from_radio) { create(:news, media: 'Radio', topic: topic, creator: creator, reviewer: reviewer) }
+
+      it 'returns only news from the specified media' do
+        get api_v1_news_index_path, params: { media: 'TV' }, headers: auth_headers, as: :json
+
+        expect(json[:news].pluck(:media).uniq).to eq(['TV'])
+        expect(json[:news].pluck(:id)).to include(news_from_tv.id)
+        expect(json[:news].pluck(:id)).not_to include(news_from_radio.id)
+      end
+    end
+
+    context 'with publication_type filter' do
+      let!(:news_article) do
+        create(:news, publication_type: 'Article', topic: topic, creator: creator, reviewer: reviewer)
+      end
+      let!(:news_interview) do
+        create(:news, publication_type: 'Interview', topic: topic, creator: creator, reviewer: reviewer)
+      end
+
+      it 'returns only news with the specified publication type' do
+        get api_v1_news_index_path, params: { publication_type: 'Article' }, headers: auth_headers, as: :json
+
+        expect(json[:news].pluck(:publication_type).uniq).to eq(['Article'])
+        expect(json[:news].pluck(:id)).to include(news_article.id)
+        expect(json[:news].pluck(:id)).not_to include(news_interview.id)
+      end
+    end
+
+    context 'with valuation filter' do
+      let!(:positive_news) { create(:news, valuation: 'positive', topic: topic, creator: creator, reviewer: reviewer) }
+      let!(:negative_news) { create(:news, valuation: 'negative', topic: topic, creator: creator, reviewer: reviewer) }
+
+      it 'returns only news with the specified valuation' do
+        get api_v1_news_index_path, params: { valuation: 'positive' }, headers: auth_headers, as: :json
+
+        expect(json[:news].pluck(:valuation).uniq).to eq(['positive'])
+        expect(json[:news].pluck(:id)).to include(positive_news.id)
+        expect(json[:news].pluck(:id)).not_to include(negative_news.id)
+      end
+    end
+
+    context 'with multiple filters combined' do
+      let!(:target_news) do
+        create(
+          :news,
+          media: 'TV',
+          publication_type: 'Article',
+          valuation: 'positive',
+          topic: topic,
+          creator: creator,
+          reviewer: reviewer,
+          date: 5.days.ago
+        )
+      end
+      let!(:other_news) do
+        create(
+          :news,
+          media: 'Radio',
+          publication_type: 'Interview',
+          valuation: 'negative',
+          topic: topic,
+          creator: creator,
+          reviewer: reviewer,
+          date: 3.days.ago
+        )
+      end
+
+      it 'returns news matching all specified filters' do
+        get api_v1_news_index_path,
+            params: {
+              media: 'TV',
+              publication_type: 'Article',
+              valuation: 'positive',
+              start_date: 7.days.ago.to_date,
+              end_date: 1.day.ago.to_date
+            },
+            headers: auth_headers,
+            as: :json
+
+        expect(json[:news].pluck(:id)).to contain_exactly(target_news.id)
+        expect(json[:news].pluck(:id)).not_to include(other_news.id)
+      end
+    end
   end
 
   context 'when authenticated as regular user' do

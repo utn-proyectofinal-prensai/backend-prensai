@@ -59,6 +59,9 @@ class News < ApplicationRecord
   filter_scope :topic_id, ->(id) { where(topic_id: id) }
   filter_scope :start_date, ->(date) { where(arel_table[:date].gteq(date)) }
   filter_scope :end_date, ->(date) { where(arel_table[:date].lteq(date)) }
+  filter_scope :media, ->(media) { where(media: media) }
+  filter_scope :publication_type, ->(type) { where(publication_type: type) }
+  filter_scope :valuation, ->(valuation) { where(valuation: valuation) }
 
   after_create :check_topic_crisis
   after_update :check_topic_crisis, if: -> { saved_change_to_valuation? || saved_change_to_topic_id? }

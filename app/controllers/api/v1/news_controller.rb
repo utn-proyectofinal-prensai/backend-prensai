@@ -74,7 +74,7 @@ module API
       end
 
       def filtering_params
-        params.permit(:topic_id, :start_date, :end_date)
+        params.slice(*News.filter_scopes)
       end
     end
   end
