@@ -1,13 +1,11 @@
 class AddUniqueIndexToNewsLinkAndModifyColumns < ActiveRecord::Migration[8.0]
   def change
-    safety_assured do
-      change_table :news, bulk: true do |t|
-        t.remove :management, type: :string
-        t.change_null :link, false
-        t.change_null :publication_type, true
-      end
-
-      add_index :news, :link, unique: true
+    change_table :news, bulk: true do |t|
+      t.remove :management, type: :string
+      t.change_null :link, false
+      t.change_null :publication_type, true
     end
+
+    add_index :news, :link, unique: true
   end
 end

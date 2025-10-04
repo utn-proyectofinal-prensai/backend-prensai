@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_08_002936) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_08_002937) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -73,6 +73,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002936) do
     t.datetime "updated_at", null: false
     t.index ["enabled"], name: "index_ai_configurations_on_enabled"
     t.index ["key"], name: "index_ai_configurations_on_key", unique: true
+  end
+
+  create_table "clippings", force: :cascade do |t|
+    t.string "name", null: false
+    t.date "start_date", null: false
+    t.date "end_date", null: false
+    t.jsonb "news_ids", default: [], null: false
+    t.bigint "creator_id", null: false
+    t.bigint "topic_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["creator_id"], name: "index_clippings_on_creator_id"
+    t.index ["end_date"], name: "index_clippings_on_end_date"
+    t.index ["news_ids"], name: "index_clippings_on_news_ids", using: :gin
+    t.index ["start_date"], name: "index_clippings_on_start_date"
+    t.index ["topic_id"], name: "index_clippings_on_topic_id"
   end
 
   create_table "flipper_features", force: :cascade do |t|
@@ -277,6 +293,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002936) do
   end
 
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "clippings", "topics"
+  add_foreign_key "clippings", "users", column: "creator_id"
   add_foreign_key "mention_news", "mentions"
   add_foreign_key "mention_news", "news"
   add_foreign_key "news", "topics"
