@@ -43,6 +43,7 @@
 #  fk_rails_...  (topic_id => topics.id)
 #
 class News < ApplicationRecord
+  include Filterable
   belongs_to :topic, optional: true
   belongs_to :creator, class_name: 'User', optional: true
   belongs_to :reviewer, class_name: 'User', optional: true
@@ -55,6 +56,9 @@ class News < ApplicationRecord
   enum :valuation, { positive: 'positive', neutral: 'neutral', negative: 'negative' }, prefix: true
 
   scope :ordered, -> { order(created_at: :desc) }
+  filter_scope :topic_id, ->(id) { where(topic_id: id) }
+  filter_scope :start_date, ->(date) { where(arel_table[:date].gteq(date)) }
+  filter_scope :end_date, ->(date) { where(arel_table[:date].lteq(date)) }
 
   after_create :check_topic_crisis
   after_update :check_topic_crisis, if: -> { saved_change_to_valuation? || saved_change_to_topic_id? }

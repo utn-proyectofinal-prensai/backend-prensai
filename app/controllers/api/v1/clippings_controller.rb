@@ -6,7 +6,7 @@ module API
       before_action :set_clipping, only: %i[show update]
 
       def index
-        scoped = policy_scope(Clipping).ordered.filter_by(filtering_params)
+        scoped = policy_scope(Clipping).filter_by(filtering_params).ordered
         @pagy, @clippings = pagy(scoped)
       end
 

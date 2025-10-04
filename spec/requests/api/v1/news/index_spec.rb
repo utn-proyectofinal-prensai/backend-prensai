@@ -7,10 +7,26 @@ describe 'GET api/v1/news' do
   let!(:creator) { create(:user) }
   let!(:reviewer) { create(:user) }
   let!(:recent_news) do
-    create(:news, title: 'Recent News', topic: topic, creator: creator, reviewer: reviewer, created_at: 1.day.ago)
+    create(
+      :news,
+      title: 'Recent News',
+      topic: topic,
+      creator: creator,
+      reviewer: reviewer,
+      created_at: 1.day.ago,
+      date: Date.current
+    )
   end
   let!(:old_news) do
-    create(:news, title: 'Old News', topic: topic, creator: creator, reviewer: reviewer, created_at: 1.week.ago)
+    create(
+      :news,
+      title: 'Old News',
+      topic: topic,
+      creator: creator,
+      reviewer: reviewer,
+      created_at: 1.week.ago,
+      date: 10.days.ago
+    )
   end
 
   context 'when authenticated as admin user' do
@@ -96,6 +112,62 @@ describe 'GET api/v1/news' do
         subject
         news_ids = json[:news].pluck(:id)
         expect(news_ids).to include(recent_news.id, old_news.id, news_from_another_topic.id)
+      end
+    end
+
+    context 'with topic_id filter' do
+      let!(:another_topic) { create(:topic) }
+      let!(:news_from_another_topic) { create(:news, topic: another_topic, creator: creator, reviewer: reviewer) }
+
+      it 'returns only news matching the topic' do
+        get api_v1_news_index_path, params: { topic_id: topic.id }, headers: auth_headers, as: :json
+
+        expect(json[:news].pluck(:topic).pluck(:id).uniq).to eq([topic.id])
+        expect(json[:news].pluck(:id)).not_to include(news_from_another_topic.id)
+      end
+    end
+
+    context 'with start_date filter' do
+      let!(:very_old_news) do
+        create(:news, topic: topic, creator: creator, reviewer: reviewer, date: 30.days.ago)
+      end
+
+      it 'returns news published on or after the start_date' do
+        get api_v1_news_index_path,
+            params: { start_date: 7.days.ago.to_date },
+            headers: auth_headers,
+            as: :json
+
+        expect(json[:news].pluck(:id)).to contain_exactly(recent_news.id)
+        expect(json[:news].pluck(:id)).not_to include(old_news.id, very_old_news.id)
+      end
+    end
+
+    context 'with end_date filter' do
+      it 'returns news published on or before the end_date' do
+        get api_v1_news_index_path,
+            params: { end_date: 7.days.ago.to_date },
+            headers: auth_headers,
+            as: :json
+
+        expect(json[:news].pluck(:id)).to contain_exactly(old_news.id)
+        expect(json[:news].pluck(:id)).not_to include(recent_news.id)
+      end
+    end
+
+    context 'with start_date and end_date filters' do
+      let!(:news_outside_range) do
+        create(:news, topic: topic, creator: creator, reviewer: reviewer, date: 40.days.ago)
+      end
+
+      it 'returns news within the date range' do
+        get api_v1_news_index_path,
+            params: { start_date: 12.days.ago.to_date, end_date: 2.days.ago.to_date },
+            headers: auth_headers,
+            as: :json
+
+        expect(json[:news].pluck(:id)).to contain_exactly(old_news.id)
+        expect(json[:news].pluck(:id)).not_to include(recent_news.id, news_outside_range.id)
       end
     end
 
