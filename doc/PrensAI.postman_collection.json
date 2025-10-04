@@ -323,7 +323,7 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"description": "Obtiene una lista paginada de todas las noticias del sistema ordenadas por fecha de creación descendente.",
+						"description": "Obtiene una lista paginada de todas las noticias del sistema ordenadas por fecha de creación descendente. Incluye filtros avanzados por tema, fechas, medio, tipo de publicación y valoración.",
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -336,7 +336,7 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/news?limit=4",
+							"raw": "localhost:3000/api/v1/news?limit=4&media=TV&valuation=positive",
 							"host": [
 								"localhost"
 							],
@@ -355,6 +355,42 @@
 									"key": "page",
 									"value": "2",
 									"disabled": true
+								},
+								{
+									"key": "topic_id",
+									"value": "1",
+									"disabled": true,
+									"description": "Filtrar por tema específico"
+								},
+								{
+									"key": "start_date",
+									"value": "2025-01-01",
+									"disabled": true,
+									"description": "Filtrar desde fecha (YYYY-MM-DD)"
+								},
+								{
+									"key": "end_date",
+									"value": "2025-01-31",
+									"disabled": true,
+									"description": "Filtrar hasta fecha (YYYY-MM-DD)"
+								},
+								{
+									"key": "media",
+									"value": "TV",
+									"disabled": true,
+									"description": "Filtrar por medio de comunicación"
+								},
+								{
+									"key": "publication_type",
+									"value": "article",
+									"disabled": true,
+									"description": "Filtrar por tipo de publicación"
+								},
+								{
+									"key": "valuation",
+									"value": "positive",
+									"disabled": true,
+									"description": "Filtrar por valoración (positive, neutral, negative)"
 								}
 							]
 						}
@@ -751,6 +787,154 @@
 								{
 									"key": "key",
 									"value": "default_topic"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clippings",
+			"item": [
+				{
+					"name": "Listar clippings",
+					"request": {
+						"description": "Obtiene una lista paginada de todos los clippings del sistema ordenados por fecha de creación descendente. Incluye filtros por tema, fechas y noticias específicas.",
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/clippings?topic_id=1",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"clippings"
+							],
+							"query": [
+								{
+									"key": "topic_id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "start_date",
+									"value": "2025-01-01",
+									"disabled": true
+								},
+								{
+									"key": "end_date",
+									"value": "2025-01-31",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear clipping",
+					"request": {
+						"description": "Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas específicas. El usuario autenticado se asigna como creador.",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"clipping\": {\r\n        \"name\": \"Clipping Semanal Transporte\",\r\n        \"start_date\": \"2025-01-01\",\r\n        \"end_date\": \"2025-01-07\",\r\n        \"topic_id\": 1,\r\n        \"news_ids\": [1, 2, 3]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/clippings",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"clippings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener clipping",
+					"request": {
+						"description": "Obtiene los detalles completos de un clipping específico incluyendo información del creador y cantidad de noticias.",
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/clippings/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"clippings",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar clipping",
+					"request": {
+						"description": "Actualiza un clipping existente permitiendo modificar nombre, fechas, tema y lista de noticias incluidas.",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"clipping\": {\r\n        \"name\": \"Clipping Actualizado\",\r\n        \"start_date\": \"2025-01-01\",\r\n        \"end_date\": \"2025-01-07\",\r\n        \"topic_id\": 1,\r\n        \"news_ids\": [1, 2, 3, 4]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/clippings/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"clippings",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
 								}
 							]
 						}
