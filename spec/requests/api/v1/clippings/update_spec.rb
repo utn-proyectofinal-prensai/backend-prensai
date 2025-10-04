@@ -13,8 +13,8 @@ describe 'PUT /api/v1/clippings/:id' do
     {
       clipping: {
         name: 'Updated Summary',
-        period_start: Date.current,
-        period_end: Date.current + 2.days,
+        start_date: Date.current,
+        end_date: Date.current + 2.days,
         topic_id: topic.id,
         news_ids: news.map(&:id)
       }
@@ -25,8 +25,8 @@ describe 'PUT /api/v1/clippings/:id' do
     {
       clipping: {
         name: '',
-        period_start: Date.current + 5.days,
-        period_end: Date.current,
+        start_date: Date.current + 5.days,
+        end_date: Date.current,
         topic_id: nil
       }
     }

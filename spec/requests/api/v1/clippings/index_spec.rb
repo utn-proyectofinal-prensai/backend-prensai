@@ -12,8 +12,8 @@ describe 'GET /api/v1/clippings' do
       :clipping,
       name: 'Recent Clipping',
       created_at: 1.day.ago,
-      period_start: Date.current,
-      period_end: Date.current,
+      start_date: Date.current,
+      end_date: Date.current,
       topic: topics.first,
       news_ids: news_items.map(&:id)
     )
@@ -23,8 +23,8 @@ describe 'GET /api/v1/clippings' do
       :clipping,
       name: 'Older Clipping',
       created_at: 5.days.ago,
-      period_start: 5.days.ago.to_date,
-      period_end: 4.days.ago.to_date,
+      start_date: 5.days.ago.to_date,
+      end_date: 4.days.ago.to_date,
       topic: topics.last,
       news_ids: [news_items.first.id]
     )
@@ -93,24 +93,24 @@ describe 'GET /api/v1/clippings' do
       end
     end
 
-    context 'with period_start filter' do
+    context 'with start_date filter' do
       subject(:request_index) do
-        get api_v1_clippings_path(period_start: 3.days.ago.to_date), headers: auth_headers, as: :json
+        get api_v1_clippings_path(start_date: 3.days.ago.to_date), headers: auth_headers, as: :json
       end
 
-      it 'returns clippings with period_start >= specified date' do
+      it 'returns clippings with start_date >= specified date' do
         request_index
         expect(json[:clippings].size).to eq(1)
         expect(json[:clippings].first[:id]).to eq(clipping_recent.id)
       end
     end
 
-    context 'with period_end filter' do
+    context 'with end_date filter' do
       subject(:request_index) do
-        get api_v1_clippings_path(period_end: 2.days.ago.to_date), headers: auth_headers, as: :json
+        get api_v1_clippings_path(end_date: 2.days.ago.to_date), headers: auth_headers, as: :json
       end
 
-      it 'returns clippings with period_end <= specified date' do
+      it 'returns clippings with end_date <= specified date' do
         request_index
         expect(json[:clippings].size).to eq(1)
         expect(json[:clippings].first[:id]).to eq(clipping_old.id)

@@ -4,23 +4,23 @@
 #
 # Table name: clippings
 #
-#  id           :bigint           not null, primary key
-#  name         :string           not null
-#  news_ids     :jsonb            not null
-#  period_end   :date             not null
-#  period_start :date             not null
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  creator_id   :bigint           not null
-#  topic_id     :bigint           not null
+#  id         :bigint           not null, primary key
+#  end_date   :date             not null
+#  name       :string           not null
+#  news_ids   :jsonb            not null
+#  start_date :date             not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  creator_id :bigint           not null
+#  topic_id   :bigint           not null
 #
 # Indexes
 #
-#  index_clippings_on_creator_id    (creator_id)
-#  index_clippings_on_news_ids      (news_ids) USING gin
-#  index_clippings_on_period_end    (period_end)
-#  index_clippings_on_period_start  (period_start)
-#  index_clippings_on_topic_id      (topic_id)
+#  index_clippings_on_creator_id  (creator_id)
+#  index_clippings_on_end_date    (end_date)
+#  index_clippings_on_news_ids    (news_ids) USING gin
+#  index_clippings_on_start_date  (start_date)
+#  index_clippings_on_topic_id    (topic_id)
 #
 # Foreign Keys
 #
@@ -37,8 +37,8 @@ class Clipping < ApplicationRecord
 
   attr_reader :invalid_news_ids
 
-  validates :name, :period_start, :period_end, presence: true
-  validate :period_end_not_before_start
+  validates :name, :start_date, :end_date, presence: true
+  validate :end_date_not_before_start_date
   validate :news_ids_must_be_positive_integers
   validate :news_ids_must_exist
 
@@ -55,8 +55,8 @@ class Clipping < ApplicationRecord
 
     where(conditions.join(' OR '), *values)
   }
-  filter_scope :period_start, ->(date) { where(arel_table[:period_start].gteq(date)) }
-  filter_scope :period_end, ->(date) { where(arel_table[:period_end].lteq(date)) }
+  filter_scope :start_date, ->(date) { where(arel_table[:start_date].gteq(date)) }
+  filter_scope :end_date, ->(date) { where(arel_table[:end_date].lteq(date)) }
 
   def news_count
     news_ids.size
@@ -76,11 +76,11 @@ class Clipping < ApplicationRecord
     self.news_ids = normalized
   end
 
-  def period_end_not_before_start
-    return if period_start.blank? || period_end.blank?
-    return unless period_end < period_start
+  def end_date_not_before_start_date
+    return if start_date.blank? || end_date.blank?
+    return unless end_date < start_date
 
-    errors.add(:period_end, :before_period_start, message: 'must be on or after period start')
+    errors.add(:end_date, :before_start_date, message: 'must be on or after start date')
   end
 
   def news_ids_must_be_positive_integers

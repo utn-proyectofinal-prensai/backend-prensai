@@ -12,8 +12,8 @@ describe 'POST /api/v1/clippings' do
     {
       clipping: {
         name: 'Weekly Summary',
-        period_start: Date.current,
-        period_end: Date.current + 1.day,
+        start_date: Date.current,
+        end_date: Date.current + 1.day,
         topic_id: topic.id,
         news_ids: news.map(&:id)
       }
@@ -24,8 +24,8 @@ describe 'POST /api/v1/clippings' do
     {
       clipping: {
         name: '',
-        period_start: nil,
-        period_end: nil,
+        start_date: nil,
+        end_date: nil,
         topic_id: nil,
         news_ids: []
       }

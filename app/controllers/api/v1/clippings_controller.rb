@@ -36,8 +36,8 @@ module API
         params.expect(
           clipping: [
             :name,
-            :period_start,
-            :period_end,
+            :start_date,
+            :end_date,
             :topic_id,
             { news_ids: [] }
           ]
@@ -45,7 +45,7 @@ module API
       end
 
       def filtering_params
-        params.permit(:topic_id, :period_start, :period_end, news_ids: [])
+        params.permit(:topic_id, :start_date, :end_date, news_ids: [])
       end
     end
   end

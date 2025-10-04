@@ -77,17 +77,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002937) do
 
   create_table "clippings", force: :cascade do |t|
     t.string "name", null: false
-    t.date "period_start", null: false
-    t.date "period_end", null: false
+    t.date "start_date", null: false
+    t.date "end_date", null: false
     t.jsonb "news_ids", default: [], null: false
     t.bigint "creator_id", null: false
     t.bigint "topic_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["creator_id"], name: "index_clippings_on_creator_id"
+    t.index ["end_date"], name: "index_clippings_on_end_date"
     t.index ["news_ids"], name: "index_clippings_on_news_ids", using: :gin
-    t.index ["period_end"], name: "index_clippings_on_period_end"
-    t.index ["period_start"], name: "index_clippings_on_period_start"
+    t.index ["start_date"], name: "index_clippings_on_start_date"
     t.index ["topic_id"], name: "index_clippings_on_topic_id"
   end
 

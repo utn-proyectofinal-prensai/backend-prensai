@@ -3,10 +3,10 @@
 FactoryBot.define do
   factory :clipping do
     name { "Clipping #{SecureRandom.hex(3)}" }
-    period_start { Date.current }
-    period_end { Date.current + 1.day }
-    association :topic
+    start_date { Date.current }
+    end_date { Date.current + 1.day }
+    topic
     news_ids { [create(:news).id] }
-    association :creator, factory: :user
+    creator factory: :user
   end
 end

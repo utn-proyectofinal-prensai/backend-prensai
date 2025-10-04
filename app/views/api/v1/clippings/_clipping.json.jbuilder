@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-json.extract! clipping, :id, :name, :period_start, :period_end, :topic_id, :news_ids, :created_at, :updated_at
+json.extract! clipping, :id, :name, :start_date, :end_date, :topic_id, :news_ids, :created_at, :updated_at
 json.news_count clipping.news_count
 
 json.creator do

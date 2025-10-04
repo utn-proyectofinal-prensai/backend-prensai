@@ -7,8 +7,8 @@ describe Clipping do
   let(:base_attributes) do
     {
       name: 'Weekly Summary',
-      period_start: Date.current,
-      period_end: Date.current + 1.day,
+      start_date: Date.current,
+      end_date: Date.current + 1.day,
       creator: creator
     }
   end
