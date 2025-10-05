@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-json.extract! clipping, :id, :name, :start_date, :end_date, :topic_id, :news_ids, :created_at, :updated_at
-json.news_count clipping.news_count
+attributes = %i[id name start_date end_date topic_id news_ids created_at updated_at]
+attributes << :metrics if local_assigns.fetch(:include_metrics, false)
+
+json.extract! clipping, *attributes
 
 json.creator do
   json.id clipping.creator.id
