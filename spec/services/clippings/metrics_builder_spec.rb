@@ -39,13 +39,16 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
         quotation: 210.75
       )
 
-      clipping = build(
-        :clipping,
-        topic: topic,
-        news_ids: [positive_news.id, neutral_news.id, negative_news.id],
+      clipping = Clipping.new(
+        name: 'Metrics sample',
         start_date: Date.new(2025, 1, 1),
-        end_date: Date.new(2025, 1, 7)
+        end_date: Date.new(2025, 1, 7),
+        topic: topic,
+        creator: create(:user)
       )
+      clipping.news = [positive_news, neutral_news, negative_news]
+
+      allow(topic).to receive(:crisis?).and_return(true)
 
       travel_to Time.zone.local(2025, 1, 10, 9, 30) do
         metrics = described_class.call(clipping)
@@ -90,7 +93,13 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
     end
 
     it 'returns default values when there are no news ids' do
-      clipping = build(:clipping, news_ids: [])
+      clipping = Clipping.new(
+        name: 'Empty clipping',
+        start_date: Date.new(2025, 1, 1),
+        end_date: Date.new(2025, 1, 7),
+        topic: create(:topic),
+        creator: create(:user)
+      )
 
       travel_to Time.zone.local(2025, 1, 1, 12, 0) do
         metrics = described_class.call(clipping)
