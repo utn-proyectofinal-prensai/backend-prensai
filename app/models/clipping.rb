@@ -18,6 +18,7 @@
 #
 #  index_clippings_on_creator_id  (creator_id)
 #  index_clippings_on_end_date    (end_date)
+#  index_clippings_on_metrics     (metrics) USING gin
 #  index_clippings_on_start_date  (start_date)
 #  index_clippings_on_topic_id    (topic_id)
 #

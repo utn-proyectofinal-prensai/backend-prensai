@@ -100,28 +100,29 @@ class News < ApplicationRecord
   end
 
   def refresh_related_clippings_metrics
+    return unless clippings.exists?
+
     clippings.find_each(&:refresh_metrics!)
   end
 
   def metrics_affecting_previous_changes?
     changed_keys = previous_changes.keys.map(&:to_sym)
-    (changed_keys & METRIC_ATTRIBUTES).any?
+    changed_keys.intersect?(METRIC_ATTRIBUTES)
   end
 
   def prevent_topic_change_when_clipped
     previous_topic_id = topic_id_in_database
     return if previous_topic_id.blank?
 
-    clippings_scope = clippings.where(topic_id: previous_topic_id)
-    return unless clippings_scope.exists?
+    return unless clipping_news.joins(:clipping).exists?(clippings: { topic_id: previous_topic_id })
 
     errors.add(:topic_id, 'cannot be changed while the news belongs to clippings for the current topic')
     throw :abort
   end
 
   def ensure_date_within_clipping_bounds
-    violating = clippings.where.not('clippings.start_date <= ? AND clippings.end_date >= ?', date, date)
-    return unless violating.exists?
+    violating = clipping_news.joins(:clipping)
+    return unless violating.exists?(['clippings.start_date > ? OR clippings.end_date < ?', date, date])
 
     errors.add(:date, 'cannot move outside the date range of linked clippings')
     throw :abort
