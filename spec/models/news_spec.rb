@@ -181,7 +181,8 @@ describe News do
       result = news.update(topic: another_topic)
 
       expect(result).to be_falsey
-      expect(news.errors[:topic_id]).to include('cannot be changed while the news belongs to clippings for the current topic')
+      message = 'cannot be changed while the news belongs to clippings for the current topic'
+      expect(news.errors[:topic_id]).to include(message)
       expect(news.reload.topic).to eq(original_topic)
     end
 
@@ -199,7 +200,8 @@ describe News do
     it 'blocks moving the date outside linked clippings range' do
       topic = create(:topic)
       news = create(:news, topic: topic, date: Date.new(2025, 1, 10))
-      create(:clipping, topic: topic, start_date: Date.new(2025, 1, 1), end_date: Date.new(2025, 1, 15), news_ids: [news.id])
+      create(:clipping, topic: topic, start_date: Date.new(2025, 1, 1), end_date: Date.new(2025, 1, 15),
+                        news_ids: [news.id])
 
       result = news.update(date: Date.new(2025, 2, 1))
 
@@ -211,7 +213,8 @@ describe News do
     it 'allows changing the date within all linked clipping ranges' do
       topic = create(:topic)
       news = create(:news, topic: topic, date: Date.new(2025, 1, 10))
-      create(:clipping, topic: topic, start_date: Date.new(2025, 1, 1), end_date: Date.new(2025, 1, 15), news_ids: [news.id])
+      create(:clipping, topic: topic, start_date: Date.new(2025, 1, 1), end_date: Date.new(2025, 1, 15),
+                        news_ids: [news.id])
 
       expect(news.update(date: Date.new(2025, 1, 12))).to be_truthy
       expect(news.reload.date).to eq(Date.new(2025, 1, 12))

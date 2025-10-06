@@ -8,42 +8,39 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
   describe '.call' do
     context 'when the clipping has associated news' do
       let(:topic) { create(:topic) }
-      let(:creator) { create(:user) }
-      let!(:positive_news) do
-        create(
-          :news,
-          topic: topic,
-          valuation: 'positive',
-          media: 'Clarín',
-          support: 'Print',
-          date: Date.new(2025, 1, 2),
-          audience_size: 1_000,
-          quotation: 120.5
-        )
-      end
-      let!(:neutral_news) do
-        create(
-          :news,
-          topic: topic,
-          valuation: 'neutral',
-          media: 'Clarín',
-          support: 'Print',
-          date: Date.new(2025, 1, 5),
-          audience_size: 2_000,
-          quotation: 80.25
-        )
-      end
-      let!(:negative_news) do
-        create(
-          :news,
-          topic: topic,
-          valuation: 'negative',
-          media: 'La Nación',
-          support: 'Digital',
-          date: Date.new(2025, 1, 1),
-          audience_size: nil,
-          quotation: 210.75
-        )
+      let(:news_items) do
+        [
+          create(
+            :news,
+            topic: topic,
+            valuation: 'positive',
+            media: 'Clarín',
+            support: 'Print',
+            date: Date.new(2025, 1, 2),
+            audience_size: 1_000,
+            quotation: 120.5
+          ),
+          create(
+            :news,
+            topic: topic,
+            valuation: 'neutral',
+            media: 'Clarín',
+            support: 'Print',
+            date: Date.new(2025, 1, 5),
+            audience_size: 2_000,
+            quotation: 80.25
+          ),
+          create(
+            :news,
+            topic: topic,
+            valuation: 'negative',
+            media: 'La Nación',
+            support: 'Digital',
+            date: Date.new(2025, 1, 1),
+            audience_size: nil,
+            quotation: 210.75
+          )
+        ]
       end
       let(:clipping) do
         create(
@@ -52,8 +49,8 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
           start_date: Date.new(2025, 1, 1),
           end_date: Date.new(2025, 1, 7),
           topic: topic,
-          creator: creator,
-          news_ids: [positive_news.id, neutral_news.id, negative_news.id]
+          creator: create(:user),
+          news_ids: news_items.pluck(:id)
         )
       end
       let(:frozen_time) { Time.zone.local(2025, 1, 10, 9, 30) }
@@ -103,6 +100,7 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
       end
 
       it 'aggregates audience values' do
+        neutral_news = news_items.find { |news| news.valuation == 'neutral' }
         expect(metrics[:audience]).to eq(
           total: 3_000,
           average: 1_500.0,
@@ -111,6 +109,7 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
       end
 
       it 'aggregates quotation values' do
+        negative_news = news_items.find { |news| news.valuation == 'negative' }
         expect(metrics[:quotation]).to eq(
           total: 411.5,
           average: 137.17,

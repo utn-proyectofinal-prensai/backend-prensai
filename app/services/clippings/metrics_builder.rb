@@ -21,7 +21,7 @@ module Clippings
         support_stats: collection_stats(:support),
         audience: numeric_stats(:audience_size),
         quotation: numeric_stats(:quotation),
-        crisis: crisis_flag
+        crisis: crisis?
       }
     end
 
@@ -73,18 +73,17 @@ module Clippings
     end
 
     def numeric_stats(field)
-      values = news_scope.where.not(field => nil).pluck(:id, field)
-      return { total: nil, average: nil, max: nil } if values.empty?
+      numeric_values = values_for(field)
+      return empty_numeric_stats if numeric_values.empty?
 
-      numeric_values = values.map { |id, value| [id, cast_numeric(field, value)] }
-      total_value = numeric_values.sum { |_id, value| value }
+      total = sum_values(numeric_values)
       count = numeric_values.size
-      max_id, max_value = numeric_values.max_by { |_id, value| value }
+      max_pair = numeric_values.max_by(&:last)
 
       {
-        total: total_value,
-        average: (total_value.to_f / count).round(2),
-        max: { news_id: max_id, value: max_value }
+        total: total,
+        average: average_for(total, count),
+        max: build_max_hash(max_pair)
       }
     end
 
@@ -107,8 +106,33 @@ module Clippings
       field == :audience_size ? value.to_i : value.to_f
     end
 
-    def crisis_flag
+    def crisis?
       clipping.topic&.crisis? || false
+    end
+
+    def values_for(field)
+      news_scope.where.not(field => nil).pluck(:id, field).map do |id, value|
+        [id, cast_numeric(field, value)]
+      end
+    end
+
+    def empty_numeric_stats
+      { total: nil, average: nil, max: nil }
+    end
+
+    def sum_values(numeric_values)
+      numeric_values.sum { |_id, value| value }
+    end
+
+    def average_for(total, count)
+      (total.to_f / count).round(2)
+    end
+
+    def build_max_hash(max_pair)
+      return if max_pair.blank?
+
+      news_id, value = max_pair
+      { news_id: news_id, value: value }
     end
   end
 end
