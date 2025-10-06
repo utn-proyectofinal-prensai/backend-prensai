@@ -34,6 +34,15 @@ describe Clipping do
         expect(clipping.topic_id).to eq(topic.id)
       end
     end
+
+    context 'with an empty news list' do
+      it 'adds a validation error' do
+        clipping = described_class.new(base_attributes.merge(news_ids: [], topic_id: topic.id))
+
+        expect(clipping).not_to be_valid
+        expect(clipping.errors[:news_ids]).to include('must include at least one news')
+      end
+    end
   end
 
   describe 'callbacks' do

@@ -40,6 +40,7 @@ class Clipping < ApplicationRecord
 
   validates :name, :start_date, :end_date, presence: true
   validate :end_date_not_before_start_date
+  validate :must_have_at_least_one_news
 
   scope :ordered, -> { order(created_at: :desc) }
   filter_scope :topic_id, ->(id) { where(topic_id: id) }
@@ -67,5 +68,11 @@ class Clipping < ApplicationRecord
     return unless end_date < start_date
 
     errors.add(:end_date, :before_start_date, message: 'must be on or after start date')
+  end
+
+  def must_have_at_least_one_news
+    return if news.any?
+
+    errors.add(:news_ids, 'must include at least one news')
   end
 end
