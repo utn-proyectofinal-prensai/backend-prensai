@@ -54,6 +54,7 @@ class News < ApplicationRecord
   has_many :clippings, through: :clipping_news
 
   validates :title, :date, :support, :media, :link, presence: true
+  validates_with ClippingConstraintsValidator, on: :update
 
   enum :valuation, { positive: 'positive', neutral: 'neutral', negative: 'negative' }, prefix: true
 
@@ -68,8 +69,6 @@ class News < ApplicationRecord
   filter_scope :valuation, ->(valuation) { where(valuation: valuation) }
 
   after_create :check_topic_crisis
-  before_update :prevent_topic_change_when_clipped, if: :will_save_change_to_topic_id?
-  before_update :ensure_date_within_clipping_bounds, if: :will_save_change_to_date?
   after_update :check_topic_crisis, if: -> { saved_change_to_valuation? || saved_change_to_topic_id? }
   after_destroy :check_topic_crisis
   after_commit :refresh_related_clippings_metrics, on: :update, if: :metrics_affecting_previous_changes?
@@ -108,23 +107,5 @@ class News < ApplicationRecord
   def metrics_affecting_previous_changes?
     changed_keys = previous_changes.keys.map(&:to_sym)
     changed_keys.intersect?(METRIC_ATTRIBUTES)
-  end
-
-  def prevent_topic_change_when_clipped
-    previous_topic_id = topic_id_in_database
-    return if previous_topic_id.blank?
-
-    return unless clipping_news.joins(:clipping).exists?(clippings: { topic_id: previous_topic_id })
-
-    errors.add(:topic_id, 'cannot be changed while the news belongs to clippings for the current topic')
-    throw :abort
-  end
-
-  def ensure_date_within_clipping_bounds
-    violating = clipping_news.joins(:clipping)
-    return unless violating.exists?(['clippings.start_date > ? OR clippings.end_date < ?', date, date])
-
-    errors.add(:date, 'cannot move outside the date range of linked clippings')
-    throw :abort
   end
 end

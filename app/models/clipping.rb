@@ -36,11 +36,15 @@ class Clipping < ApplicationRecord
   has_many :clipping_news, dependent: :destroy
   has_many :news, through: :clipping_news
 
+  before_validation :normalize_news_ids
   before_save :assign_metrics
 
-  validates :name, :start_date, :end_date, presence: true
+  validates :name, presence: true, length: { minimum: 3, maximum: 255 }
+  validates :start_date, :end_date, presence: true
   validate :end_date_not_before_start_date
   validate :must_have_at_least_one_news
+  validate :topic_must_be_enabled
+  validates_with ClippingNewsValidator
 
   scope :ordered, -> { order(created_at: :desc) }
   filter_scope :topic_id, ->(id) { where(topic_id: id) }
@@ -63,6 +67,13 @@ class Clipping < ApplicationRecord
     self.metrics = Clippings::MetricsBuilder.call(self)
   end
 
+  def normalize_news_ids
+    return unless news_ids.is_a?(Array)
+
+    sanitized_ids = news_ids.map(&:to_i).select(&:positive?).uniq
+    self.news_ids = sanitized_ids
+  end
+
   def end_date_not_before_start_date
     return if start_date.blank? || end_date.blank?
     return unless end_date < start_date
@@ -71,8 +82,14 @@ class Clipping < ApplicationRecord
   end
 
   def must_have_at_least_one_news
-    return if news.any?
+    return if news_ids.present? && news_ids.any?
 
     errors.add(:news_ids, 'must include at least one news')
+  end
+
+  def topic_must_be_enabled
+    return if topic.blank? || topic.enabled?
+
+    errors.add(:topic, 'must be enabled')
   end
 end
