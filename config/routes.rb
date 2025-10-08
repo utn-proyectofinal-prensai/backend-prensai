@@ -182,7 +182,7 @@ Rails.application.routes.draw do
       end
       resources :mentions, only: %i[index create update destroy]
       resources :clippings, only: %i[index show create update destroy] do
-        post :generate_report, on: :member
+        resource :report, only: %i[create show], module: :clippings
       end
       resources :settings, only: [] do
         get :must_update, on: :collection
