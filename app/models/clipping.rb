@@ -35,6 +35,7 @@ class Clipping < ApplicationRecord
 
   has_many :clipping_news, dependent: :destroy
   has_many :news, through: :clipping_news
+  has_one :report, class_name: 'ClippingReport', dependent: :destroy, inverse_of: :clipping
 
   before_validation :normalize_news_ids
   before_save :assign_metrics
