@@ -78,18 +78,18 @@ class Clipping < ApplicationRecord
     return if start_date.blank? || end_date.blank?
     return unless end_date < start_date
 
-    errors.add(:end_date, :before_start_date, message: 'must be on or after start date')
+    errors.add(:end_date, :before_start_date)
   end
 
   def must_have_at_least_one_news
     return if news_ids.present? && news_ids.any?
 
-    errors.add(:news_ids, 'must include at least one news')
+    errors.add(:news_ids, :blank)
   end
 
   def topic_must_be_enabled
     return if topic.blank? || topic.enabled?
 
-    errors.add(:topic, 'must be enabled')
+    errors.add(:topic, :disabled)
   end
 end

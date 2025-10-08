@@ -45,7 +45,8 @@ RSpec.describe ClippingNewsValidator do
 
         expect(clipping).not_to be_valid
         expect(clipping.errors[:news_ids]).to include(
-          "must all belong to the clipping's topic (Transport)"
+          I18n.t('activerecord.errors.models.clipping.attributes.news_ids.topic_mismatch',
+                 topic_name: topic.name)
         )
       end
     end
@@ -78,7 +79,8 @@ RSpec.describe ClippingNewsValidator do
 
         expect(clipping).not_to be_valid
         expect(clipping.errors[:news_ids]).to include(
-          'must have dates between 2025-01-01 and 2025-01-31'
+          I18n.t('activerecord.errors.models.clipping.attributes.news_ids.date_out_of_range',
+                 start_date: Date.new(2025, 1, 1), end_date: Date.new(2025, 1, 31))
         )
       end
     end

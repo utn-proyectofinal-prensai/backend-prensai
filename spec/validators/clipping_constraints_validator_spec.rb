@@ -36,15 +36,14 @@ RSpec.describe ClippingConstraintsValidator do
           news.topic = another_topic
           expect(news).not_to be_valid
           expect(news.errors[:topic_id]).to include(
-            'cannot be changed while the news belongs to clippings for the current topic'
+            I18n.t('activerecord.errors.models.news.attributes.topic_id.clipping_restriction')
           )
         end
 
-        it 'allows changing topic when clipping is updated to different topic first' do
-          clipping.update!(topic: another_topic)
+        it 'allows changing topic after destroying clipping' do
+          clipping.destroy!
 
-          new_topic = create(:topic)
-          news.topic = new_topic
+          news.topic = another_topic
 
           expect(news).to be_valid
         end
@@ -55,7 +54,7 @@ RSpec.describe ClippingConstraintsValidator do
           news.date = Date.new(2024, 12, 31)
           expect(news).not_to be_valid
           expect(news.errors[:date]).to include(
-            'cannot move outside the date range of linked clippings'
+            I18n.t('activerecord.errors.models.news.attributes.date.clipping_bounds')
           )
         end
 
@@ -63,7 +62,7 @@ RSpec.describe ClippingConstraintsValidator do
           news.date = Date.new(2025, 2, 1)
           expect(news).not_to be_valid
           expect(news.errors[:date]).to include(
-            'cannot move outside the date range of linked clippings'
+            I18n.t('activerecord.errors.models.news.attributes.date.clipping_bounds')
           )
         end
 

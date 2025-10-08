@@ -1,5 +1,25 @@
 ---
 es:
+  activerecord:
+    errors:
+      models:
+        clipping:
+          attributes:
+            end_date:
+              before_start_date: debe ser igual o posterior a la fecha de inicio
+            news_ids:
+              blank: debe incluir al menos una noticia
+              non_existent: "incluye noticias inexistentes: %{ids}"
+              topic_mismatch: "deben pertenecer al tema del clipping (%{topic_name})"
+              date_out_of_range: "deben tener fechas entre %{start_date} y %{end_date}"
+            topic:
+              disabled: debe estar habilitado
+        news:
+          attributes:
+            topic_id:
+              clipping_restriction: no se puede cambiar mientras la noticia pertenece a clippings del tema actual
+            date:
+              clipping_bounds: no se puede mover fuera del rango de fechas de los clippings asociados
   api:
     errors:
       invalid_content_type: Tipo de contenido inválido

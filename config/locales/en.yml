@@ -1,5 +1,25 @@
 ---
 en:
+  activerecord:
+    errors:
+      models:
+        clipping:
+          attributes:
+            end_date:
+              before_start_date: must be on or after start date
+            news_ids:
+              blank: must include at least one news
+              non_existent: "includes non-existent news: %{ids}"
+              topic_mismatch: "must all belong to the clipping's topic (%{topic_name})"
+              date_out_of_range: "must have dates between %{start_date} and %{end_date}"
+            topic:
+              disabled: must be enabled
+        news:
+          attributes:
+            topic_id:
+              clipping_restriction: cannot be changed while the news belongs to clippings for the current topic
+            date:
+              clipping_bounds: cannot move outside the date range of linked clippings
   active_admin:
     dashboard: Main page
     dashboard_welcome:

@@ -41,7 +41,9 @@ describe Clipping do
         clipping = described_class.new(base_attributes.merge(news_ids: [], topic_id: topic.id))
 
         expect(clipping).not_to be_valid
-        expect(clipping.errors[:news_ids]).to include('must include at least one news')
+        expect(clipping.errors[:news_ids]).to include(
+          I18n.t('activerecord.errors.models.clipping.attributes.news_ids.blank')
+        )
       end
     end
   end

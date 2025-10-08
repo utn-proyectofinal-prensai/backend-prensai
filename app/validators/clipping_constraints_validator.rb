@@ -17,10 +17,7 @@ class ClippingConstraintsValidator < ActiveModel::Validator
     blocking_clippings = record.clippings.where(topic_id: previous_topic_id)
     return unless blocking_clippings.exists?
 
-    record.errors.add(
-      :topic_id,
-      'cannot be changed while the news belongs to clippings for the current topic'
-    )
+    record.errors.add(:topic_id, :clipping_restriction)
   end
 
   def validate_date_change(record)
@@ -28,9 +25,6 @@ class ClippingConstraintsValidator < ActiveModel::Validator
     blocking_clippings = record.clippings.where('start_date > ? OR end_date < ?', new_date, new_date)
     return unless blocking_clippings.exists?
 
-    record.errors.add(
-      :date,
-      'cannot move outside the date range of linked clippings'
-    )
+    record.errors.add(:date, :clipping_bounds)
   end
 end

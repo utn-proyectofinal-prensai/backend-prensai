@@ -18,7 +18,8 @@ class ClippingNewsValidator < ActiveModel::Validator
 
     record.errors.add(
       :news_ids,
-      "includes non-existent news: #{missing_ids.join(', ')}"
+      :non_existent,
+      ids: missing_ids.join(', ')
     )
   end
 
@@ -30,7 +31,8 @@ class ClippingNewsValidator < ActiveModel::Validator
 
     record.errors.add(
       :news_ids,
-      "must all belong to the clipping's topic (#{record.topic&.name})"
+      :topic_mismatch,
+      topic_name: record.topic&.name
     )
   end
 
@@ -43,7 +45,9 @@ class ClippingNewsValidator < ActiveModel::Validator
 
     record.errors.add(
       :news_ids,
-      "must have dates between #{record.start_date} and #{record.end_date}"
+      :date_out_of_range,
+      start_date: record.start_date,
+      end_date: record.end_date
     )
   end
 end
