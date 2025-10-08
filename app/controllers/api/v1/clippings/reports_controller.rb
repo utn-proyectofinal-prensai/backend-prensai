@@ -17,7 +17,7 @@ module API
         def create
           authorize @clipping, :generate_report?
 
-          result = Clippings::ReportGenerator.call(@clipping)
+          result = ::Clippings::ReportGenerator.call(@clipping)
 
           if result.success?
             @report = result.payload

@@ -18,10 +18,18 @@ describe API::V1::ClippingsController do
       expect(patch: '/api/v1/clippings/1').to route_to('api/v1/clippings#update', id: '1', format: :json)
     end
 
-    it 'routes to #generate_report via POST' do
-      expect(post: '/api/v1/clippings/1/generate_report').to route_to(
-        'api/v1/clippings#generate_report',
-        id: '1',
+    it 'routes to clipping report#create via POST' do
+      expect(post: '/api/v1/clippings/1/report').to route_to(
+        'api/v1/clippings/reports#create',
+        clipping_id: '1',
+        format: :json
+      )
+    end
+
+    it 'routes to clipping report#show via GET' do
+      expect(get: '/api/v1/clippings/1/report').to route_to(
+        'api/v1/clippings/reports#show',
+        clipping_id: '1',
         format: :json
       )
     end
