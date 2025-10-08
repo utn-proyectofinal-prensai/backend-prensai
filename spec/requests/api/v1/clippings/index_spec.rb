@@ -6,7 +6,8 @@ describe 'GET /api/v1/clippings' do
   include_context 'with authenticated admin user via JWT'
 
   let!(:topics) { create_list(:topic, 2) }
-  let!(:news_items) { create_list(:news, 2) }
+  let!(:topic_one_news) { create_list(:news, 2, topic: topics.first, date: Date.current) }
+  let!(:topic_two_news) { create(:news, topic: topics.last, date: 5.days.ago.to_date) }
   let!(:clipping_recent) do
     create(
       :clipping,
@@ -15,7 +16,7 @@ describe 'GET /api/v1/clippings' do
       start_date: Date.current,
       end_date: Date.current,
       topic: topics.first,
-      news_ids: news_items.map(&:id)
+      news_ids: topic_one_news.map(&:id)
     )
   end
   let!(:clipping_old) do
@@ -26,7 +27,7 @@ describe 'GET /api/v1/clippings' do
       start_date: 5.days.ago.to_date,
       end_date: 4.days.ago.to_date,
       topic: topics.last,
-      news_ids: [news_items.first.id]
+      news_ids: [topic_two_news.id]
     )
   end
 
@@ -45,7 +46,7 @@ describe 'GET /api/v1/clippings' do
     payload = json[:clippings].first
 
     expect(payload[:topic_id]).to eq(topics.first.id)
-    expect(payload[:news_ids]).to match_array(news_items.map(&:id))
+    expect(payload[:news_ids]).to match_array(topic_one_news.map(&:id))
     expect(payload[:creator]).to include(:id, :name)
   end
 
@@ -82,14 +83,13 @@ describe 'GET /api/v1/clippings' do
 
     context 'with news_ids filter' do
       subject(:request_index) do
-        get api_v1_clippings_path(news_ids: [news_items.first.id]), headers: auth_headers, as: :json
+        get api_v1_clippings_path(news_ids: [topic_one_news.first.id]), headers: auth_headers, as: :json
       end
 
       it 'returns clippings containing the specified news ids' do
         request_index
-        expect(json[:clippings].size).to eq(2)
-        clipping_ids = json[:clippings].pluck(:id)
-        expect(clipping_ids).to include(clipping_recent.id, clipping_old.id)
+        expect(json[:clippings].size).to eq(1)
+        expect(json[:clippings].first[:id]).to eq(clipping_recent.id)
       end
     end
 
@@ -121,7 +121,7 @@ describe 'GET /api/v1/clippings' do
       subject(:request_index) do
         get api_v1_clippings_path(
           topic_id: topics.first.id,
-          news_ids: [news_items.first.id]
+          news_ids: [topic_one_news.first.id]
         ), headers: auth_headers, as: :json
       end
 

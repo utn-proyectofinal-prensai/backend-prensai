@@ -181,7 +181,7 @@ describe News do
       result = news.update(topic: another_topic)
 
       expect(result).to be_falsey
-      message = 'cannot be changed while the news belongs to clippings for the current topic'
+      message = I18n.t('activerecord.errors.models.news.attributes.topic_id.clipping_restriction')
       expect(news.errors[:topic_id]).to include(message)
       expect(news.reload.topic).to eq(original_topic)
     end
@@ -206,7 +206,8 @@ describe News do
       result = news.update(date: Date.new(2025, 2, 1))
 
       expect(result).to be_falsey
-      expect(news.errors[:date]).to include('cannot move outside the date range of linked clippings')
+      message = I18n.t('activerecord.errors.models.news.attributes.date.clipping_bounds')
+      expect(news.errors[:date]).to include(message)
       expect(news.reload.date).to eq(Date.new(2025, 1, 10))
     end
 
