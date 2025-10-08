@@ -709,6 +709,14 @@ Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas espec�
                         { "key": "Digital", "count": 1, "percentage": 33.33 }
                     ]
                 },
+                "mention_stats": {
+                    "total": 4,
+                    "items": [
+                        { "mention_id": 1, "name": "Ministerio de Transporte", "count": 2, "percentage": 50.0 },
+                        { "mention_id": 2, "name": "Jorge Macri", "count": 1, "percentage": 25.0 },
+                        { "mention_id": 3, "name": "Gabriela Ricardes", "count": 1, "percentage": 25.0 }
+                    ]
+                },
                 "audience": {
                     "total": 3000,
                     "average": 1500.0,
@@ -1569,6 +1577,7 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
     + total: 3 (number) - Total de noticias con valoración conocida
 + media_stats (MetricCollection) - Estadísticas agrupadas por medio
 + support_stats (MetricCollection) - Estadísticas agrupadas por soporte
++ mention_stats (MentionStatsCollection) - Estadísticas de menciones asociadas a las noticias del clipping
 + audience (MetricAggregate, nullable) - Agregados de audiencia cuando existen datos
 + quotation (MetricAggregate, nullable) - Agregados de cotización cuando existen datos
 + crisis: false (boolean) - Indica si el tema asociado está marcado como crisis
@@ -1585,6 +1594,16 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + key: "Clarín" (string) - Valor agrupado
 + count: 2 (number) - Cantidad de noticias con ese valor
 + percentage: 66.67 (number) - Porcentaje respecto del total del agrupamiento
+
+### MentionStatsCollection (object)
++ total: 4 (number) - Total de menciones contabilizadas en las noticias del clipping
++ items: (array[MentionStatsItem]) - Detalle por mención
+
+### MentionStatsItem (object)
++ mention_id: 1 (number) - ID único de la mención
++ name: "Ministerio de Transporte" (string) - Nombre de la mención
++ count: 2 (number) - Cantidad de veces que aparece la mención en las noticias del clipping
++ percentage: 50.0 (number) - Porcentaje respecto del total de menciones
 
 ### MetricAggregate (object)
 + total: 3000 (number) - Suma total del campo
