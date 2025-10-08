@@ -3,7 +3,7 @@
 module API
   module V1
     class ClippingsController < API::V1::APIController
-      before_action :set_clipping, only: %i[show update destroy]
+      before_action :set_clipping, only: %i[show update destroy generate_report]
 
       def index
         scoped = policy_scope(Clipping)
@@ -35,10 +35,23 @@ module API
         head :no_content
       end
 
+      def generate_report
+        authorize @clipping, :generate_report?
+
+        result = Clippings::ReportGenerator.call(@clipping)
+
+        if result.success?
+          @report = result.payload
+          render :generate_report, status: :ok
+        else
+          render json: { errors: result.errors }, status: :unprocessable_entity
+        end
+      end
+
       private
 
       def set_clipping
-        @clipping = Clipping.includes(:news).find(params[:id])
+        @clipping = Clipping.includes(:news, :topic, :report).find(params[:id])
       end
 
       def clipping_params
