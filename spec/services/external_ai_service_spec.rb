@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ExternalAiService, type: :service do
-  subject(:service) { described_class.new(payload) }
+  let(:service) { described_class.new(payload: payload, action: :process_news) }
 
   let(:payload) do
     {
@@ -113,6 +113,33 @@ RSpec.describe ExternalAiService, type: :service do
   describe 'URL configuration' do
     it 'uses environment variable for base URL' do
       expect(service.send(:ai_service_url)).to include('/procesar-noticias')
+    end
+  end
+
+  describe 'custom endpoint handling' do
+    let(:payload) { { metricas: { totalNoticias: 1 } } }
+    let(:custom_response) do
+      {
+        'informe' => 'Contenido',
+        'metadatos' => {
+          'fecha_generacion' => '2025-08-17',
+          'tiempo_generacion' => '5s',
+          'total_tokens' => 123
+        }
+      }
+    end
+
+    before do
+      stub_request(:post, %r{^https?://.+/generate-informe$})
+        .to_return(status: 200, body: custom_response.to_json, headers: { 'Content-Type' => 'application/json' })
+    end
+
+    it 'transforms report responses into clipping payload' do
+      response = described_class.generate_report(payload)
+
+      expect(response[:ok]).to be true
+      expect(response[:content]).to eq('Contenido')
+      expect(response[:metadata]['total_tokens']).to eq(123)
     end
   end
 
