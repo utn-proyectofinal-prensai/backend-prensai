@@ -968,6 +968,78 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Generar reporte de clipping",
+					"request": {
+						"description": "🤖 CREATOR/ADMIN: Genera un reporte de clipping utilizando IA generativa basado en las métricas y noticias del clipping. El reporte se genera automáticamente y se almacena en el sistema. Solo el creador del clipping o un administrador pueden generar reportes.",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/clippings/:id/report",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"clippings",
+								":id",
+								"report"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener reporte de clipping",
+					"request": {
+						"description": "Obtiene el reporte generado para un clipping específico. Si no existe un reporte, retorna 404.",
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/clippings/:id/report",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"clippings",
+								":id",
+								"report"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
