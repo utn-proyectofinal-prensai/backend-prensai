@@ -19,6 +19,7 @@ module Clippings
         valuation: valuation_stats,
         media_stats: collection_stats(:media),
         support_stats: collection_stats(:support),
+        mention_stats: mention_stats,
         audience: numeric_stats(:audience_size),
         quotation: numeric_stats(:quotation),
         crisis: crisis?
@@ -61,6 +62,29 @@ module Clippings
       items = counts.sort_by { |key, count| [-count, key.to_s.downcase] }.map do |key, count|
         {
           key: key,
+          count: count,
+          percentage: percentage(count, total)
+        }
+      end
+
+      {
+        total: total,
+        items: items
+      }
+    end
+
+    def mention_stats
+      counts = MentionNews
+               .joins(:mention)
+               .where(news_id: news_scope.select(:id))
+               .group('mentions.id', 'mentions.name')
+               .count
+      total = counts.values.sum
+
+      items = counts.sort_by { |(_id, name), count| [-count, name.downcase] }.map do |(id, name), count|
+        {
+          mention_id: id,
+          name: name,
           count: count,
           percentage: percentage(count, total)
         }

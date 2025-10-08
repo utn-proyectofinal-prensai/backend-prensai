@@ -8,6 +8,9 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
   describe '.call' do
     context 'when the clipping has associated news' do
       let(:topic) { create(:topic) }
+      let(:alpha_mention) { create(:mention, name: 'Alpha') }
+      let(:beta_mention) { create(:mention, name: 'Beta') }
+      let(:gamma_mention) { create(:mention, name: 'Gamma') }
       let(:news_items) do
         [
           create(
@@ -18,7 +21,8 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
             support: 'Print',
             date: Date.new(2025, 1, 2),
             audience_size: 1_000,
-            quotation: 120.5
+            quotation: 120.5,
+            mentions: [alpha_mention, beta_mention]
           ),
           create(
             :news,
@@ -28,7 +32,8 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
             support: 'Print',
             date: Date.new(2025, 1, 5),
             audience_size: 2_000,
-            quotation: 80.25
+            quotation: 80.25,
+            mentions: [alpha_mention]
           ),
           create(
             :news,
@@ -38,7 +43,8 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
             support: 'Digital',
             date: Date.new(2025, 1, 1),
             audience_size: nil,
-            quotation: 210.75
+            quotation: 210.75,
+            mentions: [gamma_mention]
           )
         ]
       end
@@ -114,6 +120,17 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
           total: 411.5,
           average: 137.17,
           max: { news_id: negative_news.id, value: 210.75 }
+        )
+      end
+
+      it 'aggregates mention metrics with counts and percentages' do
+        expect(metrics[:mention_stats]).to eq(
+          total: 4,
+          items: [
+            { mention_id: alpha_mention.id, name: 'Alpha', count: 2, percentage: 50.0 },
+            { mention_id: beta_mention.id, name: 'Beta', count: 1, percentage: 25.0 },
+            { mention_id: gamma_mention.id, name: 'Gamma', count: 1, percentage: 25.0 }
+          ]
         )
       end
 
