@@ -839,7 +839,7 @@
 				{
 					"name": "Crear clipping",
 					"request": {
-						"description": "Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas específicas. El usuario autenticado se asigna como creador.",
+					"description": "Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas específicas. El usuario autenticado se asigna como creador. Requiere al menos un ID en `news_ids`.",
 						"method": "POST",
 						"header": [
 							{
@@ -874,7 +874,7 @@
 				{
 					"name": "Obtener clipping",
 					"request": {
-						"description": "Obtiene los detalles completos de un clipping específico incluyendo información del creador y cantidad de noticias.",
+						"description": "Obtiene los detalles completos de un clipping específico, incluyendo métricas agregadas, información del creador y cantidad de noticias.",
 						"method": "GET",
 						"header": [],
 						"url": {

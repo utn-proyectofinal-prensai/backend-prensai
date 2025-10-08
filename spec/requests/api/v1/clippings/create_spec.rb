@@ -6,7 +6,7 @@ describe 'POST /api/v1/clippings' do
   include_context 'with authenticated admin user via JWT'
 
   let(:topic) { create(:topic) }
-  let(:news) { create_list(:news, 2) }
+  let(:news) { create_list(:news, 2, topic: topic, date: Date.current) }
 
   let(:valid_params) do
     {

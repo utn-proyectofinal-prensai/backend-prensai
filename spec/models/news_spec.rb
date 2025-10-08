@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
+require 'rails_helper'
+
 describe News do
+  include ActiveSupport::Testing::TimeHelpers
+
   describe 'associations' do
     it { is_expected.to belong_to(:topic).optional }
     it { is_expected.to have_many(:mention_news).dependent(:destroy) }
     it { is_expected.to have_many(:mentions).through(:mention_news) }
+    it { is_expected.to have_many(:clipping_news).dependent(:destroy) }
+    it { is_expected.to have_many(:clippings).through(:clipping_news) }
   end
 
   describe 'validations' do
@@ -37,6 +43,39 @@ describe News do
   end
 
   describe 'callbacks' do
+    context 'when metric attributes change' do
+      let(:topic) { create(:topic) }
+      let!(:news) do
+        create(
+          :news,
+          topic: topic,
+          valuation: 'neutral',
+          media: 'Clarín',
+          support: 'Print',
+          date: Date.new(2025, 1, 2),
+          audience_size: 1_000,
+          quotation: 150.5
+        )
+      end
+      let!(:clipping) { create(:clipping, topic: topic, news_ids: [news.id]) }
+
+      it 'refreshes metrics for related clippings' do
+        initial_generated_at = clipping.metrics['generated_at']
+
+        travel_to Time.zone.local(2025, 1, 3, 9, 15) do
+          news.update!(valuation: 'positive', media: 'La Nación')
+        end
+
+        clipping.reload
+        expect(clipping.metrics['generated_at']).not_to eq(initial_generated_at)
+        expect(clipping.metrics['generated_at']).to eq(Time.zone.local(2025, 1, 3, 9, 15).iso8601)
+        expect(clipping.metrics['valuation']['positive']['count']).to eq(1)
+        expect(clipping.metrics['media_stats']['items']).to contain_exactly(
+          { 'key' => 'La Nación', 'count' => 1, 'percentage' => 100.0 }
+        )
+      end
+    end
+
     context 'when news is created' do
       let(:topic) { create(:topic) }
       let(:news) { build(:news, topic: topic) }
@@ -129,6 +168,57 @@ describe News do
     it 'returns true when a required field is nil' do
       field = %i[valuation topic].sample
       expect(build(:news, valid_attributes.merge(field => nil)).requires_manual_review?).to be true
+    end
+  end
+
+  describe '#prevent_topic_change_when_clipped' do
+    it 'blocks topic changes when the news belongs to a clipping of the current topic' do
+      original_topic = create(:topic)
+      another_topic = create(:topic)
+      news = create(:news, topic: original_topic)
+      create(:clipping, topic: original_topic, news_ids: [news.id])
+
+      result = news.update(topic: another_topic)
+
+      expect(result).to be_falsey
+      message = I18n.t('activerecord.errors.models.news.attributes.topic_id.clipping_restriction')
+      expect(news.errors[:topic_id]).to include(message)
+      expect(news.reload.topic).to eq(original_topic)
+    end
+
+    it 'allows topic changes when there are no clippings for the current topic' do
+      original_topic = create(:topic)
+      another_topic = create(:topic)
+      news = create(:news, topic: original_topic)
+
+      expect(news.update(topic: another_topic)).to be_truthy
+      expect(news.reload.topic).to eq(another_topic)
+    end
+  end
+
+  describe '#ensure_date_within_clipping_bounds' do
+    it 'blocks moving the date outside linked clippings range' do
+      topic = create(:topic)
+      news = create(:news, topic: topic, date: Date.new(2025, 1, 10))
+      create(:clipping, topic: topic, start_date: Date.new(2025, 1, 1), end_date: Date.new(2025, 1, 15),
+                        news_ids: [news.id])
+
+      result = news.update(date: Date.new(2025, 2, 1))
+
+      expect(result).to be_falsey
+      message = I18n.t('activerecord.errors.models.news.attributes.date.clipping_bounds')
+      expect(news.errors[:date]).to include(message)
+      expect(news.reload.date).to eq(Date.new(2025, 1, 10))
+    end
+
+    it 'allows changing the date within all linked clipping ranges' do
+      topic = create(:topic)
+      news = create(:news, topic: topic, date: Date.new(2025, 1, 10))
+      create(:clipping, topic: topic, start_date: Date.new(2025, 1, 1), end_date: Date.new(2025, 1, 15),
+                        news_ids: [news.id])
+
+      expect(news.update(date: Date.new(2025, 1, 12))).to be_truthy
+      expect(news.reload.date).to eq(Date.new(2025, 1, 12))
     end
   end
 end

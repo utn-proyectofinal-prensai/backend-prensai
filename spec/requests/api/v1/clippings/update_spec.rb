@@ -4,7 +4,7 @@ describe 'PUT /api/v1/clippings/:id' do
   subject(:request_update) { put api_v1_clipping_path(clipping.id), params:, headers: auth_headers, as: :json }
 
   let(:topic) { create(:topic) }
-  let(:news) { create_list(:news, 2) }
+  let(:news) { create_list(:news, 2, topic: topic, date: Date.current) }
 
   let(:valid_params) do
     {

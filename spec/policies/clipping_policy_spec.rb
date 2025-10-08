@@ -9,33 +9,22 @@ describe ClippingPolicy do
   let(:clipping) { build_stubbed(:clipping, creator:) }
 
   permissions :index?, :show?, :create? do
-    it 'grants access to admins' do
+    it 'allows authenticated users' do
       expect(policy).to permit(admin, clipping)
-    end
-
-    it 'grants access to regular users' do
       expect(policy).to permit(creator, clipping)
+      expect(policy).to permit(other_user, clipping)
     end
 
-    it 'denies access to guests' do
+    it 'denies unauthenticated users' do
       expect(policy).not_to permit(nil, clipping)
     end
   end
 
   permissions :update?, :destroy? do
-    it 'grants access to admins' do
+    it 'allows admins and creators but denies others' do
       expect(policy).to permit(admin, clipping)
-    end
-
-    it 'grants access to the creator' do
       expect(policy).to permit(creator, clipping)
-    end
-
-    it 'denies access to a different regular user' do
       expect(policy).not_to permit(other_user, clipping)
-    end
-
-    it 'denies access to guests' do
       expect(policy).not_to permit(nil, clipping)
     end
   end

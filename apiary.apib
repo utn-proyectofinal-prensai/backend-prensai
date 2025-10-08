@@ -634,7 +634,6 @@ Obtiene una lista paginada de todos los clippings en el sistema, ordenados por f
                     "end_date": "2025-01-07",
                     "topic_id": 1,
                     "news_ids": [1, 2, 3],
-                    "news_count": 3,
                     "created_at": "2025-01-09T10:30:00Z",
                     "updated_at": "2025-01-09T10:30:00Z",
                     "creator": {
@@ -660,6 +659,8 @@ Obtiene una lista paginada de todos los clippings en el sistema, ordenados por f
 
 Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas específicas.
 
+> Es obligatorio incluir al menos un ID de noticia en `news_ids`.
+
 + Request (application/json)
     + Headers
         Authorization: Bearer {jwt_token}
@@ -684,7 +685,50 @@ Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas espec�
             "end_date": "2025-01-07",
             "topic_id": 1,
             "news_ids": [1, 2, 3],
-            "news_count": 3,
+            "metrics": {
+                "generated_at": "2025-01-09T10:30:00Z",
+                "date_range": { "from": "2025-01-01", "to": "2025-01-07" },
+                "news_count": 3,
+                "valuation": {
+                    "positive": { "count": 1, "percentage": 33.33 },
+                    "neutral": { "count": 1, "percentage": 33.33 },
+                    "negative": { "count": 1, "percentage": 33.33 },
+                    "total": 3
+                },
+                "media_stats": {
+                    "total": 3,
+                    "items": [
+                        { "key": "Clarín", "count": 2, "percentage": 66.67 },
+                        { "key": "La Nación", "count": 1, "percentage": 33.33 }
+                    ]
+                },
+                "support_stats": {
+                    "total": 3,
+                    "items": [
+                        { "key": "Print", "count": 2, "percentage": 66.67 },
+                        { "key": "Digital", "count": 1, "percentage": 33.33 }
+                    ]
+                },
+                "mention_stats": {
+                    "total": 4,
+                    "items": [
+                        { "mention_id": 1, "name": "Ministerio de Transporte", "count": 2, "percentage": 50.0 },
+                        { "mention_id": 2, "name": "Jorge Macri", "count": 1, "percentage": 25.0 },
+                        { "mention_id": 3, "name": "Gabriela Ricardes", "count": 1, "percentage": 25.0 }
+                    ]
+                },
+                "audience": {
+                    "total": 3000,
+                    "average": 1500.0,
+                    "max": { "news_id": 2, "value": 2000 }
+                },
+                "quotation": {
+                    "total": 411.5,
+                    "average": 137.17,
+                    "max": { "news_id": 3, "value": 210.75 }
+                },
+                "crisis": false
+            },
             "created_at": "2025-01-09T10:30:00Z",
             "updated_at": "2025-01-09T10:30:00Z",
             "creator": {
@@ -1515,10 +1559,60 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + end_date: "2025-01-07" (string) - Fecha de fin del período (ISO 8601)
 + topic_id: 1 (number) - ID del tema asociado
 + news_ids: [1, 2, 3] (array[number]) - Array de IDs de noticias incluidas
-+ news_count: 3 (number) - Cantidad de noticias en el clipping
 + created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 + creator (EntityRef) - Usuario que creó el clipping
++ metrics (ClippingMetrics, optional) - Métricas agregadas del clipping. Disponible en los endpoints de detalle, creación y actualización.
+
+### ClippingMetrics (object)
++ generated_at: "2025-01-09T10:30:00Z" (string) - Momento del último cálculo (ISO 8601)
++ date_range (object) - Rango temporal de las noticias incluidas
+    + from: "2025-01-01" (string, nullable) - Fecha mínima encontrada
+    + to: "2025-01-07" (string, nullable) - Fecha máxima encontrada
++ news_count: 3 (number) - Cantidad total de noticias consideradas
++ valuation (object) - Distribución de noticias por valoración
+    + positive (MetricBreakdown)
+    + neutral (MetricBreakdown)
+    + negative (MetricBreakdown)
+    + total: 3 (number) - Total de noticias con valoración conocida
++ media_stats (MetricCollection) - Estadísticas agrupadas por medio
++ support_stats (MetricCollection) - Estadísticas agrupadas por soporte
++ mention_stats (MentionStatsCollection) - Estadísticas de menciones asociadas a las noticias del clipping
++ audience (MetricAggregate, nullable) - Agregados de audiencia cuando existen datos
++ quotation (MetricAggregate, nullable) - Agregados de cotización cuando existen datos
++ crisis: false (boolean) - Indica si el tema asociado está marcado como crisis
+
+### MetricBreakdown (object)
++ count: 1 (number) - Cantidad de noticias en la categoría
++ percentage: 33.33 (number) - Porcentaje respecto del total
+
+### MetricCollection (object)
++ total: 3 (number) - Total de elementos considerados
++ items: (array[MetricCollectionItem]) - Detalle por clave
+
+### MetricCollectionItem (object)
++ key: "Clarín" (string) - Valor agrupado
++ count: 2 (number) - Cantidad de noticias con ese valor
++ percentage: 66.67 (number) - Porcentaje respecto del total del agrupamiento
+
+### MentionStatsCollection (object)
++ total: 4 (number) - Total de menciones contabilizadas en las noticias del clipping
++ items: (array[MentionStatsItem]) - Detalle por mención
+
+### MentionStatsItem (object)
++ mention_id: 1 (number) - ID único de la mención
++ name: "Ministerio de Transporte" (string) - Nombre de la mención
++ count: 2 (number) - Cantidad de veces que aparece la mención en las noticias del clipping
++ percentage: 50.0 (number) - Porcentaje respecto del total de menciones
+
+### MetricAggregate (object)
++ total: 3000 (number) - Suma total del campo
++ average: 1500.0 (number) - Promedio del campo
++ max: (MetricAggregateMax, nullable) - Valor máximo encontrado
+
+### MetricAggregateMax (object)
++ news_id: 2 (number) - ID de la noticia que posee el máximo
++ value: 2000 (number) - Valor máximo registrado
 
 ### Pagination (object)
 + page: 1 (number) - Página actual

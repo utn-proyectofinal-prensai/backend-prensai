@@ -50,10 +50,15 @@ class News < ApplicationRecord
 
   has_many :mention_news, dependent: :destroy
   has_many :mentions, through: :mention_news
+  has_many :clipping_news, dependent: :destroy
+  has_many :clippings, through: :clipping_news
 
   validates :title, :date, :support, :media, :link, presence: true
+  validates_with ClippingConstraintsValidator, on: :update
 
   enum :valuation, { positive: 'positive', neutral: 'neutral', negative: 'negative' }, prefix: true
+
+  METRIC_ATTRIBUTES = %i[valuation media support date audience_size quotation].freeze
 
   scope :ordered, -> { order(created_at: :desc) }
   filter_scope :topic_id, ->(id) { where(topic_id: id) }
@@ -66,6 +71,7 @@ class News < ApplicationRecord
   after_create :check_topic_crisis
   after_update :check_topic_crisis, if: -> { saved_change_to_valuation? || saved_change_to_topic_id? }
   after_destroy :check_topic_crisis
+  after_commit :refresh_related_clippings_metrics, on: :update, if: :metrics_affecting_previous_changes?
 
   def requires_manual_review?
     manual_review_fields.include?('REVISAR MANUAL') || required_fields.any?(&:nil?)
@@ -90,5 +96,16 @@ class News < ApplicationRecord
       Topic.find(topic_id_before_last_save).check_crisis!
     end
     topic&.check_crisis!
+  end
+
+  def refresh_related_clippings_metrics
+    return unless clippings.exists?
+
+    clippings.find_each(&:refresh_metrics!)
+  end
+
+  def metrics_affecting_previous_changes?
+    changed_keys = previous_changes.keys.map(&:to_sym)
+    changed_keys.intersect?(METRIC_ATTRIBUTES)
   end
 end

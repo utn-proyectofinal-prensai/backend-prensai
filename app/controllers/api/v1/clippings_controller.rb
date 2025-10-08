@@ -6,7 +6,10 @@ module API
       before_action :set_clipping, only: %i[show update destroy]
 
       def index
-        scoped = policy_scope(Clipping).filter_by(filtering_params).ordered
+        scoped = policy_scope(Clipping)
+                 .filter_by(filtering_params)
+                 .includes(:news)
+                 .ordered
         @pagy, @clippings = pagy(scoped)
       end
 
@@ -35,7 +38,7 @@ module API
       private
 
       def set_clipping
-        @clipping = Clipping.find(params[:id])
+        @clipping = Clipping.includes(:news).find(params[:id])
       end
 
       def clipping_params
