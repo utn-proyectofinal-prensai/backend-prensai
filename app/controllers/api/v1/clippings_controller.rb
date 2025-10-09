@@ -38,7 +38,7 @@ module API
       private
 
       def set_clipping
-        @clipping = Clipping.includes(:news).find(params[:id])
+        @clipping = Clipping.includes(:news, :topic, :report).find(params[:id])
       end
 
       def clipping_params

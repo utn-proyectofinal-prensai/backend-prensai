@@ -5,6 +5,8 @@ attributes << :metrics if local_assigns.fetch(:include_metrics, false)
 
 json.extract! clipping, *attributes
 
+json.has_report clipping.report.present?
+
 json.creator do
   json.id clipping.creator.id
   json.name clipping.creator.full_name

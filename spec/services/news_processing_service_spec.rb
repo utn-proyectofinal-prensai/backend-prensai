@@ -119,12 +119,12 @@ RSpec.describe NewsProcessingService, type: :service do
 
       before do
         create(:news, link: valid_urls.first)
-        allow(ExternalAiService).to receive(:call)
+        allow(ExternalAiService).to receive(:process_news)
       end
 
       it 'skips the external AI service' do
         result
-        expect(ExternalAiService).not_to have_received(:call)
+        expect(ExternalAiService).not_to have_received(:process_news)
       end
 
       it 'returns a successful result with duplicate error information' do
@@ -175,12 +175,12 @@ RSpec.describe NewsProcessingService, type: :service do
 
       before do
         create(:news, link: 'https://example.com/news-1')
-        allow(ExternalAiService).to receive(:call).and_return(external_ai_service_response)
+        allow(ExternalAiService).to receive(:process_news).and_return(external_ai_service_response)
       end
 
       it 'calls the external AI service only with fresh urls' do
         result
-        expect(ExternalAiService).to have_received(:call).with(hash_including(urls: ['https://example.com/news-3']))
+        expect(ExternalAiService).to have_received(:process_news).with(hash_including(urls: ['https://example.com/news-3']))
       end
 
       it 'returns duplicate errors alongside processed results' do

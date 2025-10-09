@@ -634,6 +634,7 @@ Obtiene una lista paginada de todos los clippings en el sistema, ordenados por f
                     "end_date": "2025-01-07",
                     "topic_id": 1,
                     "news_ids": [1, 2, 3],
+                    "has_report": true,
                     "created_at": "2025-01-09T10:30:00Z",
                     "updated_at": "2025-01-09T10:30:00Z",
                     "creator": {
@@ -685,6 +686,7 @@ Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas espec�
             "end_date": "2025-01-07",
             "topic_id": 1,
             "news_ids": [1, 2, 3],
+            "has_report": false,
             "metrics": {
                 "generated_at": "2025-01-09T10:30:00Z",
                 "date_range": { "from": "2025-01-01", "to": "2025-01-07" },
@@ -825,6 +827,102 @@ Elimina permanentemente un clipping del sistema. **Permisos:** Solo el creador d
         + errors (array[Error])
 
 + Response 403 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
+## Reportes de Clippings [/api/v1/clippings/{id}/report]
+
+### Generar Reporte de Clipping [POST]
+
+Genera un reporte de clipping utilizando IA generativa basado en las métricas y noticias del clipping. El reporte se genera automáticamente y se almacena en el sistema.
+
+**Permisos:** Solo el creador del clipping o un administrador pueden generar reportes.
+
++ Parameters
+    + id: 1 (number, required) - ID del clipping
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 200 (application/json)
+    + Attributes (ClippingReport)
+    + Body
+        {
+            "clipping_report": {
+                "id": 1,
+                "clipping_id": 1,
+                "content": "# Resumen del Clipping Semanal\n\n## Análisis General\n\nDurante el período del 1 al 7 de enero de 2025, se registraron 3 noticias relacionadas con el tema de Transporte...",
+                "metadata": {
+                    "fecha_generacion": "2025-01-09T10:30:00Z",
+                    "tiempo_generacion": "5s",
+                    "total_tokens": 1234,
+                    "modelo_ia": "gpt-4",
+                    "version": "1.0"
+                },
+                "created_at": "2025-01-09T10:30:00Z",
+                "updated_at": "2025-01-09T10:30:00Z"
+            }
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 403 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+    + Body
+        {
+            "errors": [
+                "External AI service is unreachable"
+            ]
+        }
+
+### Obtener Reporte de Clipping [GET]
+
+Obtiene el reporte generado para un clipping específico. Si no existe un reporte, retorna 404.
+
++ Parameters
+    + id: 1 (number, required) - ID del clipping
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+
++ Response 200 (application/json)
+    + Attributes (ClippingReport)
+    + Body
+        {
+            "clipping_report": {
+                "id": 1,
+                "clipping_id": 1,
+                "content": "# Resumen del Clipping Semanal\n\n## Análisis General\n\nDurante el período del 1 al 7 de enero de 2025, se registraron 3 noticias relacionadas con el tema de Transporte...",
+                "metadata": {
+                    "fecha_generacion": "2025-01-09T10:30:00Z",
+                    "tiempo_generacion": "5s",
+                    "total_tokens": 1234,
+                    "modelo_ia": "gpt-4",
+                    "version": "1.0"
+                },
+                "created_at": "2025-01-09T10:30:00Z",
+                "updated_at": "2025-01-09T10:30:00Z"
+            }
+        }
+
++ Response 401 (application/json)
     + Attributes
         + errors (array[Error])
 
@@ -1559,6 +1657,7 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + end_date: "2025-01-07" (string) - Fecha de fin del período (ISO 8601)
 + topic_id: 1 (number) - ID del tema asociado
 + news_ids: [1, 2, 3] (array[number]) - Array de IDs de noticias incluidas
++ has_report: true (boolean) - Indica si el clipping tiene un reporte generado
 + created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 + creator (EntityRef) - Usuario que creó el clipping
@@ -1655,8 +1754,12 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 - detail: Descripción del error (string)
 
 ### ClippingReport (object)
-- report_id (string)
-- title (string)
-- format (string) - `markdown|html|plain_text`
-- content (string) - Informe generado
-- summary (array[string], optional) - Puntos clave
++ id: 1 (number) - ID único del reporte
++ clipping_id: 1 (number) - ID del clipping asociado
++ content: "# Resumen del Clipping Semanal..." (string) - Contenido del reporte generado por IA
++ metadata (object) - Metadatos del reporte
+    + fecha_generacion: "2025-01-09T10:30:00Z" (string) - Fecha de generación del reporte (ISO 8601)
+    + tiempo_generacion: "5s" (string) - Tiempo que tardó en generarse el reporte
+    + total_tokens: 1234 (number) - Número total de tokens utilizados
++ created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
++ updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)

@@ -801,7 +801,7 @@
 				{
 					"name": "Listar clippings",
 					"request": {
-						"description": "Obtiene una lista paginada de todos los clippings del sistema ordenados por fecha de creación descendente. Incluye filtros por tema, fechas y noticias específicas.",
+						"description": "Obtiene una lista paginada de todos los clippings del sistema ordenados por fecha de creación descendente. Incluye filtros por tema, fechas y noticias específicas. Cada clipping incluye el campo has_report que indica si tiene un reporte generado.",
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -874,7 +874,7 @@
 				{
 					"name": "Obtener clipping",
 					"request": {
-						"description": "Obtiene los detalles completos de un clipping específico, incluyendo métricas agregadas, información del creador y cantidad de noticias.",
+						"description": "Obtiene los detalles completos de un clipping específico, incluyendo métricas agregadas, información del creador, cantidad de noticias y estado del reporte (has_report).",
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -958,6 +958,78 @@
 								"v1",
 								"clippings",
 								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generar reporte de clipping",
+					"request": {
+						"description": "🤖 CREATOR/ADMIN: Genera un reporte de clipping utilizando IA generativa basado en las métricas y noticias del clipping. El reporte se genera automáticamente y se almacena en el sistema. Solo el creador del clipping o un administrador pueden generar reportes.",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/clippings/:id/report",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"clippings",
+								":id",
+								"report"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener reporte de clipping",
+					"request": {
+						"description": "Obtiene el reporte generado para un clipping específico. Si no existe un reporte, retorna 404.",
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/clippings/:id/report",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"clippings",
+								":id",
+								"report"
 							],
 							"variable": [
 								{

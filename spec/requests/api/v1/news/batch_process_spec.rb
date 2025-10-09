@@ -76,7 +76,7 @@ RSpec.describe 'POST /api/v1/news/batch_process' do
 
       before do
         allow(NewsProcessingService).to receive(:call).and_call_original
-        allow(ExternalAiService).to receive(:call).and_return(external_ai_service_response)
+        allow(ExternalAiService).to receive(:process_news).and_return(external_ai_service_response)
       end
 
       it 'persists news with correct creator_id' do

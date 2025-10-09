@@ -17,5 +17,21 @@ describe API::V1::ClippingsController do
     it 'routes to #update via PATCH' do
       expect(patch: '/api/v1/clippings/1').to route_to('api/v1/clippings#update', id: '1', format: :json)
     end
+
+    it 'routes to clipping report#create via POST' do
+      expect(post: '/api/v1/clippings/1/report').to route_to(
+        'api/v1/clippings/reports#create',
+        clipping_id: '1',
+        format: :json
+      )
+    end
+
+    it 'routes to clipping report#show via GET' do
+      expect(get: '/api/v1/clippings/1/report').to route_to(
+        'api/v1/clippings/reports#show',
+        clipping_id: '1',
+        format: :json
+      )
+    end
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_08_002939) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_08_002940) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,6 +83,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002939) do
     t.index ["clipping_id", "news_id"], name: "index_clipping_news_on_clipping_id_and_news_id", unique: true
     t.index ["clipping_id"], name: "index_clipping_news_on_clipping_id"
     t.index ["news_id"], name: "index_clipping_news_on_news_id"
+  end
+
+  create_table "clipping_reports", force: :cascade do |t|
+    t.bigint "clipping_id", null: false
+    t.text "content", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["clipping_id"], name: "index_clipping_reports_on_clipping_id", unique: true
   end
 
   create_table "clippings", force: :cascade do |t|
@@ -305,6 +314,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002939) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "clipping_news", "clippings"
   add_foreign_key "clipping_news", "news"
+  add_foreign_key "clipping_reports", "clippings"
   add_foreign_key "clippings", "topics"
   add_foreign_key "clippings", "users", column: "creator_id"
   add_foreign_key "mention_news", "mentions"
