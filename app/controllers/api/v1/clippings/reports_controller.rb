@@ -30,14 +30,9 @@ module API
 
         def update
           authorize @clipping, :update_report?
+          raise ActiveRecord::RecordNotFound, 'Report not found' unless report
 
-          @report = @clipping.report
-          return head :not_found unless @report
-
-          @report.assign_attributes(report_params)
-          @report.reviewer = current_user
-          @report.save!
-
+          report.update!(report_params.merge(reviewer: current_user))
           render :show, status: :ok
         end
 
@@ -65,6 +60,10 @@ module API
 
         def set_clipping
           @clipping = Clipping.includes(:report).find(params[:clipping_id])
+        end
+
+        def report
+          @report ||= @clipping.report
         end
 
         def report_params
