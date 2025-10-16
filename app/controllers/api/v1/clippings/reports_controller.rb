@@ -21,6 +21,7 @@ module API
 
           if result.success?
             @report = result.payload
+            @report.update!(creator: current_user)
             render :show, status: :ok
           else
             render json: { errors: result.errors }, status: :unprocessable_entity
@@ -33,7 +34,10 @@ module API
           @report = @clipping.report
           return head :not_found unless @report
 
-          @report.update!(report_params)
+          @report.assign_attributes(report_params)
+          @report.reviewer = current_user
+          @report.save!
+
           render :show, status: :ok
         end
 
