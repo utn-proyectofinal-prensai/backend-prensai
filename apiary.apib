@@ -864,8 +864,14 @@ Genera un reporte de clipping utilizando IA generativa basado en las métricas y
                     "modelo_ia": "gpt-4",
                     "version": "1.0"
                 },
+                "manually_edited": false,
                 "created_at": "2025-01-09T10:30:00Z",
-                "updated_at": "2025-01-09T10:30:00Z"
+                "updated_at": "2025-01-09T10:30:00Z",
+                "creator": {
+                    "id": 1,
+                    "name": "Juan Perez"
+                },
+                "reviewer": null
             }
         }
 
@@ -917,8 +923,14 @@ Obtiene el reporte generado para un clipping específico. Si no existe un report
                     "modelo_ia": "gpt-4",
                     "version": "1.0"
                 },
+                "manually_edited": false,
                 "created_at": "2025-01-09T10:30:00Z",
-                "updated_at": "2025-01-09T10:30:00Z"
+                "updated_at": "2025-01-09T10:30:00Z",
+                "creator": {
+                    "id": 1,
+                    "name": "Juan Perez"
+                },
+                "reviewer": null
             }
         }
 
@@ -971,8 +983,17 @@ Actualiza el contenido y metadatos de un reporte de clipping existente. Permite 
                     "tiempo_generacion": "5s",
                     "total_tokens": 1234
                 },
+                "manually_edited": true,
                 "created_at": "2025-01-09T10:30:00Z",
-                "updated_at": "2025-01-09T11:00:00Z"
+                "updated_at": "2025-01-09T11:00:00Z",
+                "creator": {
+                    "id": 1,
+                    "name": "Juan Perez"
+                },
+                "reviewer": {
+                    "id": 2,
+                    "name": "Maria Garcia"
+                }
             }
         }
 

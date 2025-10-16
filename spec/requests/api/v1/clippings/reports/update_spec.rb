@@ -40,6 +40,16 @@ describe 'PATCH /api/v1/clippings/:clipping_id/report' do
     expect(report.reload.metadata['version']).to eq('2.0')
   end
 
+  it 'assigns the current user as reviewer' do
+    request_update_report
+    expect(report.reload.reviewer).to eq(admin_user)
+  end
+
+  it 'marks the report as manually edited' do
+    request_update_report
+    expect(report.reload.manually_edited?).to be true
+  end
+
   it 'returns the updated report payload', :aggregate_failures do
     request_update_report
 
@@ -47,6 +57,9 @@ describe 'PATCH /api/v1/clippings/:clipping_id/report' do
     expect(updated_report[:content]).to eq('Contenido actualizado del reporte')
     expect(updated_report[:metadata][:fecha_actualizacion]).to eq('2025-08-17T11:00:00Z')
     expect(updated_report[:metadata][:version]).to eq('2.0')
+    expect(updated_report[:manually_edited]).to be true
+    expect(updated_report[:reviewer][:id]).to eq(admin_user.id)
+    expect(updated_report[:reviewer][:name]).to eq(admin_user.full_name)
     expect(updated_report[:clipping_id]).to eq(clipping.id)
   end
 
@@ -94,6 +107,7 @@ describe 'PATCH /api/v1/clippings/:clipping_id/report' do
       request_update_report
       expect(response).to have_http_status(:ok)
       expect(report.reload.content).to eq('Contenido actualizado del reporte')
+      expect(report.reload.reviewer).to eq(regular_user)
     end
   end
 
