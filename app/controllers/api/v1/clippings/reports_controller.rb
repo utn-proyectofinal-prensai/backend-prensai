@@ -27,10 +27,29 @@ module API
           end
         end
 
+        def update
+          authorize @clipping, :update_report?
+
+          @report = @clipping.report
+          return head :not_found unless @report
+
+          @report.update!(report_params)
+          render :show, status: :ok
+        end
+
         private
 
         def set_clipping
           @clipping = Clipping.includes(:report).find(params[:clipping_id])
+        end
+
+        def report_params
+          params.expect(
+            clipping_report: [
+              :content,
+              metadata: {}
+            ]
+          )
         end
       end
     end
