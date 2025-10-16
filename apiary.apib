@@ -930,6 +930,78 @@ Obtiene el reporte generado para un clipping específico. Si no existe un report
     + Attributes
         + errors (array[Error])
 
+### Actualizar Reporte de Clipping [PATCH]
+
+Actualiza el contenido y metadatos de un reporte de clipping existente. Permite modificar el contenido del reporte y sus metadatos asociados.
+
+**Permisos:** Solo el creador del clipping o un administrador pueden actualizar reportes.
+
++ Parameters
+    + id: 1 (number, required) - ID del clipping
+
++ Request (application/json)
+    + Headers
+        Authorization: Bearer {jwt_token}
+    + Body
+        {
+            "clipping_report": {
+                "content": "# Resumen Actualizado del Clipping\n\n## Análisis General Actualizado\n\nDurante el período del 1 al 7 de enero de 2025, se registraron 3 noticias relacionadas con el tema de Transporte...",
+                "metadata": {
+                    "fecha_actualizacion": "2025-01-09T11:00:00Z",
+                    "version": "2.0",
+                    "modelo_ia": "gpt-4",
+                    "tiempo_generacion": "5s",
+                    "total_tokens": 1234
+                }
+            }
+        }
+
++ Response 200 (application/json)
+    + Attributes (ClippingReport)
+    + Body
+        {
+            "clipping_report": {
+                "id": 1,
+                "clipping_id": 1,
+                "content": "# Resumen Actualizado del Clipping\n\n## Análisis General Actualizado\n\nDurante el período del 1 al 7 de enero de 2025, se registraron 3 noticias relacionadas con el tema de Transporte...",
+                "metadata": {
+                    "fecha_actualizacion": "2025-01-09T11:00:00Z",
+                    "version": "2.0",
+                    "modelo_ia": "gpt-4",
+                    "tiempo_generacion": "5s",
+                    "total_tokens": 1234
+                },
+                "created_at": "2025-01-09T10:30:00Z",
+                "updated_at": "2025-01-09T11:00:00Z"
+            }
+        }
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 403 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+    + Body
+        {
+            "errors": [
+                {
+                    "content": [
+                        "can't be blank"
+                    ]
+                }
+            ]
+        }
+
 ## Topics [/api/v1/topics]
 
 ### Listar Temas [GET]

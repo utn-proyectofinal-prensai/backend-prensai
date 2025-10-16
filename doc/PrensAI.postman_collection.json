@@ -1040,6 +1040,49 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Actualizar reporte de clipping",
+					"request": {
+						"description": "🔐 CREATOR/ADMIN: Actualiza el contenido y metadatos de un reporte de clipping existente. Permite modificar el contenido del reporte y sus metadatos asociados. Solo el creador del clipping o un administrador pueden actualizar reportes.",
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"clipping_report\": {\r\n        \"content\": \"# Resumen Actualizado del Clipping\\n\\n## Análisis General Actualizado\\n\\nDurante el período del 1 al 7 de enero de 2025, se registraron 3 noticias relacionadas con el tema de Transporte...\",\r\n        \"metadata\": {\r\n            \"fecha_actualizacion\": \"2025-01-09T11:00:00Z\",\r\n            \"version\": \"2.0\",\r\n            \"modelo_ia\": \"gpt-4\",\r\n            \"tiempo_generacion\": \"5s\",\r\n            \"total_tokens\": 1234\r\n        }\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/clippings/:id/report",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"clippings",
+								":id",
+								"report"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
