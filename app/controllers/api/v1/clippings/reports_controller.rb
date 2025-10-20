@@ -21,16 +21,38 @@ module API
 
           if result.success?
             @report = result.payload
+            @report.update!(creator: current_user)
             render :show, status: :ok
           else
             render json: { errors: result.errors }, status: :unprocessable_entity
           end
         end
 
+        def update
+          authorize @clipping, :update_report?
+          raise ActiveRecord::RecordNotFound, 'Report not found' unless report
+
+          report.update!(report_params.merge(reviewer: current_user))
+          render :show, status: :ok
+        end
+
         private
 
         def set_clipping
           @clipping = Clipping.includes(:report).find(params[:clipping_id])
+        end
+
+        def report
+          @report ||= @clipping.report
+        end
+
+        def report_params
+          params.expect(
+            clipping_report: [
+              :content,
+              metadata: {}
+            ]
+          )
         end
       end
     end

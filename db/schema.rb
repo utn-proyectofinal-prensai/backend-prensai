@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_08_002940) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_16_051748) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,7 +91,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002940) do
     t.jsonb "metadata", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "reviewer_id"
+    t.bigint "creator_id"
     t.index ["clipping_id"], name: "index_clipping_reports_on_clipping_id", unique: true
+    t.index ["creator_id"], name: "index_clipping_reports_on_creator_id"
+    t.index ["reviewer_id"], name: "index_clipping_reports_on_reviewer_id"
   end
 
   create_table "clippings", force: :cascade do |t|
@@ -315,6 +319,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_002940) do
   add_foreign_key "clipping_news", "clippings"
   add_foreign_key "clipping_news", "news"
   add_foreign_key "clipping_reports", "clippings"
+  add_foreign_key "clipping_reports", "users", column: "creator_id"
+  add_foreign_key "clipping_reports", "users", column: "reviewer_id"
   add_foreign_key "clippings", "topics"
   add_foreign_key "clippings", "users", column: "creator_id"
   add_foreign_key "mention_news", "mentions"

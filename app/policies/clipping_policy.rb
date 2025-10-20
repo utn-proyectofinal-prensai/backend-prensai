@@ -19,6 +19,10 @@ class ClippingPolicy < ApplicationPolicy
     can_manage?
   end
 
+  def update_report?
+    can_manage?
+  end
+
   class Scope < Scope
     def resolve
       scope.all
