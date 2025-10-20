@@ -36,6 +36,26 @@ module API
           render :show, status: :ok
         end
 
+        def export_pdf
+          authorize @clipping, :show?
+
+          @report = @clipping.report
+          return head :not_found unless @report
+
+          result = ::Clippings::ReportPdfExporter.call(@report)
+
+          if result.success?
+            send_data(
+              result.payload[:content],
+              type: 'application/pdf',
+              filename: result.payload[:filename],
+              disposition: 'attachment'
+            )
+          else
+            render json: { errors: result.errors }, status: :unprocessable_entity
+          end
+        end
+
         private
 
         def set_clipping
@@ -50,7 +70,7 @@ module API
           params.expect(
             clipping_report: [
               :content,
-              metadata: {}
+              { metadata: {} }
             ]
           )
         end

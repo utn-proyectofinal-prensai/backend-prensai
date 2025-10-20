@@ -36,6 +36,8 @@ gem 'rswag-ui', '~> 2.16.0'
 gem 'sendgrid', '~> 1.2.4'
 gem 'sprockets-rails', '~> 3.5', '>= 3.5.2'
 gem 'yaaf', '~> 3.0'
+gem 'grover'
+gem 'redcarpet'
 
 # Gems para compatibilidad con Ruby 3.5.0+
 gem 'fiddle'
