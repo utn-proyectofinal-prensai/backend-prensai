@@ -38,12 +38,12 @@ module API
 
         def export_pdf
           authorize @clipping, :show?
-  
+
           @report = @clipping.report
           return head :not_found unless @report
-          
+
           result = ::Clippings::ReportPdfExporter.call(@report)
-          
+
           if result.success?
             send_data(
               result.payload[:content],
@@ -70,7 +70,7 @@ module API
           params.expect(
             clipping_report: [
               :content,
-              metadata: {}
+              { metadata: {} }
             ]
           )
         end
