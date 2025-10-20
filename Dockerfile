@@ -58,7 +58,7 @@ FROM base
 
 # Install packages needed for deployment
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libpq-dev libvips libjemalloc2 libyaml-dev && \
+    apt-get install --no-install-recommends -y curl libpq-dev libvips libjemalloc2 libyaml-dev ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create app directory.
@@ -79,11 +79,15 @@ RUN ln -s /usr/lib/*-linux-gnu/libjemalloc.so.2 /usr/lib/libjemalloc.so.2
 ENV RAILS_LOG_TO_STDOUT=true
 ENV RAILS_SERVE_STATIC_FILES=true
 ENV LD_PRELOAD=/usr/lib/libjemalloc.so.2
+ENV MALLOC_ARENA_MAX=2
+
+# Cloud Run health check compatibility
+ENV RAILS_ENV=production
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["./bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]

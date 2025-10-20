@@ -9,7 +9,6 @@ gem 'rails', '~> 8.0.2'
 # Gems
 gem 'activeadmin'
 gem 'active_storage_base64', '~> 3.0.0'
-gem 'aws-sdk-s3', '~> 1.192', require: false
 gem 'bootsnap', '~> 1.18'
 gem 'cssbundling-rails', '~> 1.4'
 gem 'devise', '~> 4.9'
@@ -21,6 +20,7 @@ gem 'flipper', '~> 1.3.5'
 gem 'flipper-active_record', '~> 1.3.5'
 gem 'flipper-ui', '~> 1.3.5'
 gem 'good_job', '~> 4.11.1'
+gem 'google-cloud-storage', '~> 1.52', require: false
 gem 'jbuilder', '~> 2.13'
 gem 'jsbundling-rails', '~> 1.3'
 gem 'lograge', '~> 0.14'
