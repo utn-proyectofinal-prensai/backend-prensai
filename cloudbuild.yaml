@@ -2,8 +2,10 @@
 # This file is used by Cloud Build to build and deploy the application to Cloud Run
 
 steps:
-  # Build the container image
+  # Build the container image with BuildKit enabled
   - name: 'gcr.io/cloud-builders/docker'
+    env:
+      - 'DOCKER_BUILDKIT=1'
     args: 
       - 'build'
       - '-t'
