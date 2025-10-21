@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 ARG RUBY_VERSION=3.4.2
 ARG NODE_VERSION=22.7.0
 
