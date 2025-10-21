@@ -2,21 +2,27 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: 100
+
+development:
+  <<: *default
   username: <%= ENV.fetch('POSTGRES_USER', 'prensai_api') %>
   password: <%= ENV.fetch('POSTGRES_PASSWORD', 'prensai_api') %>
   host: <%= ENV.fetch('POSTGRES_HOST', 'localhost') %>
   port: <%= ENV.fetch('POSTGRES_PORT', '5432') %>
-
-development:
-  <<: *default
   database: prensai_api_development
 
 test:
   <<: *default
+  username: <%= ENV.fetch('POSTGRES_USER', 'prensai_api') %>
+  password: <%= ENV.fetch('POSTGRES_PASSWORD', 'prensai_api') %>
+  host: <%= ENV.fetch('POSTGRES_HOST', 'localhost') %>
+  port: <%= ENV.fetch('POSTGRES_PORT', '5432') %>
   database: prensai_api_test<%= ENV['TEST_ENV_NUMBER'] %>
 
-# For production is recommended to set DATABASE_URL env variable.
-# It will take precedence over the config defined here.
+# Production uses DATABASE_URL exclusively, which is set via Secret Manager in Cloud Run.
+# DATABASE_URL format: postgresql://user:pass@localhost/db?host=/cloudsql/PROJECT:REGION:INSTANCE
+# Rails will automatically parse username, password, host, database, and other connection params.
 # https://edgeguides.rubyonrails.org/configuring.html#connection-preference
 production:
   <<: *default
+  # DATABASE_URL is provided via Secret Manager and takes precedence over all other settings

@@ -93,6 +93,7 @@ gcloud sql instances create $SQL_INSTANCE \
     --database-version=POSTGRES_16 \
     --tier=$SQL_TIER \
     --region=$REGION \
+    --edition=STANDARD \
     --root-password=$(openssl rand -base64 32) \
     --database-flags=max_connections=100 \
     --backup-start-time=03:00 \
