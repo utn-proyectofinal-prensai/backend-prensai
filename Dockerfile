@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-ARG RUBY_VERSION=3.4.2
+ARG RUBY_VERSION=3.4.5
 ARG NODE_VERSION=22.7.0
 
 # Use Node image so we can pull the binaries from here.
