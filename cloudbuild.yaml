@@ -12,8 +12,6 @@ steps:
       - 'gcr.io/$PROJECT_ID/prensai-api:$COMMIT_SHA'
       - '-t'
       - 'gcr.io/$PROJECT_ID/prensai-api:latest'
-      - '--cache-from'
-      - 'gcr.io/$PROJECT_ID/prensai-api:latest'
       - '.'
     timeout: 1800s
 
