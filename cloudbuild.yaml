@@ -40,9 +40,9 @@ steps:
       - '-e'
       - 'RAILS_ENV=production'
       - '-e'
-      - 'RAILS_MASTER_KEY
+      - 'RAILS_MASTER_KEY'
       - '-e'
-      - 'DATABASE_URL
+      - 'DATABASE_URL'
       - '--'
       - 'bundle'
       - 'exec'
