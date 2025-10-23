@@ -39,6 +39,9 @@ gem 'sendgrid', '~> 1.2.4'
 gem 'sprockets-rails', '~> 3.5', '>= 3.5.2'
 gem 'yaaf', '~> 3.0'
 
+# Compatibility with Ruby 3.5.0+
+gem 'ostruct'
+
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 4.0'
 # Use Active Model has_secure_password
