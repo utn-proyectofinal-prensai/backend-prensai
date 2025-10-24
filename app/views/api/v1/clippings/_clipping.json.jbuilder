@@ -30,3 +30,12 @@ json.creator do
   json.id clipping.creator.id
   json.name clipping.creator.full_name
 end
+
+if clipping.reviewer.present?
+  json.reviewer do
+    json.id clipping.reviewer.id
+    json.name clipping.reviewer.full_name
+  end
+else
+  json.reviewer nil
+end

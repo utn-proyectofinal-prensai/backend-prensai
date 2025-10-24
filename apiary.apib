@@ -643,7 +643,8 @@ Obtiene una lista paginada de todos los clippings en el sistema, ordenados por f
                     "creator": {
                         "id": 1,
                         "name": "Juan Pérez"
-                    }
+                    },
+                    "reviewer": null
                 }
             ],
             "pagination": {
@@ -683,16 +684,16 @@ Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas espec�
     + Attributes (ClippingSimple)
     + Body
         {
-            "clipping": {
-                "id": 1,
-                "name": "Clipping Semanal Transporte",
-                "start_date": "2025-01-01",
-                "end_date": "2025-01-07",
-                "topic_id": 1,
-                "news_ids": [1, 2, 3],
-                "created_at": "2025-01-09T10:30:00Z",
-                "updated_at": "2025-01-09T10:30:00Z"
-            }
+            "id": 1,
+            "name": "Clipping Semanal Transporte",
+            "start_date": "2025-01-01",
+            "end_date": "2025-01-07",
+            "topic_id": 1,
+            "news_ids": [1, 2, 3],
+            "created_at": "2025-01-09T10:30:00Z",
+            "updated_at": "2025-01-09T10:30:00Z",
+            "creator_id": 1,
+            "reviewer_id": 1            
         }
 
 + Response 401 (application/json)
@@ -750,16 +751,16 @@ Actualiza un clipping existente. **Permisos:** Solo el creador del clipping o un
     + Attributes (ClippingSimple)
     + Body
         {
-            "clipping": {
-                "id": 1,
-                "name": "Clipping Actualizado",
-                "start_date": "2025-01-01",
-                "end_date": "2025-01-07",
-                "topic_id": 1,
-                "news_ids": [1, 2, 3, 4],
-                "created_at": "2025-01-09T10:30:00Z",
-                "updated_at": "2025-01-10T08:15:00Z"
-            }
+            "id": 1,
+            "name": "Clipping Actualizado",
+            "start_date": "2025-01-01",
+            "end_date": "2025-01-07",
+            "topic_id": 1,
+            "news_ids": [1, 2, 3, 4],
+            "created_at": "2025-01-09T10:30:00Z",
+            "updated_at": "2025-01-10T08:15:00Z",
+            "creator_id": 1,
+            "reviewer_id": 1
         }
 
 + Response 401 (application/json)
@@ -1722,6 +1723,7 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 + creator (EntityRef) - Usuario que creó el clipping
++ reviewer (EntityRef, nullable) - Usuario que revisó el clipping por última vez
 
 ### ClippingIndex (ClippingBase)
 + news_ids: [1, 2, 3] (array[number]) - IDs de las noticias incluidas en el clipping. Disponible en listados para filtrar o consultar rápidamente.
@@ -1739,6 +1741,8 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + news_ids: [1, 2, 3] (array[number]) - IDs de las noticias vinculadas
 + created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
++ creator_id: 1 (number) - ID único del creador
++ reviewer_id: 1 (number) - ID único del último editor
 
 ### ClippingMetrics (object)
 + generated_at: "2025-01-09T10:30:00Z" (string) - Momento del último cálculo (ISO 8601)

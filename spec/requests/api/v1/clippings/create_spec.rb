@@ -50,6 +50,8 @@ describe 'POST /api/v1/clippings' do
       expect(json[:name]).to eq('Weekly Summary')
       expect(json[:topic_id]).to eq(topic.id)
       expect(json[:news_ids]).to match_array(news.map(&:id))
+      expect(json[:creator_id]).to eq(admin_user.id)
+      expect(json[:reviewer_id]).to be_nil
     end
   end
 

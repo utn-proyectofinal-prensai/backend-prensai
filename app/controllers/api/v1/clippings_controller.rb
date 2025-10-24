@@ -25,7 +25,7 @@ module API
 
       def update
         authorize @clipping
-        @clipping.update!(clipping_params)
+        @clipping.update!(clipping_params.merge(reviewer: current_user))
         render :update, status: :ok
       end
 
@@ -62,6 +62,7 @@ module API
           :topic,
           :report,
           :creator,
+          :reviewer,
           { news: %i[topic mentions creator reviewer] }
         ]
       end
