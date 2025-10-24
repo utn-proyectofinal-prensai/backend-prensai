@@ -41,13 +41,14 @@ describe 'GET /api/v1/clippings' do
     expect(json[:clippings].pluck(:id)).to eq([clipping_recent.id, clipping_old.id])
   end
 
-  it 'includes topic and news ids in each clipping', :aggregate_failures do
+  it 'includes topic details and news ids in each clipping', :aggregate_failures do
     request_index
     payload = json[:clippings].first
 
-    expect(payload[:topic_id]).to eq(topics.first.id)
+    expect(payload[:topic]).to include(id: topics.first.id, name: topics.first.name)
     expect(payload[:news_ids]).to match_array(topic_one_news.map(&:id))
     expect(payload[:creator]).to include(:id, :name)
+    expect(payload).not_to have_key(:topic_id)
   end
 
   it 'returns pagination metadata' do
@@ -77,7 +78,7 @@ describe 'GET /api/v1/clippings' do
         request_index
         expect(json[:clippings].size).to eq(1)
         expect(json[:clippings].first[:id]).to eq(clipping_recent.id)
-        expect(json[:clippings].first[:topic_id]).to eq(topics.first.id)
+        expect(json[:clippings].first[:topic][:id]).to eq(topics.first.id)
       end
     end
 
