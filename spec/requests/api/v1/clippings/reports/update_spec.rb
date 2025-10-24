@@ -2,9 +2,9 @@
 
 describe 'PATCH /api/v1/clippings/:clipping_id/report' do
   subject(:request_update_report) do
-    patch api_v1_clipping_report_path(clipping), 
-          params: { clipping_report: report_params }, 
-          headers: auth_headers, 
+    patch api_v1_clipping_report_path(clipping),
+          params: { clipping_report: report_params },
+          headers: auth_headers,
           as: :json
   end
 
