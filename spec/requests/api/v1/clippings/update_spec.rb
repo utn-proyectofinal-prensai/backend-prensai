@@ -74,7 +74,7 @@ describe 'PUT /api/v1/clippings/:id' do
       request_update
       expect(response).to have_http_status(:ok)
       expect(json[:name]).to eq('Updated Summary')
-      expect(json[:reviewer]).to include(id: regular_user.id, name: regular_user.full_name)
+      expect(json[:reviewer_id]).to eq(regular_user.id)
     end
   end
 
