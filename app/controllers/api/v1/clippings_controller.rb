@@ -8,7 +8,7 @@ module API
       def index
         scoped = policy_scope(Clipping)
                  .filter_by(filtering_params)
-                 .includes(:news)
+                 .includes(clipping_includes)
                  .ordered
         @pagy, @clippings = pagy(scoped)
       end
@@ -20,13 +20,13 @@ module API
       def create
         @clipping = authorize Clipping.new(clipping_params.merge(creator: current_user))
         @clipping.save!
-        render :show, status: :created
+        render :create, status: :created
       end
 
       def update
         authorize @clipping
-        @clipping.update!(clipping_params)
-        render :show, status: :ok
+        @clipping.update!(clipping_params.merge(reviewer: current_user))
+        render :update, status: :ok
       end
 
       def destroy
@@ -38,7 +38,7 @@ module API
       private
 
       def set_clipping
-        @clipping = Clipping.includes(:news, :topic, :report).find(params[:id])
+        @clipping = Clipping.includes(clipping_includes).find(params[:id])
       end
 
       def clipping_params
@@ -55,6 +55,16 @@ module API
 
       def filtering_params
         params.permit(:topic_id, :start_date, :end_date, news_ids: [])
+      end
+
+      def clipping_includes
+        [
+          :topic,
+          :report,
+          :creator,
+          :reviewer,
+          { news: %i[topic mentions creator reviewer] }
+        ]
       end
     end
   end

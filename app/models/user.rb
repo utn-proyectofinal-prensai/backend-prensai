@@ -36,6 +36,8 @@ class User < ApplicationRecord
 
   has_many :news, foreign_key: :creator_id, dependent: :nullify, inverse_of: :creator
   has_many :reviewed_news, class_name: 'News', foreign_key: :reviewer_id, dependent: :nullify, inverse_of: :reviewer
+  has_many :reviewed_clippings, class_name: 'Clipping', foreign_key: :reviewer_id, dependent: :nullify,
+                                inverse_of: :reviewer
 
   validates :role, presence: true, inclusion: { in: %w[admin user] }
 

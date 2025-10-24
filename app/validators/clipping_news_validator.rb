@@ -24,7 +24,7 @@ class ClippingNewsValidator < ActiveModel::Validator
   end
 
   def validate_news_belong_to_topic(record)
-    return unless record.topic_id.present?
+    return if record.topic_id.blank?
 
     mismatched_news = News.where(id: record.news_ids).where.not(topic_id: record.topic_id)
     return unless mismatched_news.exists?

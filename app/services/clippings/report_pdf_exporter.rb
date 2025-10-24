@@ -1,17 +1,17 @@
 module Clippings
   class ReportPdfExporter
     include ActiveModel::Model
-    
+
     attr_reader :report
-    
+
     def self.call(report)
       new(report).call
     end
-    
+
     def initialize(report)
       @report = report
     end
-    
+
     def call
       html_content = build_html_content
       pdf_content = generate_pdf(html_content)
@@ -20,12 +20,12 @@ module Clippings
       Rails.logger.error "ReportPdfExporter error: #{error.message}"
       failure_result("Error generando PDF: #{error.message}")
     end
-    
+
     private
-    
+
     def build_html_content
       markdown_html = convert_markdown_to_html(report.content)
-      
+
       <<~HTML
         <!DOCTYPE html>
         <html>
@@ -154,7 +154,7 @@ module Clippings
           <div class="header">
             <h1>Reporte de Clipping</h1>
           </div>
-          
+        #{'  '}
           <div class="metadata">
             <p><strong>Tema:</strong> #{report.clipping.topic&.name || 'Sin tema'}</p>
             <p><strong>Período:</strong> #{date_range_text}</p>
@@ -162,11 +162,11 @@ module Clippings
             #{creator_info}
             #{reviewer_info}
           </div>
-          
+        #{'  '}
           <div class="content">
             #{markdown_html}
           </div>
-          
+        #{'  '}
           <div class="footer">
             <p>Generado por PrensAI - #{Time.current.strftime('%d/%m/%Y')}</p>
           </div>
@@ -174,16 +174,16 @@ module Clippings
         </html>
       HTML
     end
-    
+
     def convert_markdown_to_html(markdown_text)
       return '' if markdown_text.blank?
-      
+
       renderer = Redcarpet::Render::HTML.new(
         filter_html: false,
         hard_wrap: true,
         link_attributes: { target: '_blank' }
       )
-      
+
       markdown = Redcarpet::Markdown.new(
         renderer,
         autolink: true,
@@ -195,14 +195,14 @@ module Clippings
         highlight: true,
         footnotes: true
       )
-      
+
       markdown.render(markdown_text)
     end
-    
+
     def generate_pdf(html_content)
       Grover.new(html_content, **grover_options).to_pdf
     end
-    
+
     def grover_options
       {
         format: 'A4',
@@ -220,7 +220,7 @@ module Clippings
         wait_until: 'networkidle0'
       }
     end
-    
+
     def header_template
       <<~HTML
         <div style="width: 100%; font-size: 10px; padding: 5px 15px; text-align: center; color: #666;">
@@ -228,7 +228,7 @@ module Clippings
         </div>
       HTML
     end
-    
+
     def footer_template
       <<~HTML
         <div style="width: 100%; font-size: 10px; padding: 5px 15px; display: flex; justify-content: space-between; color: #666;">
@@ -237,11 +237,11 @@ module Clippings
         </div>
       HTML
     end
-    
+
     def date_range_text
       start_date = report.clipping.start_date&.strftime('%d/%m/%Y')
       end_date = report.clipping.end_date&.strftime('%d/%m/%Y')
-      
+
       if start_date && end_date
         "#{start_date} - #{end_date}"
       elsif start_date
@@ -249,38 +249,38 @@ module Clippings
       elsif end_date
         "Hasta #{end_date}"
       else
-        "Sin período definido"
+        'Sin período definido'
       end
     end
-    
+
     def creator_info
-      return '' unless report.creator.present?
-      
+      return '' if report.creator.blank?
+
       "<p><strong>Creado por:</strong> #{report.creator.full_name}</p>"
     end
-    
+
     def reviewer_info
-      return '' unless report.reviewer.present?
-      
+      return '' if report.reviewer.blank?
+
       "<p><strong>Revisado por:</strong> #{report.reviewer.full_name}</p>"
     end
-    
+
     def filename
       topic_name = report.clipping.topic&.name&.parameterize || 'sin_tema'
       date = Date.current.strftime('%Y%m%d')
       "reporte_clipping_#{topic_name}_#{date}.pdf"
     end
-    
+
     def success_result(content, filename)
       ServiceResult.new(
-        success: true, 
+        success: true,
         payload: {
           content: content,
           filename: filename
         }
       )
     end
-    
+
     def failure_result(errors)
       ServiceResult.new(success: false, errors: Array.wrap(errors))
     end

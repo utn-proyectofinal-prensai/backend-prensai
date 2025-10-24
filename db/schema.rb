@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_16_051748) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_16_060000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -107,9 +107,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_16_051748) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "metrics", default: {}, null: false
+    t.bigint "reviewer_id"
     t.index ["creator_id"], name: "index_clippings_on_creator_id"
     t.index ["end_date"], name: "index_clippings_on_end_date"
     t.index ["metrics"], name: "index_clippings_on_metrics", using: :gin
+    t.index ["reviewer_id"], name: "index_clippings_on_reviewer_id"
     t.index ["start_date"], name: "index_clippings_on_start_date"
     t.index ["topic_id"], name: "index_clippings_on_topic_id"
   end
@@ -323,6 +325,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_16_051748) do
   add_foreign_key "clipping_reports", "users", column: "reviewer_id"
   add_foreign_key "clippings", "topics"
   add_foreign_key "clippings", "users", column: "creator_id"
+  add_foreign_key "clippings", "users", column: "reviewer_id"
   add_foreign_key "mention_news", "mentions"
   add_foreign_key "mention_news", "news"
   add_foreign_key "news", "topics"
