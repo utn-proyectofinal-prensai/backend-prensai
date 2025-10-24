@@ -680,96 +680,18 @@ Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas espec�
         }
 
 + Response 201 (application/json)
-    + Attributes (ClippingShow)
+    + Attributes (ClippingSimple)
     + Body
         {
-            "id": 1,
-            "name": "Clipping Semanal Transporte",
-            "start_date": "2025-01-01",
-            "end_date": "2025-01-07",
-            "topic": {
+            "clipping": {
                 "id": 1,
-                "name": "Transporte"
-            },
-            "news": [
-                {
-                    "id": 1,
-                    "title": "Título de la noticia",
-                    "publication_type": "article",
-                    "date": "2025-01-02",
-                    "support": "web",
-                    "media": "Nombre del medio",
-                    "section": "Política",
-                    "author": "Autor/a",
-                    "interviewee": null,
-                    "link": "https://ejemplo.com/noticia",
-                    "audience_size": 10000,
-                    "quotation": null,
-                    "valuation": "neutral",
-                    "political_factor": "local",
-                    "created_at": "2025-01-09T10:30:00Z",
-                    "updated_at": "2025-01-09T10:30:00Z",
-                    "crisis": false,
-                    "requires_manual_review": false,
-                    "topic": {
-                        "id": 1,
-                        "name": "Transporte"
-                    },
-                    "mentions": [],
-                    "creator": null,
-                    "reviewer": null
-                }
-            ],
-            "has_report": false,
-            "metrics": {
-                "generated_at": "2025-01-09T10:30:00Z",
-                "date_range": { "from": "2025-01-01", "to": "2025-01-07" },
-                "news_count": 3,
-                "valuation": {
-                    "positive": { "count": 1, "percentage": 33.33 },
-                    "neutral": { "count": 1, "percentage": 33.33 },
-                    "negative": { "count": 1, "percentage": 33.33 },
-                    "total": 3
-                },
-                "media_stats": {
-                    "total": 3,
-                    "items": [
-                        { "key": "Clarín", "count": 2, "percentage": 66.67 },
-                        { "key": "La Nación", "count": 1, "percentage": 33.33 }
-                    ]
-                },
-                "support_stats": {
-                    "total": 3,
-                    "items": [
-                        { "key": "Print", "count": 2, "percentage": 66.67 },
-                        { "key": "Digital", "count": 1, "percentage": 33.33 }
-                    ]
-                },
-                "mention_stats": {
-                    "total": 4,
-                    "items": [
-                        { "mention_id": 1, "name": "Ministerio de Transporte", "count": 2, "percentage": 50.0 },
-                        { "mention_id": 2, "name": "Jorge Macri", "count": 1, "percentage": 25.0 },
-                        { "mention_id": 3, "name": "Gabriela Ricardes", "count": 1, "percentage": 25.0 }
-                    ]
-                },
-                "audience": {
-                    "total": 3000,
-                    "average": 1500.0,
-                    "max": { "news_id": 2, "value": 2000 }
-                },
-                "quotation": {
-                    "total": 411.5,
-                    "average": 137.17,
-                    "max": { "news_id": 3, "value": 210.75 }
-                },
-                "crisis": false
-            },
-            "created_at": "2025-01-09T10:30:00Z",
-            "updated_at": "2025-01-09T10:30:00Z",
-            "creator": {
-                "id": 1,
-                "name": "Juan Pérez"
+                "name": "Clipping Semanal Transporte",
+                "start_date": "2025-01-01",
+                "end_date": "2025-01-07",
+                "topic_id": 1,
+                "news_ids": [1, 2, 3],
+                "created_at": "2025-01-09T10:30:00Z",
+                "updated_at": "2025-01-09T10:30:00Z"
             }
         }
 
@@ -825,7 +747,20 @@ Actualiza un clipping existente. **Permisos:** Solo el creador del clipping o un
         }
 
 + Response 200 (application/json)
-    + Attributes (ClippingShow)
+    + Attributes (ClippingSimple)
+    + Body
+        {
+            "clipping": {
+                "id": 1,
+                "name": "Clipping Actualizado",
+                "start_date": "2025-01-01",
+                "end_date": "2025-01-07",
+                "topic_id": 1,
+                "news_ids": [1, 2, 3, 4],
+                "created_at": "2025-01-09T10:30:00Z",
+                "updated_at": "2025-01-10T08:15:00Z"
+            }
+        }
 
 + Response 401 (application/json)
     + Attributes
@@ -1792,8 +1727,18 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + news_ids: [1, 2, 3] (array[number]) - IDs de las noticias incluidas en el clipping. Disponible en listados para filtrar o consultar rápidamente.
 
 ### ClippingShow (ClippingBase)
-+ news (array[NewsItem]) - Noticias completas asociadas al clipping. Incluido en los endpoints de detalle, creación y actualización.
-+ metrics (ClippingMetrics, optional) - Métricas agregadas del clipping. Disponible en los endpoints de detalle, creación y actualización.
++ news (array[NewsItem]) - Noticias completas asociadas al clipping. Incluido en el endpoint de detalle.
++ metrics (ClippingMetrics, optional) - Métricas agregadas del clipping. Disponible en el endpoint de detalle.
+
+### ClippingSimple (object)
++ id: 1 (number) - ID único del clipping recién procesado
++ name: "Clipping Semanal Transporte" (string) - Nombre del clipping
++ start_date: "2025-01-01" (string) - Fecha de inicio del período (ISO 8601)
++ end_date: "2025-01-07" (string) - Fecha de fin del período (ISO 8601)
++ topic_id: 1 (number) - ID del tema asociado
++ news_ids: [1, 2, 3] (array[number]) - IDs de las noticias vinculadas
++ created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
++ updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 
 ### ClippingMetrics (object)
 + generated_at: "2025-01-09T10:30:00Z" (string) - Momento del último cálculo (ISO 8601)

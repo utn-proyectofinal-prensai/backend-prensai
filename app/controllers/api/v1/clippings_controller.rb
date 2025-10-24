@@ -20,13 +20,13 @@ module API
       def create
         @clipping = authorize Clipping.new(clipping_params.merge(creator: current_user))
         @clipping.save!
-        render :show, status: :created
+        render :create, status: :created
       end
 
       def update
         authorize @clipping
         @clipping.update!(clipping_params)
-        render :show, status: :ok
+        render :update, status: :ok
       end
 
       def destroy
