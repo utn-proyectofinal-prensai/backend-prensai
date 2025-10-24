@@ -48,11 +48,10 @@ describe 'POST /api/v1/clippings' do
       request_create
       expect(json[:id]).to be_present
       expect(json[:name]).to eq('Weekly Summary')
-      expect(json[:topic]).to include(id: topic.id, name: topic.name)
-      expect(json[:news]).to be_an(Array)
-      expect(json[:news].pluck(:id)).to match_array(news.map(&:id))
-      expect(json[:creator]).to include(:id, :name)
-      expect(json[:reviewer]).to be_nil
+      expect(json[:topic_id]).to eq(topic.id)
+      expect(json[:news_ids]).to match_array(news.map(&:id))
+      expect(json[:creator_id]).to eq(admin_user.id)
+      expect(json[:reviewer_id]).to be_nil
     end
   end
 

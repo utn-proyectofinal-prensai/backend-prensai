@@ -43,10 +43,9 @@ describe 'PUT /api/v1/clippings/:id' do
     it 'updates the clipping attributes', :aggregate_failures do
       request_update
       expect(json[:name]).to eq('Updated Summary')
-      expect(json[:topic]).to include(id: topic.id, name: topic.name)
-      expect(json[:news]).to be_an(Array)
-      expect(json[:news].pluck(:id)).to match_array(news.map(&:id))
-      expect(json[:reviewer]).to include(id: admin_user.id, name: admin_user.full_name)
+      expect(json[:topic_id]).to eq(topic.id)
+      expect(json[:news_ids]).to match_array(news.map(&:id))
+      expect(json[:reviewer_id]).to eq(admin_user.id)
     end
 
     context 'with invalid parameters' do
