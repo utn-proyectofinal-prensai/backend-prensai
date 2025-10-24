@@ -8,7 +8,7 @@ module API
       def index
         scoped = policy_scope(Clipping)
                  .filter_by(filtering_params)
-                 .includes(:news, :topic)
+                 .includes(clipping_includes)
                  .ordered
         @pagy, @clippings = pagy(scoped)
       end
@@ -38,7 +38,7 @@ module API
       private
 
       def set_clipping
-        @clipping = Clipping.includes(:news, :topic, :report).find(params[:id])
+        @clipping = Clipping.includes(clipping_includes).find(params[:id])
       end
 
       def clipping_params
@@ -55,6 +55,15 @@ module API
 
       def filtering_params
         params.permit(:topic_id, :start_date, :end_date, news_ids: [])
+      end
+
+      def clipping_includes
+        [
+          :topic,
+          :report,
+          :creator,
+          { news: %i[topic mentions creator reviewer] }
+        ]
       end
     end
   end
