@@ -801,7 +801,7 @@
 				{
 					"name": "Listar clippings",
 					"request": {
-						"description": "Obtiene una lista paginada de todos los clippings del sistema ordenados por fecha de creación descendente. Incluye filtros por tema, fechas y noticias específicas. Cada clipping incluye el campo has_report que indica si tiene un reporte generado.",
+						"description": "Obtiene una lista paginada de todos los clippings del sistema ordenados por fecha de creación descendente. Incluye filtros por tema, fechas y noticias específicas. Cada clipping devuelve `has_report` y `topic` (objeto con id y name).",
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -839,7 +839,7 @@
 				{
 					"name": "Crear clipping",
 					"request": {
-					"description": "Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas específicas. El usuario autenticado se asigna como creador. Requiere al menos un ID en `news_ids`.",
+					"description": "Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas específicas. El usuario autenticado se asigna como creador. Requiere al menos un ID en `news_ids`. La respuesta expone `topic` (id y name) y el arreglo completo de `news` asociadas.",
 						"method": "POST",
 						"header": [
 							{
@@ -874,7 +874,7 @@
 				{
 					"name": "Obtener clipping",
 					"request": {
-						"description": "Obtiene los detalles completos de un clipping específico, incluyendo métricas agregadas, información del creador, cantidad de noticias y estado del reporte (has_report).",
+						"description": "Obtiene los detalles completos de un clipping específico, incluyendo métricas agregadas, información del creador, `topic` (id y name), el arreglo completo de `news` y el estado del reporte (`has_report`).",
 						"method": "GET",
 						"header": [],
 						"url": {

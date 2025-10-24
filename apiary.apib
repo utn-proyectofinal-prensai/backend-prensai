@@ -606,7 +606,7 @@ Actualiza una noticia existente. Requiere autenticación y el usuario debe tener
 
 ### Listar Clippings [GET]
 
-Obtiene una lista paginada de todos los clippings en el sistema, ordenados por fecha de creación descendente.
+Obtiene una lista paginada de todos los clippings en el sistema, ordenados por fecha de creación descendente. Cada clipping incluye `topic` (objeto con ID y nombre) y el flag `has_report`.
 
 **Parámetros de filtrado disponibles:**
 - `topic_id`: Filtrar por tema específico
@@ -620,7 +620,7 @@ Obtiene una lista paginada de todos los clippings en el sistema, ordenados por f
 
 + Response 200 (application/json)
     + Attributes
-        + clippings (array[Clipping])
+        + clippings (array[ClippingIndex])
         + pagination (Pagination)
         
     + Body
@@ -632,7 +632,10 @@ Obtiene una lista paginada de todos los clippings en el sistema, ordenados por f
                     "name": "Clipping Semanal Transporte",
                     "start_date": "2025-01-01",
                     "end_date": "2025-01-07",
-                    "topic_id": 1,
+                    "topic": {
+                        "id": 1,
+                        "name": "Transporte"
+                    },
                     "news_ids": [1, 2, 3],
                     "has_report": true,
                     "created_at": "2025-01-09T10:30:00Z",
@@ -677,15 +680,46 @@ Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas espec�
         }
 
 + Response 201 (application/json)
-    + Attributes (Clipping)
+    + Attributes (ClippingShow)
     + Body
         {
             "id": 1,
             "name": "Clipping Semanal Transporte",
             "start_date": "2025-01-01",
             "end_date": "2025-01-07",
-            "topic_id": 1,
-            "news_ids": [1, 2, 3],
+            "topic": {
+                "id": 1,
+                "name": "Transporte"
+            },
+            "news": [
+                {
+                    "id": 1,
+                    "title": "Título de la noticia",
+                    "publication_type": "article",
+                    "date": "2025-01-02",
+                    "support": "web",
+                    "media": "Nombre del medio",
+                    "section": "Política",
+                    "author": "Autor/a",
+                    "interviewee": null,
+                    "link": "https://ejemplo.com/noticia",
+                    "audience_size": 10000,
+                    "quotation": null,
+                    "valuation": "neutral",
+                    "political_factor": "local",
+                    "created_at": "2025-01-09T10:30:00Z",
+                    "updated_at": "2025-01-09T10:30:00Z",
+                    "crisis": false,
+                    "requires_manual_review": false,
+                    "topic": {
+                        "id": 1,
+                        "name": "Transporte"
+                    },
+                    "mentions": [],
+                    "creator": null,
+                    "reviewer": null
+                }
+            ],
             "has_report": false,
             "metrics": {
                 "generated_at": "2025-01-09T10:30:00Z",
@@ -759,7 +793,7 @@ Obtiene los detalles de un clipping específico.
         Authorization: Bearer {jwt_token}
 
 + Response 200 (application/json)
-    + Attributes (Clipping)
+    + Attributes (ClippingShow)
 
 + Response 401 (application/json)
     + Attributes
@@ -791,7 +825,7 @@ Actualiza un clipping existente. **Permisos:** Solo el creador del clipping o un
         }
 
 + Response 200 (application/json)
-    + Attributes (Clipping)
+    + Attributes (ClippingShow)
 
 + Response 401 (application/json)
     + Attributes
@@ -1743,17 +1777,22 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 
-### Clipping (object)
+### ClippingBase (object)
 + id: 1 (number) - ID único del clipping
 + name: "Clipping Semanal Transporte" (string) - Nombre del clipping
 + start_date: "2025-01-01" (string) - Fecha de inicio del período (ISO 8601)
 + end_date: "2025-01-07" (string) - Fecha de fin del período (ISO 8601)
-+ topic_id: 1 (number) - ID del tema asociado
-+ news_ids: [1, 2, 3] (array[number]) - Array de IDs de noticias incluidas
++ topic (EntityRef) - Tema asociado al clipping (incluye id y nombre)
 + has_report: true (boolean) - Indica si el clipping tiene un reporte generado
 + created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 + creator (EntityRef) - Usuario que creó el clipping
+
+### ClippingIndex (ClippingBase)
++ news_ids: [1, 2, 3] (array[number]) - IDs de las noticias incluidas en el clipping. Disponible en listados para filtrar o consultar rápidamente.
+
+### ClippingShow (ClippingBase)
++ news (array[NewsItem]) - Noticias completas asociadas al clipping. Incluido en los endpoints de detalle, creación y actualización.
 + metrics (ClippingMetrics, optional) - Métricas agregadas del clipping. Disponible en los endpoints de detalle, creación y actualización.
 
 ### ClippingMetrics (object)
