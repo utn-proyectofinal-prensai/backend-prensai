@@ -8,7 +8,7 @@ module API
       def index
         scoped = policy_scope(Clipping)
                  .filter_by(filtering_params)
-                 .includes(:news)
+                 .includes(:news, :topic)
                  .ordered
         @pagy, @clippings = pagy(scoped)
       end
