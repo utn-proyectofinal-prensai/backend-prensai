@@ -4,27 +4,30 @@
 #
 # Table name: clippings
 #
-#  id         :bigint           not null, primary key
-#  end_date   :date             not null
-#  metrics    :jsonb            not null
-#  name       :string           not null
-#  start_date :date             not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  creator_id :bigint           not null
-#  topic_id   :bigint           not null
+#  id          :bigint           not null, primary key
+#  end_date    :date             not null
+#  metrics     :jsonb            not null
+#  name        :string           not null
+#  start_date  :date             not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  creator_id  :bigint           not null
+#  reviewer_id :bigint
+#  topic_id    :bigint           not null
 #
 # Indexes
 #
-#  index_clippings_on_creator_id  (creator_id)
-#  index_clippings_on_end_date    (end_date)
-#  index_clippings_on_metrics     (metrics) USING gin
-#  index_clippings_on_start_date  (start_date)
-#  index_clippings_on_topic_id    (topic_id)
+#  index_clippings_on_creator_id   (creator_id)
+#  index_clippings_on_end_date     (end_date)
+#  index_clippings_on_metrics      (metrics) USING gin
+#  index_clippings_on_reviewer_id  (reviewer_id)
+#  index_clippings_on_start_date   (start_date)
+#  index_clippings_on_topic_id     (topic_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (creator_id => users.id)
+#  fk_rails_...  (reviewer_id => users.id)
 #  fk_rails_...  (topic_id => topics.id)
 #
 class Clipping < ApplicationRecord
