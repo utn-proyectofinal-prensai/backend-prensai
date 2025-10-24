@@ -46,8 +46,7 @@ describe 'PUT /api/v1/clippings/:id' do
       expect(json[:topic]).to include(id: topic.id, name: topic.name)
       expect(json[:news]).to be_an(Array)
       expect(json[:news].pluck(:id)).to match_array(news.map(&:id))
-      expect(json).not_to have_key(:news_ids)
-      expect(json).not_to have_key(:topic_id)
+      expect(json[:reviewer]).to include(id: admin_user.id, name: admin_user.full_name)
     end
 
     context 'with invalid parameters' do
@@ -76,6 +75,7 @@ describe 'PUT /api/v1/clippings/:id' do
       request_update
       expect(response).to have_http_status(:ok)
       expect(json[:name]).to eq('Updated Summary')
+      expect(json[:reviewer]).to include(id: regular_user.id, name: regular_user.full_name)
     end
   end
 

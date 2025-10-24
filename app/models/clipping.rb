@@ -32,6 +32,7 @@ class Clipping < ApplicationRecord
 
   belongs_to :creator, class_name: 'User'
   belongs_to :topic
+  belongs_to :reviewer, class_name: 'User', optional: true
 
   has_many :clipping_news, dependent: :destroy
   has_many :news, through: :clipping_news

@@ -643,7 +643,8 @@ Obtiene una lista paginada de todos los clippings en el sistema, ordenados por f
                     "creator": {
                         "id": 1,
                         "name": "Juan Pérez"
-                    }
+                    },
+                    "reviewer": null
                 }
             ],
             "pagination": {
@@ -770,7 +771,8 @@ Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas espec�
             "creator": {
                 "id": 1,
                 "name": "Juan Pérez"
-            }
+            },
+            "reviewer": null
         }
 
 + Response 401 (application/json)
@@ -1787,6 +1789,7 @@ Recibe un conjunto de noticias **ya clasificadas** por el backend y genera un in
 + created_at: "2025-01-09T10:30:00Z" (string) - Fecha de creación (ISO 8601)
 + updated_at: "2025-01-09T10:30:00Z" (string) - Fecha de última actualización (ISO 8601)
 + creator (EntityRef) - Usuario que creó el clipping
++ reviewer (EntityRef, nullable) - Usuario que revisó el clipping por última vez
 
 ### ClippingIndex (ClippingBase)
 + news_ids: [1, 2, 3] (array[number]) - IDs de las noticias incluidas en el clipping. Disponible en listados para filtrar o consultar rápidamente.

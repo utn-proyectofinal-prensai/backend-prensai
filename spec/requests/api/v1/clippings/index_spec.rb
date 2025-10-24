@@ -49,6 +49,7 @@ describe 'GET /api/v1/clippings' do
     expect(payload[:news_ids]).to match_array(topic_one_news.map(&:id))
     expect(payload[:creator]).to include(:id, :name)
     expect(payload).not_to have_key(:topic_id)
+    expect(payload).to have_key(:reviewer)
   end
 
   it 'returns pagination metadata' do

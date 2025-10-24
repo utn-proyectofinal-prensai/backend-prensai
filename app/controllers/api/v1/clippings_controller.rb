@@ -8,7 +8,7 @@ module API
       def index
         scoped = policy_scope(Clipping)
                  .filter_by(filtering_params)
-                 .includes(:news, :topic)
+                 .includes(:news, :topic, :creator, :reviewer)
                  .ordered
         @pagy, @clippings = pagy(scoped)
       end
@@ -25,7 +25,9 @@ module API
 
       def update
         authorize @clipping
-        @clipping.update!(clipping_params)
+        @clipping.assign_attributes(clipping_params)
+        @clipping.reviewer = current_user
+        @clipping.save!
         render :show, status: :ok
       end
 
@@ -38,7 +40,7 @@ module API
       private
 
       def set_clipping
-        @clipping = Clipping.includes(:news, :topic, :report).find(params[:id])
+        @clipping = Clipping.includes(:news, :topic, :report, :creator, :reviewer).find(params[:id])
       end
 
       def clipping_params

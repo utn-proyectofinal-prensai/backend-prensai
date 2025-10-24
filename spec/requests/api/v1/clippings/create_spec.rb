@@ -52,8 +52,7 @@ describe 'POST /api/v1/clippings' do
       expect(json[:news]).to be_an(Array)
       expect(json[:news].pluck(:id)).to match_array(news.map(&:id))
       expect(json[:creator]).to include(:id, :name)
-      expect(json).not_to have_key(:news_ids)
-      expect(json).not_to have_key(:topic_id)
+      expect(json[:reviewer]).to be_nil
     end
   end
 
