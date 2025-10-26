@@ -40,6 +40,7 @@
 #                           api_v1_mention PATCH      /api/v1/mentions/:id(.:format)                                                                    api/v1/mentions#update {format: :json}
 #                                          PUT        /api/v1/mentions/:id(.:format)                                                                    api/v1/mentions#update {format: :json}
 #                                          DELETE     /api/v1/mentions/:id(.:format)                                                                    api/v1/mentions#destroy {format: :json}
+#        export_pdf_api_v1_clipping_report GET        /api/v1/clippings/:clipping_id/report/export_pdf(.:format)                                        api/v1/clippings/reports#export_pdf {format: :json}
 #                   api_v1_clipping_report GET        /api/v1/clippings/:clipping_id/report(.:format)                                                   api/v1/clippings/reports#show {format: :json}
 #                                          PATCH      /api/v1/clippings/:clipping_id/report(.:format)                                                   api/v1/clippings/reports#update {format: :json}
 #                                          PUT        /api/v1/clippings/:clipping_id/report(.:format)                                                   api/v1/clippings/reports#update {format: :json}
@@ -51,6 +52,7 @@
 #                                          PUT        /api/v1/clippings/:id(.:format)                                                                   api/v1/clippings#update {format: :json}
 #                                          DELETE     /api/v1/clippings/:id(.:format)                                                                   api/v1/clippings#destroy {format: :json}
 #              must_update_api_v1_settings GET        /api/v1/settings/must_update(.:format)                                                            api/v1/settings#must_update {format: :json}
+#                           api_v1_metrics GET        /api/v1/metrics(.:format)                                                                         api/v1/metrics#show {format: :json}
 #                   new_admin_user_session GET        /admin/login(.:format)                                                                            active_admin/devise/sessions#new
 #                       admin_user_session POST       /admin/login(.:format)                                                                            active_admin/devise/sessions#create
 #               destroy_admin_user_session DELETE|GET /admin/logout(.:format)                                                                           active_admin/devise/sessions#destroy
@@ -194,6 +196,7 @@ Rails.application.routes.draw do
       resources :settings, only: [] do
         get :must_update, on: :collection
       end
+      resource :metrics, only: :show
     end
   end
 
