@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_16_060000) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_17_001000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -248,6 +248,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_16_060000) do
     t.index ["name"], name: "index_mentions_on_name", unique: true
   end
 
+  create_table "metric_snapshots", force: :cascade do |t|
+    t.string "context", default: "global", null: false
+    t.jsonb "data", default: {}, null: false
+    t.datetime "generated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["context", "generated_at"], name: "index_metric_snapshots_on_context_and_generated_at"
+  end
+
   create_table "news", force: :cascade do |t|
     t.string "title", null: false
     t.string "publication_type"
@@ -268,6 +277,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_16_060000) do
     t.datetime "updated_at", null: false
     t.bigint "creator_id"
     t.bigint "reviewer_id"
+    t.index ["created_at"], name: "index_news_on_created_at"
     t.index ["creator_id"], name: "index_news_on_creator_id"
     t.index ["date"], name: "index_news_on_date"
     t.index ["link"], name: "index_news_on_link", unique: true

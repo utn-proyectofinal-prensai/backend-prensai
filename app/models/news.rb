@@ -27,6 +27,7 @@
 #
 # Indexes
 #
+#  index_news_on_created_at        (created_at)
 #  index_news_on_creator_id        (creator_id)
 #  index_news_on_date              (date)
 #  index_news_on_link              (link) UNIQUE
