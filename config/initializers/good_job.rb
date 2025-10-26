@@ -5,7 +5,13 @@ Rails.application.configure do
   config.good_job.enqueue_after_transaction_commit = true
   # Prioritize the queue high over the rest
   config.good_job.queues = 'high,*'
-  # config.good_job.enable_cron = true
-  # config.good_job.cron_graceful_restart_period = 5.minutes
-  # config.good_job.cron = { example: { cron: '0 * * * *', class: 'ExampleJob'  } }
+  config.good_job.enable_cron = true
+  config.good_job.cron_graceful_restart_period = 5.minutes
+  config.good_job.cron = {
+    metrics_snapshot_refresh: {
+      cron: '0 * * * *',
+      class: 'Metrics::SnapshotRefreshJob',
+      args: [{ context: 'global' }]
+    }
+  }
 end
