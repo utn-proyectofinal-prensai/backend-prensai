@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 ActiveAdmin.register AiConfiguration do
-  permit_params :key, :display_name, :description, :enabled, :value_type, :value, :reference_type
+  permit_params :key, :display_name, :description, :enabled, :internal, :value_type, :value, :reference_type
 
   scope :all, default: true
   scope :enabled
+  scope :internal_only
 
   filter :key
   filter :display_name
   filter :value_type, as: :select, collection: %w[array string reference]
   filter :enabled
+  filter :internal
   filter :created_at
   filter :updated_at
 
@@ -21,6 +23,7 @@ ActiveAdmin.register AiConfiguration do
     column :value_type
     column :reference_type
     column :enabled
+    column :internal
     column :updated_at
     actions
   end
@@ -34,6 +37,7 @@ ActiveAdmin.register AiConfiguration do
       row :value_type
       row :reference_type
       row :enabled
+      row :internal
       row :value do |resource|
         value = resource.value
 
@@ -60,6 +64,7 @@ ActiveAdmin.register AiConfiguration do
       f.input :value_type, as: :select, collection: AiConfiguration::VALUE_TYPES, include_blank: false
       f.input :reference_type, as: :select, collection: AiConfiguration::REFERENCE_TYPES, include_blank: true
       f.input :enabled
+      f.input :internal
       f.input :value, as: :text,
                       input_html: {
                         rows: 8,

@@ -7,7 +7,7 @@ module API
 
       def index
         authorize AiConfiguration
-        @ai_configurations = policy_scope(AiConfiguration).enabled.ordered
+        @ai_configurations = policy_scope(AiConfiguration).enabled.external.ordered
       end
 
       def update

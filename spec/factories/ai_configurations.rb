@@ -5,6 +5,7 @@ FactoryBot.define do
     value_type { 'string' }
     value { Faker::Lorem.sentence }
     enabled { true }
+    internal { false }
     description { Faker::Lorem.paragraph }
 
     trait :array_type do
@@ -20,6 +21,10 @@ FactoryBot.define do
 
     trait :disabled do
       enabled { false }
+    end
+
+    trait :internal do
+      internal { true }
     end
   end
 end

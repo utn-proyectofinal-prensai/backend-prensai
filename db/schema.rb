@@ -69,9 +69,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_001000) do
     t.text "description"
     t.boolean "enabled", default: true, null: false
     t.string "reference_type"
+    t.boolean "internal", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["enabled"], name: "index_ai_configurations_on_enabled"
+    t.index ["internal"], name: "index_ai_configurations_on_internal"
     t.index ["key"], name: "index_ai_configurations_on_key", unique: true
   end
 

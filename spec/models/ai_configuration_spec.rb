@@ -127,7 +127,7 @@ describe AiConfiguration do
   end
 
   describe '.get_value' do
-    before { create(:ai_configuration, key: 'test_key', value: 'test_value') }
+    let!(:config) { create(:ai_configuration, key: 'test_key', value: 'test_value') }
 
     it 'returns the value for existing key' do
       expect(described_class.get_value('test_key')).to eq('test_value')
@@ -135,6 +135,14 @@ describe AiConfiguration do
 
     it 'returns nil for non-existing key' do
       expect(described_class.get_value('non_existing_key')).to be_nil
+    end
+
+    context 'when the configuration is disabled' do
+      before { config.update!(enabled: false) }
+
+      it 'returns nil' do
+        expect(described_class.get_value('test_key')).to be_nil
+      end
     end
   end
 end
