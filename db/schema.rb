@@ -116,6 +116,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_001000) do
     t.index ["topic_id"], name: "index_clippings_on_topic_id"
   end
 
+  create_table "dashboard_snapshots", force: :cascade do |t|
+    t.string "context", default: "global", null: false
+    t.jsonb "data", default: {}, null: false
+    t.datetime "generated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["context", "generated_at"], name: "index_dashboard_snapshots_on_context_and_generated_at"
+  end
+
   create_table "flipper_features", force: :cascade do |t|
     t.string "key", null: false
     t.datetime "created_at", null: false
@@ -246,15 +255,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_001000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_mentions_on_name", unique: true
-  end
-
-  create_table "metric_snapshots", force: :cascade do |t|
-    t.string "context", default: "global", null: false
-    t.jsonb "data", default: {}, null: false
-    t.datetime "generated_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["context", "generated_at"], name: "index_metric_snapshots_on_context_and_generated_at"
   end
 
   create_table "news", force: :cascade do |t|

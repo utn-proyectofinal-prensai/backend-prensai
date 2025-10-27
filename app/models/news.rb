@@ -62,6 +62,8 @@ class News < ApplicationRecord
   METRIC_ATTRIBUTES = %i[valuation media support date audience_size quotation].freeze
 
   scope :ordered, -> { order(created_at: :desc) }
+  scope :processed_between, ->(range) { where(created_at: range) }
+  scope :with_topic, -> { where.not(topic_id: nil) }
   filter_scope :topic_id, ->(id) { where(topic_id: id) }
   filter_scope :start_date, ->(date) { where(arel_table[:date].gteq(date)) }
   filter_scope :end_date, ->(date) { where(arel_table[:date].lteq(date)) }

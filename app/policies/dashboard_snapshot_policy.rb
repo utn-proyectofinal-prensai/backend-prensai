@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class MetricSnapshotPolicy < ApplicationPolicy
+class DashboardSnapshotPolicy < ApplicationPolicy
   def show?
     user.present?
   end

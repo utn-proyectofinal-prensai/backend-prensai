@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-module Metrics
+module Dashboard
   class SnapshotFetcher
-    DEFAULT_CONTEXT = MetricSnapshot::GLOBAL_CONTEXT
+    DEFAULT_CONTEXT = DashboardSnapshot::GLOBAL_CONTEXT
 
     def initialize(context: DEFAULT_CONTEXT)
       @context = context
     end
 
     def call
-      snapshot = MetricSnapshot.for_context(context).ordered_by_recency.first
+      snapshot = DashboardSnapshot.for_context(context).ordered_by_recency.first
 
       {
         context: context,

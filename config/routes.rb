@@ -196,7 +196,7 @@ Rails.application.routes.draw do
       resources :settings, only: [] do
         get :must_update, on: :collection
       end
-      resource :metrics, only: :show
+      resource :dashboard, only: :show
     end
   end
 

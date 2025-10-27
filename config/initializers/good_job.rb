@@ -8,9 +8,9 @@ Rails.application.configure do
   config.good_job.enable_cron = true
   config.good_job.cron_graceful_restart_period = 5.minutes
   config.good_job.cron = {
-    metrics_snapshot_refresh: {
+    dashboard_snapshot_refresh: {
       cron: '0 * * * *',
-      class: 'Metrics::SnapshotRefreshJob',
+      class: 'Dashboard::SnapshotRefreshJob',
       args: [{ context: 'global' }]
     }
   }

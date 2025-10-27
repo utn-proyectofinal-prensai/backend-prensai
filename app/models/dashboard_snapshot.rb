@@ -2,7 +2,7 @@
 
 # == Schema Information
 #
-# Table name: metric_snapshots
+# Table name: dashboard_snapshots
 #
 #  id           :bigint           not null, primary key
 #  context      :string           default("global"), not null
@@ -13,15 +13,13 @@
 #
 # Indexes
 #
-#  index_metric_snapshots_on_context_and_generated_at  (context,generated_at)
+#  index_dashboard_snapshots_on_context_and_generated_at  (context,generated_at)
 #
-class MetricSnapshot < ApplicationRecord
+class DashboardSnapshot < ApplicationRecord
   GLOBAL_CONTEXT = 'global'
 
   scope :for_context, ->(context) { where(context: context) }
   scope :ordered_by_recency, -> { order(generated_at: :desc) }
 
-  validates :context, presence: true
-  validates :generated_at, presence: true
-  validates :data, presence: true
+  validates :context, :generated_at, :data, presence: true
 end
