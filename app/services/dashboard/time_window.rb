@@ -5,7 +5,7 @@ module Dashboard
     module_function
 
     def last_days(days, now = Time.zone.now)
-      (now - (days - 1).days).beginning_of_day..now.end_of_day
+      (now - days.days).beginning_of_day..now.end_of_day
     end
 
     def dates_for(range)
