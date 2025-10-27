@@ -4,6 +4,10 @@ require 'rails_helper'
 
 RSpec.describe ExternalAiService, type: :service do
   let(:service) { described_class.new(payload: payload, action: :process_news) }
+  let(:base_url) { 'http://ai.example.com' }
+  let!(:base_config) do
+    create(:ai_configuration, key: 'AI_MODULE_BASE_URL', value: base_url, value_type: 'string', internal: true)
+  end
 
   let(:payload) do
     {
@@ -13,6 +17,17 @@ RSpec.describe ExternalAiService, type: :service do
       ministerios_key_words: ['Ministerio de Cultura'],
       ministro_key_words: ['Ricardes']
     }
+  end
+
+  def with_modified_env(env)
+    original_env = {}
+    env.each do |key, value|
+      original_env[key] = ENV.fetch(key, nil)
+      ENV[key] = value
+    end
+    yield
+  ensure
+    env.each_key { |key| ENV[key] = original_env[key] }
   end
 
   describe '#call' do
@@ -32,7 +47,7 @@ RSpec.describe ExternalAiService, type: :service do
       end
 
       before do
-        stub_request(:post, %r{^https?://.+/procesar-noticias$})
+        stub_request(:post, "#{base_url}/procesar-noticias")
           .to_return(status: 200, body: ai_response.to_json, headers: { 'Content-Type' => 'application/json' })
       end
 
@@ -57,7 +72,7 @@ RSpec.describe ExternalAiService, type: :service do
 
     context 'when AI service fails with non-success status' do
       before do
-        stub_request(:post, %r{^https?://.+/procesar-noticias$})
+        stub_request(:post, "#{base_url}/procesar-noticias")
           .to_return(status: 500, body: 'Internal Server Error')
       end
 
@@ -76,7 +91,7 @@ RSpec.describe ExternalAiService, type: :service do
       end
 
       before do
-        stub_request(:post, %r{^https?://.+/procesar-noticias$})
+        stub_request(:post, "#{base_url}/procesar-noticias")
           .to_return(status: 200, body: invalid_response.to_json, headers: { 'Content-Type' => 'application/json' })
       end
 
@@ -87,7 +102,7 @@ RSpec.describe ExternalAiService, type: :service do
 
     context 'when connection fails' do
       before do
-        stub_request(:post, %r{^https?://.+/procesar-noticias$})
+        stub_request(:post, "#{base_url}/procesar-noticias")
           .to_raise(Faraday::ConnectionFailed)
       end
 
@@ -99,7 +114,7 @@ RSpec.describe ExternalAiService, type: :service do
 
     context 'when JSON parsing fails' do
       before do
-        stub_request(:post, %r{^https?://.+/procesar-noticias$})
+        stub_request(:post, "#{base_url}/procesar-noticias")
           .to_return(status: 200, body: 'invalid json', headers: { 'Content-Type' => 'application/json' })
       end
 
@@ -111,8 +126,63 @@ RSpec.describe ExternalAiService, type: :service do
   end
 
   describe 'URL configuration' do
-    it 'uses environment variable for base URL' do
-      expect(service.send(:ai_service_url)).to include('/procesar-noticias')
+    it 'uses the database value when present' do
+      expect(service.send(:ai_module_base_url)).to eq(base_url)
+    end
+
+    it 'falls back to ENV when configuration is absent' do
+      base_config.destroy!
+      env_url = 'http://env-ai.example.com'
+
+      with_modified_env('AI_MODULE_BASE_URL' => env_url) do
+        expect(service.send(:ai_module_base_url)).to eq(env_url)
+      end
+    end
+
+    it 'raises when no base URL is configured' do
+      base_config.destroy!
+
+      expect {
+        service.send(:ai_module_base_url)
+      }.to raise_error(ExternalAiService::MissingConfigurationError)
+    end
+  end
+
+  describe 'fallback URL handling' do
+    let(:fallback_url) { 'http://ai-fallback.example.com' }
+    let!(:fallback_config) do
+      create(:ai_configuration, key: 'AI_MODULE_FALLBACK_BASE_URL', value: fallback_url, value_type: 'string',
+                                internal: true)
+    end
+
+    let(:ai_response) do
+      {
+        'recibidas' => 1,
+        'procesadas' => 1,
+        'data' => [],
+        'errores' => []
+      }
+    end
+
+    it 'uses the fallback URL when the primary connection fails' do
+      stub_request(:post, "#{base_url}/procesar-noticias").to_raise(Faraday::ConnectionFailed)
+      stub_request(:post, "#{fallback_url}/procesar-noticias")
+        .to_return(status: 200, body: ai_response.to_json, headers: { 'Content-Type' => 'application/json' })
+
+      result = service.call
+
+      expect(result[:ok]).to be true
+      expect(WebMock).to have_requested(:post, "#{fallback_url}/procesar-noticias")
+    end
+
+    it 'does not use the fallback when the primary returns a non-success status' do
+      stub_request(:post, "#{base_url}/procesar-noticias").to_return(status: 500, body: 'Internal Server Error')
+
+      result = service.call
+
+      expect(result[:ok]).to be false
+      expect(WebMock).to have_requested(:post, "#{base_url}/procesar-noticias")
+      expect(WebMock).not_to have_requested(:post, "#{fallback_url}/procesar-noticias")
     end
   end
 
@@ -130,7 +200,7 @@ RSpec.describe ExternalAiService, type: :service do
     end
 
     before do
-      stub_request(:post, %r{^https?://.+/generate-informe$})
+      stub_request(:post, "#{base_url}/generate-informe")
         .to_return(status: 200, body: custom_response.to_json, headers: { 'Content-Type' => 'application/json' })
     end
 

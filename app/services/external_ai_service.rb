@@ -8,6 +8,8 @@ class ExternalAiService
     generate_report: 'generate-informe'
   }.freeze
 
+  MissingConfigurationError = Class.new(StandardError)
+
   attr_accessor :payload, :action
 
   validates :action, presence: true, inclusion: { in: ENDPOINTS.keys }
@@ -47,12 +49,19 @@ class ExternalAiService
   end
 
   def ai_module_base_url
-    ENV.fetch('AI_MODULE_BASE_URL', 'http://localhost:3001')
+    @ai_module_base_url ||= configuration_value_for('AI_MODULE_BASE_URL') ||
+                            env_value_for('AI_MODULE_BASE_URL') ||
+                            raise(MissingConfigurationError, 'AI_MODULE_BASE_URL is not configured')
   end
 
-  def ai_service_url
+  def ai_module_fallback_base_url
+    @ai_module_fallback_base_url ||= configuration_value_for('AI_MODULE_FALLBACK_BASE_URL') ||
+                                     env_value_for('AI_MODULE_FALLBACK_BASE_URL')
+  end
+
+  def ai_service_url(base_url = ai_module_base_url)
     path = ENDPOINTS.fetch(action)
-    "#{ai_module_base_url.chomp('/')}/#{path}"
+    "#{base_url.chomp('/')}/#{path}"
   end
 
   def transform_process_news_response(ai_data)
@@ -90,7 +99,10 @@ class ExternalAiService
   end
 
   def perform_request
-    http_client.post(ai_service_url, payload)
+    primary_url = ai_service_url(ai_module_base_url)
+    http_client.post(primary_url, payload)
+  rescue Faraday::Error => primary_error
+    handle_primary_connection_error(primary_error)
   end
 
   def handle_unsuccessful_response(response)
@@ -134,5 +146,30 @@ class ExternalAiService
     return body['errores'] || body['errors'] if body.is_a?(Hash)
 
     body
+  end
+
+  def handle_primary_connection_error(error)
+    Rails.logger.error "AI service connection error for #{ai_module_base_url}: #{error.message}"
+
+    return raise(error) if ai_module_fallback_base_url.blank?
+
+    attempt_fallback_request(error)
+  end
+
+  def attempt_fallback_request(original_error)
+    fallback_url = ai_service_url(ai_module_fallback_base_url)
+    Rails.logger.warn "Attempting AI fallback URL #{fallback_url} after error: #{original_error.message}"
+    http_client.post(fallback_url, payload)
+  rescue Faraday::Error => fallback_error
+    Rails.logger.error "AI fallback connection error: #{fallback_error.message}"
+    raise fallback_error
+  end
+
+  def configuration_value_for(key)
+    AiConfiguration.get_value(key).presence
+  end
+
+  def env_value_for(key)
+    ENV[key].presence
   end
 end
