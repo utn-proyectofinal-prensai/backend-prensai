@@ -16,9 +16,9 @@
 #
 # Indexes
 #
-#  index_ai_configurations_on_enabled  (enabled)
-#  index_ai_configurations_on_internal (internal)
-#  index_ai_configurations_on_key      (key) UNIQUE
+#  index_ai_configurations_on_enabled   (enabled)
+#  index_ai_configurations_on_internal  (internal)
+#  index_ai_configurations_on_key       (key) UNIQUE
 #
 class AiConfiguration < ApplicationRecord
   RANSACK_ATTRIBUTES = %w[id key display_name value_type reference_type enabled internal created_at updated_at].freeze
