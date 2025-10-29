@@ -2,7 +2,7 @@
 
 module API
   module V1
-    class DashboardController < APIController
+    class DashboardsController < APIController
       def show
         authorize DashboardSnapshot
 
