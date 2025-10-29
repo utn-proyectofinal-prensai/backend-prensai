@@ -4,7 +4,8 @@ module Dashboard
   class SnapshotRefreshJob < ApplicationJob
     queue_as :default
 
-    def perform(context: DashboardSnapshot::GLOBAL_CONTEXT)
+    def perform(context = DashboardSnapshot::GLOBAL_CONTEXT)
+      context = context.presence || DashboardSnapshot::GLOBAL_CONTEXT
       DashboardSnapshot.create!(
         context: context,
         generated_at: Time.current,

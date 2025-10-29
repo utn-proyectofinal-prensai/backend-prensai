@@ -1087,6 +1087,40 @@
 			]
 		},
 		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Obtener métricas del dashboard",
+					"request": {
+						"description": "Obtiene el snapshot de métricas agregadas para el dashboard (última semana), precalculado cada hora. Devuelve totales de noticias procesadas, tendencia diaria, top de temas y menciones, y conteos de clippings/reportes.",
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/v1/dashboard",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"dashboard"
+							],
+							"query": [
+								{
+									"key": "context",
+									"value": "global",
+									"description": "Contexto opcional si existieran variantes del tablero.",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Sign in",
 			"event": [
 				{
