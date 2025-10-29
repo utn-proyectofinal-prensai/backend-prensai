@@ -10,8 +10,7 @@ Rails.application.configure do
   config.good_job.cron = {
     dashboard_snapshot_refresh: {
       cron: '0 * * * *',
-      class: 'Dashboard::SnapshotRefreshJob',
-      args: [{ context: 'global' }]
+      class: 'Dashboard::SnapshotRefreshJob'
     }
   }
 end

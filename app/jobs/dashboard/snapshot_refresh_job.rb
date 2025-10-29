@@ -4,9 +4,8 @@ module Dashboard
   class SnapshotRefreshJob < ApplicationJob
     queue_as :default
 
-    def perform(*args)
-      context = resolve_context(args)
-
+    def perform(context = DashboardSnapshot::GLOBAL_CONTEXT)
+      context = context.presence || DashboardSnapshot::GLOBAL_CONTEXT
       DashboardSnapshot.create!(
         context: context,
         generated_at: Time.current,
@@ -18,18 +17,6 @@ module Dashboard
 
     def build_payload(context)
       Dashboard::SnapshotBuilder.new(context: context).call
-    end
-
-    def resolve_context(args)
-      raw = args.first
-
-      context = if raw.is_a?(Hash)
-                  raw.with_indifferent_access[:context]
-                else
-                  raw
-                end
-
-      context.presence || DashboardSnapshot::GLOBAL_CONTEXT
     end
   end
 end
