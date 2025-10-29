@@ -1054,6 +1054,40 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Descargar reporte de clipping (PDF)",
+					"request": {
+						"description": "🔐 CREATOR/ADMIN: Descarga el reporte de clipping en formato PDF. Retorna 404 si el reporte no existe.",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/pdf"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/clippings/:id/report/export_pdf",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"clippings",
+								":id",
+								"report",
+								"export_pdf"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
