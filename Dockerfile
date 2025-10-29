@@ -96,6 +96,10 @@ RUN apt-get update -qq && \
       xdg-utils && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Copy node binaries required by Grover/Puppeteer
+COPY --from=node /usr/local /usr/local
+COPY --from=node /opt /opt
+
 # Create app directory.
 RUN mkdir -p "${APP_HOME}"
 
