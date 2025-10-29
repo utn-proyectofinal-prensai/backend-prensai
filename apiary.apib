@@ -1054,6 +1054,44 @@ Actualiza el contenido y metadatos de un reporte de clipping existente. Permite 
             ]
         }
 
+### Descargar Reporte de Clipping (PDF) [GET /api/v1/clippings/{id}/report/export_pdf]
+
+Descarga el reporte generado de un clipping en formato PDF listo para compartir. Retorna 404 si el clipping aún no tiene reporte generado.
+
++ Parameters
+    + id: 1 (number, required) - ID del clipping
+
++ Request
+    + Headers
+        Authorization: Bearer {jwt_token}
+        Accept: application/pdf
+
++ Response 200 (application/pdf)
+    + Headers
+        Content-Disposition: attachment; filename="clipping-report.pdf"
+
++ Response 401 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 403 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 404 (application/json)
+    + Attributes
+        + errors (array[Error])
+
++ Response 422 (application/json)
+    + Attributes
+        + errors (array[Error])
+    + Body
+        {
+            "errors": [
+                "No se pudo generar el PDF, inténtalo nuevamente."
+            ]
+        }
+
 ## Topics [/api/v1/topics]
 
 ### Listar Temas [GET]

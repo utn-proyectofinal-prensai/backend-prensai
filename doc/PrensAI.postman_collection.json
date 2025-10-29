@@ -31,11 +31,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/users/:id",
+							"raw": "{{base_url}}/api/v1/users/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -59,11 +58,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/user",
+							"raw": "{{base_url}}/api/v1/user",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -80,11 +78,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/users/:id",
+							"raw": "{{base_url}}/api/v1/users/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -120,11 +117,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/users",
+							"raw": "{{base_url}}/api/v1/users",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -155,11 +151,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/users",
+							"raw": "{{base_url}}/api/v1/users",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -176,11 +171,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/users/:id",
+							"raw": "{{base_url}}/api/v1/users/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -218,11 +212,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/users/:id/change_password",
+							"raw": "{{base_url}}/api/v1/users/:id/change_password",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -261,11 +254,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/user/change_password",
+							"raw": "{{base_url}}/api/v1/user/change_password",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -302,11 +294,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/news/batch_process",
+							"raw": "{{base_url}}/api/v1/news/batch_process",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -336,11 +327,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/news?limit=4&media=TV&valuation=positive",
+							"raw": "{{base_url}}/api/v1/news?limit=4&media=TV&valuation=positive",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -418,11 +408,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/news/:id",
+							"raw": "{{base_url}}/api/v1/news/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -463,11 +452,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/mentions?enabled=true",
+							"raw": "{{base_url}}/api/v1/mentions?enabled=true",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -504,11 +492,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/mentions",
+							"raw": "{{base_url}}/api/v1/mentions",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -539,11 +526,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/mentions/:id",
+							"raw": "{{base_url}}/api/v1/mentions/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -567,11 +553,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/mentions/:id",
+							"raw": "{{base_url}}/api/v1/mentions/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -600,11 +585,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/topics?enabled=true",
+							"raw": "{{base_url}}/api/v1/topics?enabled=true",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -641,11 +625,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/topics",
+							"raw": "{{base_url}}/api/v1/topics",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -676,11 +659,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/topics/:id",
+							"raw": "{{base_url}}/api/v1/topics/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -704,11 +686,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/topics/:id",
+							"raw": "{{base_url}}/api/v1/topics/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -737,11 +718,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/ai_configurations",
+							"raw": "{{base_url}}/api/v1/ai_configurations",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -772,11 +752,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/ai_configurations/:key",
+							"raw": "{{base_url}}/api/v1/ai_configurations/:key",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -805,11 +784,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/clippings?topic_id=1",
+							"raw": "{{base_url}}/api/v1/clippings?topic_id=1",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -839,7 +817,7 @@
 				{
 					"name": "Crear clipping",
 					"request": {
-					"description": "Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas específicas. El usuario autenticado se asigna como creador. Requiere al menos un ID en `news_ids`.",
+						"description": "Crea un nuevo clipping en el sistema con un conjunto de noticias y fechas específicas. El usuario autenticado se asigna como creador. Requiere al menos un ID en `news_ids`.",
 						"method": "POST",
 						"header": [
 							{
@@ -857,11 +835,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/clippings",
+							"raw": "{{base_url}}/api/v1/clippings",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -878,11 +855,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/clippings/:id",
+							"raw": "{{base_url}}/api/v1/clippings/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -920,11 +896,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/clippings/:id",
+							"raw": "{{base_url}}/api/v1/clippings/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -948,11 +923,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/clippings/:id",
+							"raw": "{{base_url}}/api/v1/clippings/:id",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -990,11 +964,10 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/clippings/:id/report",
+							"raw": "{{base_url}}/api/v1/clippings/:id/report",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -1019,11 +992,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/clippings/:id/report",
+							"raw": "{{base_url}}/api/v1/clippings/:id/report",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -1062,17 +1034,50 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/v1/clippings/:id/report",
+							"raw": "{{base_url}}/api/v1/clippings/:id/report",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
 								"clippings",
 								":id",
 								"report"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Descargar reporte de clipping (PDF)",
+					"request": {
+						"description": "🔐 CREATOR/ADMIN: Descarga el reporte de clipping en formato PDF. Retorna 404 si el reporte no existe.",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/pdf"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/clippings/:id/report/export_pdf",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"clippings",
+								":id",
+								"report",
+								"export_pdf"
 							],
 							"variable": [
 								{
@@ -1096,11 +1101,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/v1/dashboard",
+							"raw": "{{base_url}}/api/v1/dashboard",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -1159,11 +1163,10 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:3000/api/v1/users/sign_in",
+					"raw": "{{base_url}}/api/v1/users/sign_in",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "3000",
 					"path": [
 						"api",
 						"v1",
@@ -1190,11 +1193,10 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:3000/api/v1/users/sign_out",
+					"raw": "{{base_url}}/api/v1/users/sign_out",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "3000",
 					"path": [
 						"api",
 						"v1",
@@ -1242,6 +1244,10 @@
 		{
 			"key": "token",
 			"value": ""
+		},
+		{
+			"key": "base_url",
+			"value": "localhost:3000"
 		}
 	]
 }
