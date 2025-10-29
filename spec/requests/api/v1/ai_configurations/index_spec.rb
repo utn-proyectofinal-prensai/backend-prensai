@@ -8,6 +8,7 @@ describe 'GET api/v1/ai_configurations' do
   let!(:enabled_config) { create(:ai_configuration, enabled: true, display_name: 'A Config') }
   let!(:disabled_config) { create(:ai_configuration, enabled: false, display_name: 'B Config') }
   let!(:another_enabled_config) { create(:ai_configuration, enabled: true, display_name: 'C Config') }
+  let!(:internal_config) { create(:ai_configuration, enabled: true, internal: true, display_name: 'Internal Config') }
 
   context 'when authenticated as admin user' do
     include_context 'with authenticated admin user via JWT'
@@ -32,6 +33,12 @@ describe 'GET api/v1/ai_configurations' do
       subject
       config_keys = json[:ai_configurations].pluck(:key)
       expect(config_keys).not_to include(disabled_config.key)
+    end
+
+    it 'excludes internal configurations' do
+      subject
+      config_keys = json[:ai_configurations].pluck(:key)
+      expect(config_keys).not_to include(internal_config.key)
     end
 
     it 'returns configurations ordered by display_name' do

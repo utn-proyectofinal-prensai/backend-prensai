@@ -6,6 +6,7 @@
 #  description    :text
 #  display_name   :string           not null
 #  enabled        :boolean          default(TRUE), not null
+#  internal       :boolean          default(FALSE), not null
 #  key            :string           not null
 #  reference_type :string
 #  value          :jsonb
@@ -15,16 +16,19 @@
 #
 # Indexes
 #
-#  index_ai_configurations_on_enabled  (enabled)
-#  index_ai_configurations_on_key      (key) UNIQUE
+#  index_ai_configurations_on_enabled   (enabled)
+#  index_ai_configurations_on_internal  (internal)
+#  index_ai_configurations_on_key       (key) UNIQUE
 #
 class AiConfiguration < ApplicationRecord
-  RANSACK_ATTRIBUTES = %w[id key display_name value_type reference_type enabled created_at updated_at].freeze
+  RANSACK_ATTRIBUTES = %w[id key display_name value_type reference_type enabled internal created_at updated_at].freeze
 
   validates :key, presence: true, uniqueness: true
   validates :display_name, :value_type, presence: true
 
   scope :enabled, -> { where(enabled: true) }
+  scope :external, -> { where(internal: false) }
+  scope :internal_only, -> { where(internal: true) }
   scope :ordered, -> { order(:display_name) }
 
   VALUE_TYPES = %w[array string reference].freeze
@@ -40,7 +44,7 @@ class AiConfiguration < ApplicationRecord
   validate :value_type_matches_value
 
   def self.get_value(key)
-    find_by(key: key)&.value
+    enabled.find_by(key: key)&.value
   end
 
   def options
