@@ -16,6 +16,67 @@ FORMAT: 1A
                 "online": true
             }
 
+## Dashboard [/api/v1/dashboard]
+
+### show [GET]
+
++ Parameters
+    + context: `global` (optional, string) - Contexto del snapshot si existieran variantes.
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "meta": {
+                    "range": {
+                        "from": "2025-10-21",
+                        "to": "2025-10-28"
+                    },
+                    "generated_at": "2025-10-28T13:00:00-03:00"
+                },
+                "news": {
+                    "count": 248,
+                    "valuation": {
+                        "positive": 92,
+                        "neutral": 108,
+                        "negative": 48,
+                        "unassigned": 0
+                    },
+                    "trend": [
+                        { "date": "2025-10-22", "count": 32 },
+                        { "date": "2025-10-23", "count": 40 },
+                        { "date": "2025-10-24", "count": 25 },
+                        { "date": "2025-10-25", "count": 45 },
+                        { "date": "2025-10-26", "count": 30 },
+                        { "date": "2025-10-27", "count": 60 },
+                        { "date": "2025-10-28", "count": 16 }
+                    ]
+                },
+                "topics": {
+                    "count_unique": 12,
+                    "top": [
+                        { "name": "Economía", "news_count": 58 },
+                        { "name": "Cultura", "news_count": 34 },
+                        { "name": "Política", "news_count": 28 }
+                    ]
+                },
+                "mentions": {
+                    "count_unique": 41,
+                    "top": [
+                        { "entity": "Jorge Macri", "count": 12 },
+                        { "entity": "GCBA", "count": 9 },
+                        { "entity": "CABA", "count": 6 }
+                    ]
+                },
+                "clippings": {
+                    "count": 7
+                },
+                "reports": {
+                    "count": 6
+                }
+            }
+
 ## Users [/api/v1/user]
 
 ### show [GET]
