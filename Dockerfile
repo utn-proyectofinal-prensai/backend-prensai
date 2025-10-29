@@ -111,6 +111,7 @@ COPY --link . .
 COPY --from=builder $APP_HOME/public/ $APP_HOME/public/
 COPY --from=builder $APP_HOME/tmp/ $APP_HOME/tmp/
 COPY --from=builder $APP_HOME/vendor/ $APP_HOME/vendor/
+COPY --from=builder $APP_HOME/node_modules/ $APP_HOME/node_modules/
 
 RUN ln -s /usr/lib/*-linux-gnu/libjemalloc.so.2 /usr/lib/libjemalloc.so.2
 
