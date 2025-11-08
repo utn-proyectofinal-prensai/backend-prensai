@@ -5,7 +5,8 @@ class ExternalAiService
 
   ENDPOINTS = {
     process_news: 'procesar-noticias',
-    generate_report: 'generate-informe'
+    generate_report: 'generate-informe',
+    health: 'health'
   }.freeze
 
   MissingConfigurationError = Class.new(StandardError)
@@ -59,8 +60,8 @@ class ExternalAiService
                                      env_value_for('AI_MODULE_FALLBACK_BASE_URL')
   end
 
-  def ai_service_url(base_url = ai_module_base_url)
-    path = ENDPOINTS.fetch(action)
+  def ai_service_url(base_url = ai_module_base_url, endpoint_key = action)
+    path = ENDPOINTS.fetch(endpoint_key)
     "#{base_url.chomp('/')}/#{path}"
   end
 
@@ -100,6 +101,8 @@ class ExternalAiService
 
   def perform_request
     primary_url = ai_service_url(ai_module_base_url)
+    return handle_unhealthy_primary unless service_healthy?(ai_module_base_url)
+
     http_client.post(primary_url, payload)
   rescue Faraday::Error => primary_error
     handle_primary_connection_error(primary_error)
@@ -156,6 +159,16 @@ class ExternalAiService
     attempt_fallback_request(error)
   end
 
+  def handle_unhealthy_primary
+    message = "AI service health check failed for #{ai_module_base_url}"
+    Rails.logger.error message
+
+    return raise(StandardError, message) if ai_module_fallback_base_url.blank?
+
+    Rails.logger.warn "Falling back to #{ai_module_fallback_base_url} due to failed health check"
+    attempt_fallback_request(StandardError.new(message))
+  end
+
   def attempt_fallback_request(original_error)
     fallback_url = ai_service_url(ai_module_fallback_base_url)
     Rails.logger.warn "Attempting AI fallback URL #{fallback_url} after error: #{original_error.message}"
@@ -171,5 +184,14 @@ class ExternalAiService
 
   def env_value_for(key)
     ENV[key].presence
+  end
+
+  def service_healthy?(base_url)
+    health_url = ai_service_url(base_url, :health)
+    response = http_client.get(health_url)
+    response.success?
+  rescue Faraday::Error => error
+    Rails.logger.warn "AI health check failed for #{health_url}: #{error.message}"
+    false
   end
 end
