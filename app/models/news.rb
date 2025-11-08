@@ -45,6 +45,11 @@
 #
 class News < ApplicationRecord
   include Filterable
+  RANSACK_ATTRIBUTES = %w[
+    id title media support valuation date created_at topic_id
+  ].freeze
+  RANSACK_ASSOCIATIONS = %w[topic creator reviewer].freeze
+
   belongs_to :topic, optional: true
   belongs_to :creator, class_name: 'User', optional: true
   belongs_to :reviewer, class_name: 'User', optional: true

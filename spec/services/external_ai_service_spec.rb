@@ -19,22 +19,10 @@ RSpec.describe ExternalAiService, type: :service do
     }
   end
 
-  def with_modified_env(env)
-    original_env = {}
-    env.each do |key, value|
-      original_env[key] = ENV.key?(key) ? ENV[key] : :__prensai_env_missing__
-      value.nil? ? ENV.delete(key) : ENV[key] = value
-    end
-    yield
-  ensure
-    env.each_key do |key|
-      original_value = original_env[key]
-      if original_value == :__prensai_env_missing__
-        ENV.delete(key)
-      else
-        ENV[key] = original_value
-      end
-    end
+  before do
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with('AI_MODULE_BASE_URL').and_return(nil)
+    allow(ENV).to receive(:[]).with('AI_MODULE_FALLBACK_BASE_URL').and_return(nil)
   end
 
   def stub_health_check(url, status: 200, body: { status: 'ok' })
@@ -165,19 +153,17 @@ RSpec.describe ExternalAiService, type: :service do
       base_config.destroy!
       env_url = 'http://env-ai.example.com'
 
-      with_modified_env('AI_MODULE_BASE_URL' => env_url) do
-        expect(service.send(:ai_module_base_url)).to eq(env_url)
-      end
+      allow(ENV).to receive(:[]).with('AI_MODULE_BASE_URL').and_return(env_url)
+
+      expect(service.send(:ai_module_base_url)).to eq(env_url)
     end
 
     it 'raises when no base URL is configured' do
       base_config.destroy!
 
-      with_modified_env('AI_MODULE_BASE_URL' => nil) do
-        expect {
-          service.send(:ai_module_base_url)
-        }.to raise_error(ExternalAiService::MissingConfigurationError)
-      end
+      expect {
+        service.send(:ai_module_base_url)
+      }.to raise_error(ExternalAiService::MissingConfigurationError)
     end
   end
 

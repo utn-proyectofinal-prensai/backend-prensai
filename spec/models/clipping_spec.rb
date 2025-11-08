@@ -88,4 +88,19 @@ describe Clipping do
       end
     end
   end
+
+  describe '#refresh_metrics!' do
+    it 'rebuilds metrics for existing news' do
+      test_date = Date.current
+      clipping = create(:clipping, news_count: 1, start_date: test_date, end_date: test_date, creator: creator,
+                                   topic: topic)
+
+      original_generated_at = clipping.metrics['generated_at']
+      travel 1.hour do
+        clipping.refresh_metrics!
+      end
+
+      expect(clipping.reload.metrics['generated_at']).not_to eq(original_generated_at)
+    end
+  end
 end
