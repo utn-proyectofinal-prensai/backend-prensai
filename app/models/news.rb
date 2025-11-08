@@ -67,7 +67,17 @@ class News < ApplicationRecord
   filter_scope :topic_id, ->(id) { where(topic_id: id) }
   filter_scope :start_date, ->(date) { where(arel_table[:date].gteq(date)) }
   filter_scope :end_date, ->(date) { where(arel_table[:date].lteq(date)) }
-  filter_scope :media, ->(media) { where(media: media) }
+  filter_scope :media, lambda { |media|
+    values = Array(media).compact_blank
+    return none if values.empty?
+
+    conditions = values.map do |value|
+      sanitized_value = sanitize_sql_like(value.to_s)
+      arel_table[:media].matches("%#{sanitized_value}%", nil, true)
+    end
+
+    where(conditions.reduce { |acc, condition| acc.or(condition) })
+  }
   filter_scope :publication_type, ->(type) { where(publication_type: type) }
   filter_scope :valuation, ->(valuation) { where(valuation: valuation) }
 

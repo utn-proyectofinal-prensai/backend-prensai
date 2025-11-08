@@ -22,15 +22,35 @@ RSpec.describe ExternalAiService, type: :service do
   def with_modified_env(env)
     original_env = {}
     env.each do |key, value|
-      original_env[key] = ENV.fetch(key, nil)
-      ENV[key] = value
+      original_env[key] = ENV.key?(key) ? ENV[key] : :__prensai_env_missing__
+      value.nil? ? ENV.delete(key) : ENV[key] = value
     end
     yield
   ensure
-    env.each_key { |key| ENV[key] = original_env[key] }
+    env.each_key do |key|
+      original_value = original_env[key]
+      if original_value == :__prensai_env_missing__
+        ENV.delete(key)
+      else
+        ENV[key] = original_value
+      end
+    end
+  end
+
+  def stub_health_check(url, status: 200, body: { status: 'ok' })
+    response_body = body.is_a?(String) ? body : body.to_json
+    stub_request(:get, "#{url}/health")
+      .to_return(status: status, body: response_body, headers: { 'Content-Type' => 'application/json' })
   end
 
   describe '#call' do
+    let(:health_status) { 200 }
+    let(:health_body) { { status: 'ok' } }
+
+    before do
+      stub_health_check(base_url, status: health_status, body: health_body)
+    end
+
     context 'when AI service responds successfully' do
       let(:ai_response) do
         {
@@ -123,6 +143,17 @@ RSpec.describe ExternalAiService, type: :service do
         expect(result).to be_nil
       end
     end
+
+    context 'when the primary health check fails' do
+      let(:health_status) { 503 }
+      let(:health_body) { { status: 'down' } }
+
+      it 'raises an error before attempting the primary request' do
+        expect {
+          service.call
+        }.to raise_error(StandardError, /health check failed/i)
+      end
+    end
   end
 
   describe 'URL configuration' do
@@ -142,9 +173,11 @@ RSpec.describe ExternalAiService, type: :service do
     it 'raises when no base URL is configured' do
       base_config.destroy!
 
-      expect {
-        service.send(:ai_module_base_url)
-      }.to raise_error(ExternalAiService::MissingConfigurationError)
+      with_modified_env('AI_MODULE_BASE_URL' => nil) do
+        expect {
+          service.send(:ai_module_base_url)
+        }.to raise_error(ExternalAiService::MissingConfigurationError)
+      end
     end
   end
 
@@ -162,6 +195,13 @@ RSpec.describe ExternalAiService, type: :service do
         'data' => [],
         'errores' => []
       }
+    end
+
+    let(:primary_health_status) { 200 }
+    let(:primary_health_body) { { status: 'ok' } }
+
+    before do
+      stub_health_check(base_url, status: primary_health_status, body: primary_health_body)
     end
 
     it 'uses the fallback URL when the primary connection fails' do
@@ -184,6 +224,25 @@ RSpec.describe ExternalAiService, type: :service do
       expect(WebMock).to have_requested(:post, "#{base_url}/procesar-noticias")
       expect(WebMock).not_to have_requested(:post, "#{fallback_url}/procesar-noticias")
     end
+
+    context 'when the primary health check fails' do
+      let(:primary_health_status) { 500 }
+      let(:primary_health_body) { { status: 'down' } }
+
+      before do
+        stub_request(:post, "#{fallback_url}/procesar-noticias")
+          .to_return(status: 200, body: ai_response.to_json, headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'skips the primary request and uses the fallback' do
+        result = service.call
+
+        expect(result[:ok]).to be true
+        expect(WebMock).to have_requested(:get, "#{base_url}/health")
+        expect(WebMock).to have_requested(:post, "#{fallback_url}/procesar-noticias")
+        expect(WebMock).not_to have_requested(:post, "#{base_url}/procesar-noticias")
+      end
+    end
   end
 
   describe 'custom endpoint handling' do
@@ -200,6 +259,7 @@ RSpec.describe ExternalAiService, type: :service do
     end
 
     before do
+      stub_health_check(base_url)
       stub_request(:post, "#{base_url}/generate-informe")
         .to_return(status: 200, body: custom_response.to_json, headers: { 'Content-Type' => 'application/json' })
     end
