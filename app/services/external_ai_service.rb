@@ -45,6 +45,7 @@ class ExternalAiService
     @http_client ||= Faraday.new do |f|
       f.request :json
       f.response :json
+      f.options.timeout = 120
       f.adapter Faraday.default_adapter
     end
   end
@@ -103,7 +104,7 @@ class ExternalAiService
     primary_url = ai_service_url(ai_module_base_url)
     return handle_unhealthy_primary unless service_healthy?(ai_module_base_url)
 
-    http_client.post(primary_url, payload)
+    post_with_timing(primary_url)
   rescue Faraday::Error => primary_error
     handle_primary_connection_error(primary_error)
   end
@@ -172,7 +173,7 @@ class ExternalAiService
   def attempt_fallback_request(original_error)
     fallback_url = ai_service_url(ai_module_fallback_base_url)
     Rails.logger.warn "Attempting AI fallback URL #{fallback_url} after error: #{original_error.message}"
-    http_client.post(fallback_url, payload)
+    post_with_timing(fallback_url)
   rescue Faraday::Error => fallback_error
     Rails.logger.error "AI fallback connection error: #{fallback_error.message}"
     raise fallback_error
@@ -184,6 +185,32 @@ class ExternalAiService
 
   def env_value_for(key)
     ENV[key].presence
+  end
+
+  def post_with_timing(url)
+    started_at = Time.current
+    http_client.post(url, payload).tap do
+      log_request_success(url, elapsed_time_from(started_at))
+    end
+  rescue Faraday::Error => error
+    log_request_failure(url, elapsed_time_from(started_at), error)
+    raise
+  end
+
+  def elapsed_time_from(start_time)
+    Time.current - start_time
+  end
+
+  def log_request_success(url, duration)
+    Rails.logger.info "AI request to #{url} completed in #{format('%.2f', duration)}s"
+  end
+
+  def log_request_failure(url, duration, error)
+    timeout = http_client.options.timeout
+    Rails.logger.error(
+      "AI request to #{url} failed after #{format('%.2f', duration)}s (client timeout: #{timeout || 'nil'}s). " \
+      "Original error: #{error.class} - #{error.message}"
+    )
   end
 
   def service_healthy?(base_url)
