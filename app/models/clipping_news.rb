@@ -34,6 +34,19 @@ class ClippingNews < ApplicationRecord
   def refresh_clipping_metrics
     return if clipping.destroyed?
 
-    clipping.refresh_metrics!
+    clipping.with_lock do
+      clipping.news.exists? ? clipping.refresh_metrics! : destroy_empty_clipping
+    end
+  rescue ActiveRecord::RecordNotFound
+    log_missing_clipping
+  end
+
+  def destroy_empty_clipping
+    Rails.logger.info "Destroying clipping #{clipping.id} because it no longer has news attached"
+    clipping.destroy!
+  end
+
+  def log_missing_clipping
+    Rails.logger.info "Skipping clipping metrics refresh because clipping #{clipping_id} no longer exists"
   end
 end
