@@ -43,12 +43,21 @@ describe News do
 
     describe '.filter_by media' do
       let!(:matching_news) { create(:news, media: 'La Nación') }
-      let!(:other_news) { create(:news, media: 'Clarín') }
+      let!(:other_news) { create(:news, media: 'Infobae') }
 
       it 'finds news with media containing the query' do
         result = described_class.filter_by(media: 'Naci')
 
         expect(result).to contain_exactly(matching_news)
+        expect(result).not_to include(other_news)
+      end
+
+      it 'supports array filters keeping partial matching' do
+        another_match = create(:news, media: 'Radio Clarín AM')
+
+        result = described_class.filter_by(media: ['Naci', 'Clarín'])
+
+        expect(result).to contain_exactly(matching_news, another_match)
         expect(result).not_to include(other_news)
       end
     end
