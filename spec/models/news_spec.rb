@@ -40,6 +40,18 @@ describe News do
         expect(described_class.ordered).to eq([new_news, old_news])
       end
     end
+
+    describe '.filter_by media' do
+      let!(:matching_news) { create(:news, media: 'La Nación') }
+      let!(:other_news) { create(:news, media: 'Clarín') }
+
+      it 'finds news with media containing the query' do
+        result = described_class.filter_by(media: 'Naci')
+
+        expect(result).to contain_exactly(matching_news)
+        expect(result).not_to include(other_news)
+      end
+    end
   end
 
   describe 'callbacks' do
