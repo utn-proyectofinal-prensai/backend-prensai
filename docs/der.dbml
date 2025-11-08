@@ -1,0 +1,294 @@
+// DER del backend Prensai con sintaxis dbdiagram.io
+
+Table active_storage_attachments {
+  id bigint [pk]
+  name varchar [not null]
+  record_type varchar [not null]
+  record_id bigint [not null]
+  blob_id bigint [not null]
+  created_at datetime [not null]
+}
+
+Table active_storage_blobs {
+  id bigint [pk]
+  key varchar [not null, unique]
+  filename varchar [not null]
+  content_type varchar
+  metadata text
+  byte_size bigint [not null]
+  checksum varchar
+  created_at datetime [not null]
+  service_name varchar [not null]
+}
+
+Table active_storage_variant_records {
+  id bigint [pk]
+  blob_id bigint [not null]
+  variation_digest varchar [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table admin_users {
+  id serial [pk]
+  email varchar [not null, default: "", unique]
+  encrypted_password varchar [not null, default: ""]
+  reset_password_token varchar
+  reset_password_sent_at datetime
+  remember_created_at datetime
+  sign_in_count int [not null, default: 0]
+  current_sign_in_at datetime
+  last_sign_in_at datetime
+  current_sign_in_ip inet
+  last_sign_in_ip inet
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table ai_configurations {
+  id bigint [pk]
+  key varchar [not null, unique]
+  value jsonb
+  value_type varchar [not null]
+  display_name varchar [not null]
+  description text
+  enabled boolean [not null, default: true]
+  reference_type varchar
+  internal boolean [not null, default: false]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table clipping_news {
+  id bigint [pk]
+  clipping_id bigint [not null]
+  news_id bigint [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table clipping_reports {
+  id bigint [pk]
+  clipping_id bigint [not null]
+  content text [not null]
+  metadata jsonb [not null, default: '{}']
+  reviewer_id bigint
+  creator_id bigint
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table clippings {
+  id bigint [pk]
+  name varchar [not null]
+  start_date date [not null]
+  end_date date [not null]
+  creator_id bigint [not null]
+  topic_id bigint [not null]
+  reviewer_id bigint
+  metrics jsonb [not null, default: '{}']
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table dashboard_snapshots {
+  id bigint [pk]
+  context varchar [not null, default: "global"]
+  data jsonb [not null, default: '{}']
+  generated_at datetime [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table flipper_features {
+  id bigint [pk]
+  key varchar [not null, unique]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table flipper_gates {
+  id bigint [pk]
+  feature_key varchar [not null]
+  key varchar [not null]
+  value text
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table good_job_batches {
+  id uuid [pk]
+  description text
+  serialized_properties jsonb
+  on_finish text
+  on_success text
+  on_discard text
+  callback_queue_name text
+  callback_priority int
+  enqueued_at datetime
+  discarded_at datetime
+  finished_at datetime
+  jobs_finished_at datetime
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table good_job_executions {
+  id uuid [pk]
+  active_job_id uuid [not null]
+  job_class text
+  queue_name text
+  serialized_params jsonb
+  scheduled_at datetime
+  finished_at datetime
+  error text
+  error_event smallint
+  error_backtrace text[]
+  process_id uuid
+  duration interval
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table good_job_processes {
+  id uuid [pk]
+  state jsonb
+  lock_type smallint
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table good_job_settings {
+  id uuid [pk]
+  key text
+  value jsonb
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table good_jobs {
+  id uuid [pk]
+  queue_name text
+  priority int
+  serialized_params jsonb
+  scheduled_at datetime
+  performed_at datetime
+  finished_at datetime
+  error text
+  active_job_id uuid
+  concurrency_key text
+  cron_key text
+  retried_good_job_id uuid
+  cron_at datetime
+  batch_id uuid
+  batch_callback_id uuid
+  is_discrete boolean
+  executions_count int
+  job_class text
+  error_event smallint
+  labels text[]
+  locked_by_id uuid
+  locked_at datetime
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table jwt_denylists {
+  id bigint [pk]
+  jti varchar [not null, unique]
+  exp datetime [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table mention_news {
+  id bigint [pk]
+  mention_id bigint [not null]
+  news_id bigint [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table mentions {
+  id bigint [pk]
+  name varchar [not null, unique]
+  enabled boolean [not null, default: true]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table news {
+  id bigint [pk]
+  title varchar [not null]
+  publication_type varchar
+  date date [not null]
+  support varchar [not null]
+  media varchar [not null]
+  section varchar
+  author varchar
+  interviewee varchar
+  link varchar [not null, unique]
+  audience_size int
+  quotation decimal(10,2) [not null, default: 0]
+  valuation varchar
+  political_factor varchar
+  plain_text text
+  topic_id bigint
+  creator_id bigint
+  reviewer_id bigint
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table settings {
+  id bigint [pk]
+  key varchar [not null, unique]
+  value varchar
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table topics {
+  id bigint [pk]
+  name varchar [not null, unique]
+  description text
+  enabled boolean [not null, default: true]
+  crisis boolean [not null, default: false]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table users {
+  id serial [pk]
+  email varchar [unique]
+  encrypted_password varchar [not null, default: ""]
+  reset_password_token varchar [unique]
+  reset_password_sent_at datetime
+  allow_password_change boolean [not null, default: false]
+  sign_in_count int [not null, default: 0]
+  current_sign_in_at datetime
+  last_sign_in_at datetime
+  current_sign_in_ip inet
+  last_sign_in_ip inet
+  first_name varchar [default: ""]
+  last_name varchar [default: ""]
+  username varchar [default: ""]
+  role varchar [not null, default: "user"]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Ref: active_storage_variant_records.blob_id > active_storage_blobs.id
+Ref: clipping_news.clipping_id > clippings.id
+Ref: clipping_news.news_id > news.id
+Ref: clipping_reports.clipping_id > clippings.id
+Ref: clipping_reports.creator_id > users.id
+Ref: clipping_reports.reviewer_id > users.id
+Ref: clippings.topic_id > topics.id
+Ref: clippings.creator_id > users.id
+Ref: clippings.reviewer_id > users.id
+Ref: mention_news.mention_id > mentions.id
+Ref: mention_news.news_id > news.id
+Ref: news.topic_id > topics.id
+Ref: news.creator_id > users.id
+Ref: news.reviewer_id > users.id
