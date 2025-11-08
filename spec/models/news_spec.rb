@@ -55,7 +55,7 @@ describe News do
       it 'supports array filters keeping partial matching' do
         another_match = create(:news, media: 'Radio Clarín AM')
 
-        result = described_class.filter_by(media: ['Naci', 'Clarín'])
+        result = described_class.filter_by(media: %w[Naci Clarín])
 
         expect(result).to contain_exactly(matching_news, another_match)
         expect(result).not_to include(other_news)
