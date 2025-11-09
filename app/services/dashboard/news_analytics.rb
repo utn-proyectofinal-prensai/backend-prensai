@@ -54,9 +54,11 @@ module Dashboard
     end
 
     def trend
+      date_expression = Arel.sql(localized_created_at_date_sql)
+
       counts = weekly_scope
-               .group(Arel.sql('DATE(created_at)'))
-               .order(Arel.sql('DATE(created_at) ASC'))
+               .group(date_expression)
+               .order(date_expression.asc)
                .count
 
       counts_by_date = counts.to_h do |date_value, total|
@@ -110,6 +112,15 @@ module Dashboard
 
     def trend_range
       @trend_range ||= Dashboard::TimeWindow.last_days(trend_days, now)
+    end
+
+    def localized_created_at_date_sql
+      # `created_at` is persisted in UTC; convert to the configured Time.zone before truncating
+      column = "#{News.quoted_table_name}.#{News.connection.quote_column_name('created_at')}"
+      utc_zone = News.connection.quote('UTC')
+      local_zone = News.connection.quote(Time.zone.tzinfo&.name || Time.zone.name)
+
+      "DATE(((#{column}) AT TIME ZONE #{utc_zone}) AT TIME ZONE #{local_zone})"
     end
   end
 end
