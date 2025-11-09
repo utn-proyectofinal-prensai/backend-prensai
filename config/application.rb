@@ -24,7 +24,7 @@ module App
     # in config/environments, which are processed later.
     #
     config.time_zone = 'Buenos Aires'
-    config.active_record.default_timezone = :utc
+    config.active_record.default_timezone = :local
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Set default locale to Spanish
