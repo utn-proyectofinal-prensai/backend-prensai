@@ -62,8 +62,11 @@ RSpec.describe Clippings::ReportGenerator, type: :service do
     end
 
     context 'when report persistence fails' do
+      let(:failing_report) { clipping.build_report }
+
       before do
-        allow_any_instance_of(ClippingReport).to receive(:update!).and_raise(StandardError, 'DB error')
+        allow(clipping).to receive_messages(report: failing_report, build_report: failing_report)
+        allow(failing_report).to receive(:update!).and_raise(StandardError, 'DB error')
       end
 
       it 'returns a failure result with the error message' do

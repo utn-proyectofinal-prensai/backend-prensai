@@ -8,9 +8,13 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
   describe '.call' do
     context 'when the clipping has associated news' do
       let(:topic) { create(:topic) }
-      let(:alpha_mention) { create(:mention, name: 'Alpha') }
-      let(:beta_mention) { create(:mention, name: 'Beta') }
-      let(:gamma_mention) { create(:mention, name: 'Gamma') }
+      let(:mentions) do
+        {
+          alpha: create(:mention, name: 'Alpha'),
+          beta: create(:mention, name: 'Beta'),
+          gamma: create(:mention, name: 'Gamma')
+        }
+      end
       let(:news_items) do
         [
           create(
@@ -22,7 +26,7 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
             date: Date.new(2025, 1, 2),
             audience_size: 1_000,
             quotation: 120.5,
-            mentions: [alpha_mention, beta_mention]
+            mentions: [mentions[:alpha], mentions[:beta]]
           ),
           create(
             :news,
@@ -33,7 +37,7 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
             date: Date.new(2025, 1, 5),
             audience_size: 2_000,
             quotation: 80.25,
-            mentions: [alpha_mention]
+            mentions: [mentions[:alpha]]
           ),
           create(
             :news,
@@ -44,7 +48,7 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
             date: Date.new(2025, 1, 1),
             audience_size: nil,
             quotation: 210.75,
-            mentions: [gamma_mention]
+            mentions: [mentions[:gamma]]
           )
         ]
       end
@@ -127,9 +131,9 @@ RSpec.describe Clippings::MetricsBuilder, type: :service do
         expect(metrics[:mention_stats]).to eq(
           total: 4,
           items: [
-            { mention_id: alpha_mention.id, name: 'Alpha', count: 2, percentage: 50.0 },
-            { mention_id: beta_mention.id, name: 'Beta', count: 1, percentage: 25.0 },
-            { mention_id: gamma_mention.id, name: 'Gamma', count: 1, percentage: 25.0 }
+            { mention_id: mentions[:alpha].id, name: 'Alpha', count: 2, percentage: 50.0 },
+            { mention_id: mentions[:beta].id, name: 'Beta', count: 1, percentage: 25.0 },
+            { mention_id: mentions[:gamma].id, name: 'Gamma', count: 1, percentage: 25.0 }
           ]
         )
       end

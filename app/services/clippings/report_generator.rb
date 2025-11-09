@@ -40,15 +40,27 @@ module Clippings
         totalNoticias: metrics[:news_count],
         temaSeleccionado: clipping.topic&.name,
         fechaGeneracion: metrics[:generated_at],
-        periodo: {
-          fechaInicio: metrics.dig(:date_range, :from)&.to_s || clipping.start_date&.to_s,
-          fechaFin: metrics.dig(:date_range, :to)&.to_s || clipping.end_date&.to_s
-        },
+        periodo: period_payload(metrics),
         valoraciones: valuations_payload(metrics[:valuation], metrics[:crisis]),
         soportes: collection_payload(metrics.dig(:support_stats, :items)),
         medios: collection_payload(metrics.dig(:media_stats, :items)),
         menciones: mention_payload(metrics.dig(:mention_stats, :items))
       }
+    end
+
+    def period_payload(metrics)
+      {
+        fechaInicio: metric_start_date(metrics),
+        fechaFin: metric_end_date(metrics)
+      }
+    end
+
+    def metric_start_date(metrics)
+      metrics.dig(:date_range, :from)&.to_s || clipping.start_date&.to_s
+    end
+
+    def metric_end_date(metrics)
+      metrics.dig(:date_range, :to)&.to_s || clipping.end_date&.to_s
     end
 
     def valuations_payload(valuation_metrics, crisis_flag)

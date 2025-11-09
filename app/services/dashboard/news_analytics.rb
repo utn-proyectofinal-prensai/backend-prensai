@@ -67,19 +67,17 @@ module Dashboard
       end
 
       Dashboard::TimeWindow.dates_for(window_range).map do |date|
-        { date: date.iso8601, count: counts_by_date[date] || 0 }
+        { date: date.iso8601, count: counts_by_date.fetch(date, 0) }
       end
     end
 
     def valuation_counts
       counts = weekly_scope.group(:valuation).count
+      result = News.valuations.keys.index_with { |valuation| counts[valuation] || 0 }
 
-      News.valuations.keys.index_with { |valuation|
-        counts[valuation] || 0
-      }.tap do |result|
-        unassigned = counts[nil].to_i
-        result['unassigned'] = unassigned if unassigned.positive?
-      end
+      unassigned = counts[nil].to_i
+      result['unassigned'] = unassigned if unassigned.positive?
+      result
     end
 
     def top_topics
@@ -108,6 +106,17 @@ module Dashboard
 
     def mention_scope
       Mention.joins(:news).merge(weekly_scope)
+    end
+
+    def daily_counts_by_date
+      weekly_scope
+        .group(Arel.sql('DATE(created_at)'))
+        .order(Arel.sql('DATE(created_at) ASC'))
+        .count
+        .each_with_object({}) do |(date_value, total), result|
+          date = date_value.is_a?(Date) ? date_value : Date.parse(date_value.to_s)
+          result[date] = total
+        end
     end
 
     def trend_range

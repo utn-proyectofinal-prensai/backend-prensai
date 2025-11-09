@@ -82,17 +82,15 @@ module Clippings
     end
 
     def numeric_field_stats(field)
-      values = news_scope.where.not(field => nil).pluck(:id, field)
-      return { total: nil, average: nil, max: nil } if values.empty?
+      typed_values = typed_numeric_values(field)
+      return empty_numeric_stats if typed_values.empty?
 
-      typed_values = values.map { |id, val| [id, cast_to_numeric(field, val)] }
       total = typed_values.sum(&:last)
-      max_news_id, max_value = typed_values.max_by(&:last)
 
       {
         total: total,
-        average: (total.to_f / typed_values.size).round(2),
-        max: { news_id: max_news_id, value: max_value }
+        average: calculate_average(total, typed_values.size),
+        max: max_numeric_value(typed_values)
       }
     end
 
@@ -116,6 +114,26 @@ module Clippings
         count: count,
         percentage: calculate_percentage(count, total)
       }
+    end
+
+    def typed_numeric_values(field)
+      news_scope
+        .where.not(field => nil)
+        .pluck(:id, field)
+        .map { |id, value| [id, cast_to_numeric(field, value)] }
+    end
+
+    def max_numeric_value(values)
+      news_id, value = values.max_by(&:last)
+      { news_id: news_id, value: value }
+    end
+
+    def empty_numeric_stats
+      { total: nil, average: nil, max: nil }
+    end
+
+    def calculate_average(total, size)
+      (total.to_f / size).round(2)
     end
 
     def calculate_percentage(count, total)
