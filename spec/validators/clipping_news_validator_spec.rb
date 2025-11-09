@@ -29,8 +29,12 @@ RSpec.describe ClippingNewsValidator do
       end
 
       context 'when some news do not belong to the clipping topic' do
-        let(:news_different_topic) { create(:news, topic: another_topic, date: Date.new(2025, 1, 16)) }
-        let(:news_ids) { [news_in_topic.id, news_different_topic.id] }
+        let(:news_ids) do
+          [
+            news_in_topic.id,
+            create(:news, topic: another_topic, date: Date.new(2025, 1, 16)).id
+          ]
+        end
 
         it 'adds validation error' do
           expect(clipping).not_to be_valid
@@ -48,8 +52,12 @@ RSpec.describe ClippingNewsValidator do
       end
 
       context 'when some news are outside date range' do
-        let(:news_outside_range) { create(:news, topic: topic, date: Date.new(2025, 2, 1)) }
-        let(:news_ids) { [news_in_topic.id, news_outside_range.id] }
+        let(:news_ids) do
+          [
+            news_in_topic.id,
+            create(:news, topic: topic, date: Date.new(2025, 2, 1)).id
+          ]
+        end
 
         it 'adds validation error' do
           expect(clipping).not_to be_valid
@@ -61,9 +69,12 @@ RSpec.describe ClippingNewsValidator do
       end
 
       context 'when news is on boundary dates' do
-        let(:news_on_start) { create(:news, topic: topic, date: start_date) }
-        let(:news_on_end) { create(:news, topic: topic, date: end_date) }
-        let(:news_ids) { [news_on_start.id, news_on_end.id] }
+        let(:news_ids) do
+          [
+            create(:news, topic: topic, date: start_date).id,
+            create(:news, topic: topic, date: end_date).id
+          ]
+        end
 
         it { is_expected.to be_valid }
       end

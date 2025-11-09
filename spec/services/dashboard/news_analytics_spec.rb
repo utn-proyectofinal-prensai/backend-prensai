@@ -21,12 +21,12 @@ RSpec.describe Dashboard::NewsAnalytics do
   describe '#news_summary' do
     subject(:summary) { described_class.new(now: now, trend_days: 1).news_summary }
 
-    let!(:yesterday_news) do
+    before do
       create(:news, created_at: now.beginning_of_day - 12.hours, valuation: 'positive')
+      create(:news, created_at: now - 4.hours, valuation: 'neutral')
+      create(:news, created_at: now - 30.minutes, valuation: nil)
+      create(:news, created_at: now - 3.days, valuation: 'negative')
     end
-    let!(:today_neutral) { create(:news, created_at: now - 4.hours, valuation: 'neutral') }
-    let!(:today_without_valuation) { create(:news, created_at: now - 30.minutes, valuation: nil) }
-    let!(:out_of_range_news) { create(:news, created_at: now - 3.days, valuation: 'negative') }
 
     it 'only counts records within the window and groups by local day' do
       expect(summary[:count]).to eq(3)

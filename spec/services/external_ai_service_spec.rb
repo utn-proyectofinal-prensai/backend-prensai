@@ -3,8 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe ExternalAiService, type: :service do
-  MISSING_ENV = Object.new.freeze
-
   let(:service) { described_class.new(payload: payload, action: :process_news) }
   let(:base_url) { 'http://ai.example.com' }
   let!(:base_config) do

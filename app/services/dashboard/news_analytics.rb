@@ -54,17 +54,7 @@ module Dashboard
     end
 
     def trend
-      date_expression = Arel.sql(localized_created_at_date_sql)
-
-      counts = weekly_scope
-               .group(date_expression)
-               .order(date_expression.asc)
-               .count
-
-      counts_by_date = counts.to_h do |date_value, total|
-        date = date_value.is_a?(Date) ? date_value : Date.parse(date_value.to_s)
-        [date, total]
-      end
+      counts_by_date = normalized_trend_counts
 
       Dashboard::TimeWindow.dates_for(window_range).map do |date|
         { date: date.iso8601, count: counts_by_date.fetch(date, 0) }
@@ -108,15 +98,19 @@ module Dashboard
       Mention.joins(:news).merge(weekly_scope)
     end
 
-    def daily_counts_by_date
+    def normalized_trend_counts
       weekly_scope
-        .group(Arel.sql('DATE(created_at)'))
-        .order(Arel.sql('DATE(created_at) ASC'))
+        .group(trend_grouping_expression)
+        .order(trend_grouping_expression.asc)
         .count
         .each_with_object({}) do |(date_value, total), result|
           date = date_value.is_a?(Date) ? date_value : Date.parse(date_value.to_s)
           result[date] = total
         end
+    end
+
+    def trend_grouping_expression
+      Arel.sql(localized_created_at_date_sql)
     end
 
     def trend_range

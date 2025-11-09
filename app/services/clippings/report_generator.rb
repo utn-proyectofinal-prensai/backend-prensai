@@ -35,17 +35,7 @@ module Clippings
 
     def metrics_payload
       metrics = Clippings::MetricsBuilder.call(clipping)
-
-      {
-        totalNoticias: metrics[:news_count],
-        temaSeleccionado: clipping.topic&.name,
-        fechaGeneracion: metrics[:generated_at],
-        periodo: period_payload(metrics),
-        valoraciones: valuations_payload(metrics[:valuation], metrics[:crisis]),
-        soportes: collection_payload(metrics.dig(:support_stats, :items)),
-        medios: collection_payload(metrics.dig(:media_stats, :items)),
-        menciones: mention_payload(metrics.dig(:mention_stats, :items))
-      }
+      core_metrics_payload(metrics).merge(distribution_payload(metrics))
     end
 
     def period_payload(metrics)
@@ -92,6 +82,24 @@ module Clippings
           porcentaje: item[:percentage]
         }
       end
+    end
+
+    def core_metrics_payload(metrics)
+      {
+        totalNoticias: metrics[:news_count],
+        temaSeleccionado: clipping.topic&.name,
+        fechaGeneracion: metrics[:generated_at],
+        periodo: period_payload(metrics),
+        valoraciones: valuations_payload(metrics[:valuation], metrics[:crisis])
+      }
+    end
+
+    def distribution_payload(metrics)
+      {
+        soportes: collection_payload(metrics.dig(:support_stats, :items)),
+        medios: collection_payload(metrics.dig(:media_stats, :items)),
+        menciones: mention_payload(metrics.dig(:mention_stats, :items))
+      }
     end
 
     def count_percentage_payload(data)

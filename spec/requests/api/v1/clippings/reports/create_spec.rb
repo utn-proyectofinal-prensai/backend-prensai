@@ -85,11 +85,16 @@ describe 'POST /api/v1/clippings/:clipping_id/report' do
     include_context 'with authenticated regular user via JWT'
 
     let(:clipping) { create(:clipping, creator: create(:user)) }
+    let(:report_generator) { Clippings::ReportGenerator }
+
+    before do
+      allow(report_generator).to receive(:call)
+    end
 
     it 'returns forbidden' do
-      expect(Clippings::ReportGenerator).not_to receive(:call)
       request_create_report
       expect(response).to have_http_status(:forbidden)
+      expect(report_generator).not_to have_received(:call)
     end
   end
 
