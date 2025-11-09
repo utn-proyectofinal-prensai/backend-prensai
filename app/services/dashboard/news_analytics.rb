@@ -54,30 +54,20 @@ module Dashboard
     end
 
     def trend
-      counts = weekly_scope
-               .group(Arel.sql('DATE(created_at)'))
-               .order(Arel.sql('DATE(created_at) ASC'))
-               .count
-
-      counts_by_date = counts.to_h do |date_value, total|
-        date = date_value.is_a?(Date) ? date_value : Date.parse(date_value.to_s)
-        [date, total]
-      end
+      counts_by_date = normalized_trend_counts
 
       Dashboard::TimeWindow.dates_for(window_range).map do |date|
-        { date: date.iso8601, count: counts_by_date[date] || 0 }
+        { date: date.iso8601, count: counts_by_date.fetch(date, 0) }
       end
     end
 
     def valuation_counts
       counts = weekly_scope.group(:valuation).count
+      result = News.valuations.keys.index_with { |valuation| counts[valuation] || 0 }
 
-      News.valuations.keys.index_with { |valuation|
-        counts[valuation] || 0
-      }.tap do |result|
-        unassigned = counts[nil].to_i
-        result['unassigned'] = unassigned if unassigned.positive?
-      end
+      unassigned = counts[nil].to_i
+      result['unassigned'] = unassigned if unassigned.positive?
+      result
     end
 
     def top_topics
@@ -108,8 +98,32 @@ module Dashboard
       Mention.joins(:news).merge(weekly_scope)
     end
 
+    def normalized_trend_counts
+      weekly_scope
+        .group(trend_grouping_expression)
+        .order(trend_grouping_expression.asc)
+        .count
+        .each_with_object({}) do |(date_value, total), result|
+          date = date_value.is_a?(Date) ? date_value : Date.parse(date_value.to_s)
+          result[date] = total
+        end
+    end
+
+    def trend_grouping_expression
+      Arel.sql(localized_created_at_date_sql)
+    end
+
     def trend_range
       @trend_range ||= Dashboard::TimeWindow.last_days(trend_days, now)
+    end
+
+    def localized_created_at_date_sql
+      column = "#{News.quoted_table_name}.#{News.connection.quote_column_name('created_at')}"
+      utc_zone = News.connection.quote('UTC')
+      local_zone_name = Time.zone.tzinfo&.identifier || Time.zone.name
+      local_zone = News.connection.quote(local_zone_name)
+
+      "DATE(((#{column}) AT TIME ZONE #{utc_zone}) AT TIME ZONE #{local_zone})"
     end
   end
 end

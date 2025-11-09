@@ -168,37 +168,35 @@ RSpec.describe ExternalAiService, type: :service do
   end
 
   describe 'fallback URL handling' do
-    let(:fallback_url) { 'http://ai-fallback.example.com' }
-    let!(:fallback_config) do
-      create(:ai_configuration, key: 'AI_MODULE_FALLBACK_BASE_URL', value: fallback_url, value_type: 'string',
-                                internal: true)
-    end
-
-    let(:ai_response) do
+    let(:fallback_setup) do
       {
-        'recibidas' => 1,
-        'procesadas' => 1,
-        'data' => [],
-        'errores' => []
+        url: 'http://ai-fallback.example.com',
+        response: {
+          'recibidas' => 1,
+          'procesadas' => 1,
+          'data' => [],
+          'errores' => []
+        }
       }
     end
-
-    let(:primary_health_status) { 200 }
-    let(:primary_health_body) { { status: 'ok' } }
+    let(:primary_health) { { status: 200, body: { status: 'ok' } } }
 
     before do
-      stub_health_check(base_url, status: primary_health_status, body: primary_health_body)
+      create(:ai_configuration, key: 'AI_MODULE_FALLBACK_BASE_URL', value: fallback_setup[:url], value_type: 'string',
+                                internal: true)
+      stub_health_check(base_url, status: primary_health[:status], body: primary_health[:body])
     end
 
     it 'uses the fallback URL when the primary connection fails' do
       stub_request(:post, "#{base_url}/procesar-noticias").to_raise(Faraday::ConnectionFailed)
-      stub_request(:post, "#{fallback_url}/procesar-noticias")
-        .to_return(status: 200, body: ai_response.to_json, headers: { 'Content-Type' => 'application/json' })
+      stub_request(:post, "#{fallback_setup[:url]}/procesar-noticias")
+        .to_return(status: 200, body: fallback_setup[:response].to_json,
+                   headers: { 'Content-Type' => 'application/json' })
 
       result = service.call
 
       expect(result[:ok]).to be true
-      expect(WebMock).to have_requested(:post, "#{fallback_url}/procesar-noticias")
+      expect(WebMock).to have_requested(:post, "#{fallback_setup[:url]}/procesar-noticias")
     end
 
     it 'does not use the fallback when the primary returns a non-success status' do
@@ -208,16 +206,16 @@ RSpec.describe ExternalAiService, type: :service do
 
       expect(result[:ok]).to be false
       expect(WebMock).to have_requested(:post, "#{base_url}/procesar-noticias")
-      expect(WebMock).not_to have_requested(:post, "#{fallback_url}/procesar-noticias")
+      expect(WebMock).not_to have_requested(:post, "#{fallback_setup[:url]}/procesar-noticias")
     end
 
     context 'when the primary health check fails' do
-      let(:primary_health_status) { 500 }
-      let(:primary_health_body) { { status: 'down' } }
+      let(:primary_health) { { status: 500, body: { status: 'down' } } }
 
       before do
-        stub_request(:post, "#{fallback_url}/procesar-noticias")
-          .to_return(status: 200, body: ai_response.to_json, headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "#{fallback_setup[:url]}/procesar-noticias")
+          .to_return(status: 200, body: fallback_setup[:response].to_json,
+                     headers: { 'Content-Type' => 'application/json' })
       end
 
       it 'skips the primary request and uses the fallback' do
@@ -225,7 +223,7 @@ RSpec.describe ExternalAiService, type: :service do
 
         expect(result[:ok]).to be true
         expect(WebMock).to have_requested(:get, "#{base_url}/health")
-        expect(WebMock).to have_requested(:post, "#{fallback_url}/procesar-noticias")
+        expect(WebMock).to have_requested(:post, "#{fallback_setup[:url]}/procesar-noticias")
         expect(WebMock).not_to have_requested(:post, "#{base_url}/procesar-noticias")
       end
     end

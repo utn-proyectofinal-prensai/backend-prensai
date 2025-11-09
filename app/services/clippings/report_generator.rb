@@ -35,20 +35,22 @@ module Clippings
 
     def metrics_payload
       metrics = Clippings::MetricsBuilder.call(clipping)
+      core_metrics_payload(metrics).merge(distribution_payload(metrics))
+    end
 
+    def period_payload(metrics)
       {
-        totalNoticias: metrics[:news_count],
-        temaSeleccionado: clipping.topic&.name,
-        fechaGeneracion: metrics[:generated_at],
-        periodo: {
-          fechaInicio: metrics.dig(:date_range, :from)&.to_s || clipping.start_date&.to_s,
-          fechaFin: metrics.dig(:date_range, :to)&.to_s || clipping.end_date&.to_s
-        },
-        valoraciones: valuations_payload(metrics[:valuation], metrics[:crisis]),
-        soportes: collection_payload(metrics.dig(:support_stats, :items)),
-        medios: collection_payload(metrics.dig(:media_stats, :items)),
-        menciones: mention_payload(metrics.dig(:mention_stats, :items))
+        fechaInicio: metric_start_date(metrics),
+        fechaFin: metric_end_date(metrics)
       }
+    end
+
+    def metric_start_date(metrics)
+      metrics.dig(:date_range, :from)&.to_s || clipping.start_date&.to_s
+    end
+
+    def metric_end_date(metrics)
+      metrics.dig(:date_range, :to)&.to_s || clipping.end_date&.to_s
     end
 
     def valuations_payload(valuation_metrics, crisis_flag)
@@ -80,6 +82,24 @@ module Clippings
           porcentaje: item[:percentage]
         }
       end
+    end
+
+    def core_metrics_payload(metrics)
+      {
+        totalNoticias: metrics[:news_count],
+        temaSeleccionado: clipping.topic&.name,
+        fechaGeneracion: metrics[:generated_at],
+        periodo: period_payload(metrics),
+        valoraciones: valuations_payload(metrics[:valuation], metrics[:crisis])
+      }
+    end
+
+    def distribution_payload(metrics)
+      {
+        soportes: collection_payload(metrics.dig(:support_stats, :items)),
+        medios: collection_payload(metrics.dig(:media_stats, :items)),
+        menciones: mention_payload(metrics.dig(:mention_stats, :items))
+      }
     end
 
     def count_percentage_payload(data)
