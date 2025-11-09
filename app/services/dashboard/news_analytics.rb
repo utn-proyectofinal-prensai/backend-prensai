@@ -118,10 +118,10 @@ module Dashboard
     end
 
     def localized_created_at_date_sql
-      # `created_at` is persisted in UTC; convert to the configured Time.zone before truncating
       column = "#{News.quoted_table_name}.#{News.connection.quote_column_name('created_at')}"
       utc_zone = News.connection.quote('UTC')
-      local_zone = News.connection.quote(Time.zone.tzinfo&.name || Time.zone.name)
+      local_zone_name = Time.zone.tzinfo&.identifier || Time.zone.name
+      local_zone = News.connection.quote(local_zone_name)
 
       "DATE(((#{column}) AT TIME ZONE #{utc_zone}) AT TIME ZONE #{local_zone})"
     end
