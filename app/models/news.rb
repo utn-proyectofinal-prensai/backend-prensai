@@ -14,7 +14,7 @@
 #  plain_text       :text
 #  political_factor :string
 #  publication_type :string
-#  quotation        :decimal(10, 2)   default(0.0)
+#  quotation        :decimal(15, 2)   default(0.0)
 #  section          :string
 #  support          :string           not null
 #  title            :string           not null
