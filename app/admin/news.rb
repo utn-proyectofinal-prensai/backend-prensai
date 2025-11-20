@@ -55,7 +55,5 @@ ActiveAdmin.register News do
       row :updated_at
       row :plain_text
     end
-
-    active_admin_comments
   end
 end
